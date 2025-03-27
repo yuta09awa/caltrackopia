@@ -1,7 +1,15 @@
 
 import { useState } from "react";
 import { Star, MapPin, Clock, Filter, ArrowUpDown } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
+// Update mock data to include images
 const mockLocations = [
   {
     id: "1",
@@ -14,6 +22,10 @@ const mockLocations = [
     price: "$",
     dietaryOptions: ["High Protein", "Low Fat"],
     cuisine: "American",
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
   },
   {
     id: "2",
@@ -26,6 +38,10 @@ const mockLocations = [
     price: "$$",
     dietaryOptions: ["High Fiber", "Vegan"],
     cuisine: "Various",
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
   },
   {
     id: "3",
@@ -38,6 +54,10 @@ const mockLocations = [
     price: "$$",
     dietaryOptions: ["High Protein", "Keto Friendly"],
     cuisine: "American",
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
   },
   {
     id: "4",
@@ -50,6 +70,10 @@ const mockLocations = [
     price: "$$$",
     dietaryOptions: ["Organic", "Vegan"],
     cuisine: "Various",
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
   },
   {
     id: "5",
@@ -62,6 +86,10 @@ const mockLocations = [
     price: "$",
     dietaryOptions: ["Low Fat", "High Fiber"],
     cuisine: "Mediterranean",
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
   },
 ];
 
@@ -114,42 +142,68 @@ const LocationList = () => {
             key={location.id}
             className="p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer"
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-medium">{location.name}</h4>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                  <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
-                    {location.type}
-                  </span>
-                  <span>•</span>
-                  <span>{location.price}</span>
-                  <span>•</span>
-                  <span>{location.distance}</span>
+            <div className="flex gap-4">
+              {/* Image Carousel */}
+              <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 relative">
+                <Carousel className="w-full h-full">
+                  <CarouselContent className="h-full">
+                    {location.images.map((image, index) => (
+                      <CarouselItem key={index} className="h-full">
+                        <div className="h-full rounded-md overflow-hidden">
+                          <img 
+                            src={image} 
+                            alt={`${location.name} image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="h-6 w-6 -left-3" />
+                  <CarouselNext className="h-6 w-6 -right-3" />
+                </Carousel>
+              </div>
+              
+              {/* Location Details */}
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-medium">{location.name}</h4>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                      <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                        {location.type}
+                      </span>
+                      <span>•</span>
+                      <span>{location.price}</span>
+                      <span>•</span>
+                      <span>{location.distance}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="font-medium">{location.rating}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="font-medium">{location.rating}</span>
-              </div>
-            </div>
-            
-            {/* Show dietary options */}
-            <div className="mt-1 flex flex-wrap gap-1">
-              {location.dietaryOptions && location.dietaryOptions.map((option, idx) => (
-                <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                  {option}
-                </span>
-              ))}
-            </div>
-            
-            <div className="mt-2 flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <MapPin className="w-3 h-3" />
-                <span>{location.address}</span>
-              </div>
-              <div className={`flex items-center gap-1 ${location.openNow ? 'text-green-600' : 'text-red-500'}`}>
-                <Clock className="w-3 h-3" />
-                <span>{location.openNow ? 'Open Now' : 'Closed'}</span>
+                
+                {/* Show dietary options */}
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {location.dietaryOptions && location.dietaryOptions.map((option, idx) => (
+                    <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                      {option}
+                    </span>
+                  ))}
+                </div>
+                
+                <div className="mt-2 flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <MapPin className="w-3 h-3" />
+                    <span>{location.address}</span>
+                  </div>
+                  <div className={`flex items-center gap-1 ${location.openNow ? 'text-green-600' : 'text-red-500'}`}>
+                    <Clock className="w-3 h-3" />
+                    <span>{location.openNow ? 'Open Now' : 'Closed'}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
