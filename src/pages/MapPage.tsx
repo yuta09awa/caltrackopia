@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Container from "@/components/ui/Container";
@@ -30,7 +30,7 @@ const MapPage = () => {
 
   // This would typically fetch from a geolocation API
   // For demo purposes, we're just setting a static location
-  useState(() => {
+  useEffect(() => {
     // Example: get user location then update cuisine options based on location
     // navigator.geolocation.getCurrentPosition((position) => {
     //   fetchCuisinesByLocation(position.coords.latitude, position.coords.longitude)
