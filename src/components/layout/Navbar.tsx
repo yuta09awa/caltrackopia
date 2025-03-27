@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, MapPin, Utensils, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
@@ -8,9 +8,10 @@ import Container from "../ui/Container";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/", icon: null },
     { name: "Map", path: "/map", icon: MapPin },
     { name: "Nutrition", path: "/nutrition", icon: Utensils },
   ];
@@ -27,7 +28,7 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-4",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-3",
         isScrolled
           ? "glass shadow-sm border-b border-gray-200/10"
           : "bg-transparent"
@@ -45,22 +46,29 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="flex items-center space-x-1 text-sm text-foreground/90 hover:text-primary transition-colors"
-              >
-                {item.icon && <item.icon className="w-4 h-4" />}
-                <span>{item.name}</span>
-              </Link>
+              item.icon ? (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                    location.pathname === item.path
+                      ? "bg-primary/10 text-primary"
+                      : "hover:bg-gray-100 text-gray-700"
+                  } transition-colors`}
+                  title={item.name}
+                >
+                  <item.icon className="w-5 h-5" />
+                </Link>
+              ) : null
             ))}
             <Link
               to="/account"
-              className="flex items-center justify-center rounded-full w-8 h-8 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              className="flex items-center justify-center rounded-full w-10 h-10 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              title="Account"
             >
-              <User className="w-4 h-4" />
+              <User className="w-5 h-5" />
             </Link>
           </div>
 
@@ -80,25 +88,31 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 glass animate-fade-in border-b border-gray-200/10">
-            <div className="flex flex-col space-y-4 px-6 py-5">
+            <div className="flex justify-around py-4">
               {menuItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="flex items-center space-x-2 text-base hover:text-primary"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.icon && <item.icon className="w-5 h-5" />}
-                  <span>{item.name}</span>
-                </Link>
+                item.icon ? (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`flex flex-col items-center p-2 rounded-lg ${
+                      location.pathname === item.path
+                        ? "bg-primary/10 text-primary"
+                        : "text-gray-700"
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <item.icon className="w-6 h-6 mb-1" />
+                    <span className="text-xs">{item.name}</span>
+                  </Link>
+                ) : null
               ))}
               <Link
                 to="/account"
-                className="flex items-center space-x-2 text-base hover:text-primary"
+                className="flex flex-col items-center p-2 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <User className="w-5 h-5" />
-                <span>Account</span>
+                <User className="w-6 h-6 mb-1" />
+                <span className="text-xs">Account</span>
               </Link>
             </div>
           </div>

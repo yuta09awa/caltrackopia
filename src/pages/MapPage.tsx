@@ -5,28 +5,71 @@ import Footer from "@/components/layout/Footer";
 import Container from "@/components/ui/Container";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
+import { Filter } from "lucide-react";
 
 const MapPage = () => {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <main className="flex-1 pt-24 pb-16">
+      <main className="flex-1 pt-16 pb-16">
         <Container>
-          <div className="mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold mb-2">Explore Nearby</h1>
-            <p className="text-muted-foreground">
-              Discover restaurants, grocery stores, and more with healthy options near you.
-            </p>
+          {/* Map Section */}
+          <div className="relative w-full h-[40vh] md:h-[50vh] mb-4 mt-2 rounded-xl overflow-hidden shadow-sm">
+            <MapView />
+            
+            {/* Floating Filter Button */}
+            <button 
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="absolute top-4 right-4 z-20 p-3 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+            >
+              <Filter className="w-5 h-5 text-gray-700" />
+            </button>
+            
+            {/* Filter Panel (shows when filter is clicked) */}
+            {isFilterOpen && (
+              <div className="absolute top-16 right-4 z-20 w-64 bg-white rounded-lg shadow-lg p-4 border border-gray-100 animate-fade-in">
+                <h3 className="font-medium mb-3">Filter Options</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1">Distance</label>
+                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
+                      <option>Any Distance</option>
+                      <option>Within 1 mile</option>
+                      <option>Within 5 miles</option>
+                      <option>Within 10 miles</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1">Category</label>
+                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
+                      <option>All Places</option>
+                      <option>Restaurants</option>
+                      <option>Grocery Stores</option>
+                      <option>Convenience Stores</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1">Rating</label>
+                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
+                      <option>Any Rating</option>
+                      <option>4+ Stars</option>
+                      <option>3+ Stars</option>
+                    </select>
+                  </div>
+                  <button className="w-full bg-primary text-white p-2 rounded-md text-sm mt-2">
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 animate-fade-in">
-              <MapView />
-            </div>
-            <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
-              <LocationList />
-            </div>
+          {/* Listings Section */}
+          <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <LocationList />
           </div>
         </Container>
       </main>
