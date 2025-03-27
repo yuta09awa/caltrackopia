@@ -1,30 +1,59 @@
 
-import { useState } from "react";
-import { Search, MapPin, Plus, Minus } from "lucide-react";
+import { useState, useCallback } from "react";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { Search, Plus, Minus } from "lucide-react";
+
+// The API key should ideally be in environment variables for production
+const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
+
+const containerStyle = {
+  width: '100%',
+  height: '100%'
+};
+
+const defaultCenter = {
+  lat: 37.7749, // San Francisco coordinates as default
+  lng: -122.4194
+};
 
 const MapView = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [zoom, setZoom] = useState(14);
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY
+  });
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
+
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  const handleZoomIn = () => {
+    if (map) {
+      const currentZoom = map.getZoom() || zoom;
+      map.setZoom(currentZoom + 1);
+      setZoom(currentZoom + 1);
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (map) {
+      const currentZoom = map.getZoom() || zoom;
+      if (currentZoom > 1) {
+        map.setZoom(currentZoom - 1);
+        setZoom(currentZoom - 1);
+      }
+    }
+  };
 
   return (
     <div className="relative w-full h-full bg-gray-100 overflow-hidden">
-      {/* Google Maps style background */}
-      <div className="absolute inset-0 bg-[#e8e8e8]">
-        <div className="absolute inset-0 opacity-50">
-          {/* Fake roads */}
-          <div className="absolute left-1/4 top-0 bottom-0 w-2 bg-white"></div>
-          <div className="absolute right-1/3 top-0 bottom-0 w-1 bg-white"></div>
-          <div className="absolute top-1/3 left-0 right-0 h-2 bg-white"></div>
-          <div className="absolute top-2/3 left-0 right-0 h-1 bg-white"></div>
-          
-          {/* Fake buildings */}
-          <div className="absolute left-[20%] top-[20%] w-10 h-10 bg-[#d4d4d4] rounded-sm"></div>
-          <div className="absolute left-[60%] top-[30%] w-14 h-8 bg-[#d4d4d4] rounded-sm"></div>
-          <div className="absolute left-[40%] top-[60%] w-12 h-12 bg-[#d4d4d4] rounded-sm"></div>
-          <div className="absolute left-[70%] top-[50%] w-8 h-16 bg-[#d4d4d4] rounded-sm"></div>
-          <div className="absolute left-[10%] top-[70%] w-16 h-10 bg-[#d4d4d4] rounded-sm"></div>
-        </div>
-      </div>
-
       {/* Search bar */}
       <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
         <div className="relative flex items-center w-full bg-white rounded-full shadow-md">
@@ -41,20 +70,42 @@ const MapView = () => {
         </div>
       </div>
 
-      {/* Map pin with current location */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="relative animate-pulse">
-          <MapPin className="w-8 h-8 text-primary" strokeWidth={2} />
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 w-2 h-2 bg-primary rounded-full"></div>
+      {/* Google Map */}
+      {isLoaded ? (
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={defaultCenter}
+          zoom={zoom}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+          options={{
+            zoomControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {/* Current location marker */}
+          <Marker position={defaultCenter} />
+        </GoogleMap>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <p>Loading map...</p>
         </div>
-      </div>
+      )}
 
       {/* Zoom controls */}
       <div className="absolute bottom-4 right-4 z-10 bg-white rounded-lg overflow-hidden shadow-md">
-        <button className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200">
+        <button 
+          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
+          onClick={handleZoomIn}
+        >
           <Plus className="w-5 h-5" />
         </button>
-        <button className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center">
+        <button 
+          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center"
+          onClick={handleZoomOut}
+        >
           <Minus className="w-5 h-5" />
         </button>
       </div>

@@ -13,10 +13,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const MapPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
+  const [cuisineOptions, setCuisineOptions] = useState([
+    { value: "all", label: "All Cuisines" },
+    { value: "american", label: "American" },
+    { value: "italian", label: "Italian" },
+    { value: "mexican", label: "Mexican" },
+    { value: "asian", label: "Asian" },
+    { value: "mediterranean", label: "Mediterranean" },
+  ]);
+  const isMobile = useIsMobile();
+
+  // This would typically fetch from a geolocation API
+  // For demo purposes, we're just setting a static location
+  useState(() => {
+    // Example: get user location then update cuisine options based on location
+    // navigator.geolocation.getCurrentPosition((position) => {
+    //   fetchCuisinesByLocation(position.coords.latitude, position.coords.longitude)
+    //     .then(data => setCuisineOptions(data));
+    // });
+
+    // Simulating different cuisine options based on location
+    const mockLocationBasedCuisines = [
+      { value: "all", label: "All Cuisines" },
+      { value: "american", label: "American" },
+      { value: "italian", label: "Italian" },
+      { value: "mexican", label: "Mexican" },
+      { value: "asian", label: "Asian" },
+      { value: "mediterranean", label: "Mediterranean" },
+      { value: "local", label: "Local Specialties" }, // Location-specific cuisine
+    ];
+    
+    setCuisineOptions(mockLocationBasedCuisines);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -82,12 +115,11 @@ const MapPage = () => {
                         <SelectValue placeholder="All Cuisines" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Cuisines</SelectItem>
-                        <SelectItem value="american">American</SelectItem>
-                        <SelectItem value="italian">Italian</SelectItem>
-                        <SelectItem value="mexican">Mexican</SelectItem>
-                        <SelectItem value="asian">Asian</SelectItem>
-                        <SelectItem value="mediterranean">Mediterranean</SelectItem>
+                        {cuisineOptions.map((cuisine) => (
+                          <SelectItem key={cuisine.value} value={cuisine.value}>
+                            {cuisine.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
