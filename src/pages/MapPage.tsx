@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import Container from "@/components/ui/Container";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
 import { Filter } from "lucide-react";
@@ -57,7 +55,7 @@ const MapPage = () => {
       
       <main className="flex-1 pt-16 pb-16">
         {/* Full-width map container */}
-        <div className="relative w-full h-[40vh] md:h-[50vh] mb-4">
+        <div className="relative w-full h-[40vh] md:h-[50vh]">
           <MapView />
           
           {/* Floating Filter Button */}
@@ -138,12 +136,10 @@ const MapPage = () => {
           )}
         </div>
         
-        <Container>
-          {/* Listings Section */}
-          <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-            <LocationList />
-          </div>
-        </Container>
+        {/* Listings Section - removed Container and padding */}
+        <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <LocationList />
+        </div>
       </main>
       
       <Footer />
