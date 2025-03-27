@@ -143,13 +143,13 @@ const LocationList = () => {
             className="p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer"
           >
             <div className="flex gap-4">
-              {/* Image Carousel */}
-              <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 relative">
+              {/* Image Carousel with floating controls */}
+              <div className="w-28 h-28 md:w-36 md:h-36 flex-shrink-0 relative overflow-hidden rounded-md">
                 <Carousel className="w-full h-full">
                   <CarouselContent className="h-full">
                     {location.images.map((image, index) => (
                       <CarouselItem key={index} className="h-full">
-                        <div className="h-full rounded-md overflow-hidden">
+                        <div className="h-full w-full overflow-hidden">
                           <img 
                             src={image} 
                             alt={`${location.name} image ${index + 1}`}
@@ -159,8 +159,9 @@ const LocationList = () => {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="h-6 w-6 -left-3" />
-                  <CarouselNext className="h-6 w-6 -right-3" />
+                  {/* Floating overlay navigation buttons */}
+                  <CarouselPrevious className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
+                  <CarouselNext className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
                 </Carousel>
               </div>
               
