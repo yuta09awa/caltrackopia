@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Star, MapPin, Clock, Filter, ArrowUpDown } from "lucide-react";
 import {
   Carousel,
@@ -97,6 +97,24 @@ const LocationList = () => {
   const [locations, setLocations] = useState(mockLocations);
   const [activeTab, setActiveTab] = useState<string>("all");
   
+  // Filter locations by type and sort by open status
+  const filteredAndSortedLocations = useMemo(() => {
+    let filtered = [...locations];
+    
+    if (activeTab === "restaurant") {
+      filtered = filtered.filter(loc => loc.type.toLowerCase() === "restaurant");
+    } else if (activeTab === "grocery") {
+      filtered = filtered.filter(loc => loc.type.toLowerCase() === "grocery");
+    }
+    
+    // Sort open locations first
+    return filtered.sort((a, b) => {
+      if (a.openNow && !b.openNow) return -1;
+      if (!a.openNow && b.openNow) return 1;
+      return 0;
+    });
+  }, [locations, activeTab]);
+  
   const filterByType = (type: string) => {
     setActiveTab(type);
   };
@@ -137,7 +155,7 @@ const LocationList = () => {
       </div>
       
       <div className="max-h-[500px] overflow-auto">
-        {locations.map((location) => (
+        {filteredAndSortedLocations.map((location) => (
           <div 
             key={location.id}
             className="p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer"
@@ -196,10 +214,6 @@ const LocationList = () => {
                 </div>
                 
                 <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                  <div className="flex items-center gap-0.5 sm:gap-1 text-muted-foreground">
-                    <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    <span className="truncate">{location.address}</span>
-                  </div>
                   <div className={`flex items-center gap-0.5 sm:gap-1 ${location.openNow ? 'text-green-600' : 'text-red-500'}`}>
                     <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     <span>{location.openNow ? 'Open Now' : 'Closed'}</span>
