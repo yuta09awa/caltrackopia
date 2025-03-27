@@ -231,12 +231,10 @@ const LocationList = () => {
             key={location.id}
             className="border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
           >
-            {/* Hazy overlay for closed locations */}
+            {/* Hazy overlay for closed locations - reduced opacity */}
             {!location.openNow && (
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center">
-                <div className="bg-black/60 text-white px-3 py-1 rounded-md text-sm font-medium">
-                  Closed
-                </div>
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10">
+                {/* Removed the "Closed" label */}
               </div>
             )}
             
