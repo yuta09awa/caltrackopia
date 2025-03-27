@@ -229,7 +229,7 @@ const LocationList = () => {
         {filteredAndSortedLocations.map((location) => (
           <div 
             key={location.id}
-            className="border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-2.5"
+            className="border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
           >
             {/* Hazy overlay for closed locations */}
             {!location.openNow && (
