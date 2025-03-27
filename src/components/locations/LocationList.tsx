@@ -11,6 +11,9 @@ const mockLocations = [
     distance: "0.3 mi",
     address: "123 Nutrition St",
     openNow: true,
+    price: "$",
+    dietaryOptions: ["High Protein", "Low Fat"],
+    cuisine: "American",
   },
   {
     id: "2",
@@ -20,6 +23,9 @@ const mockLocations = [
     distance: "0.5 mi",
     address: "456 Organic Ave",
     openNow: true,
+    price: "$$",
+    dietaryOptions: ["High Fiber", "Vegan"],
+    cuisine: "Various",
   },
   {
     id: "3",
@@ -29,6 +35,9 @@ const mockLocations = [
     distance: "0.8 mi",
     address: "789 Fitness Blvd",
     openNow: false,
+    price: "$$",
+    dietaryOptions: ["High Protein", "Keto Friendly"],
+    cuisine: "American",
   },
   {
     id: "4",
@@ -38,6 +47,9 @@ const mockLocations = [
     distance: "1.2 mi",
     address: "101 Wholesome Way",
     openNow: true,
+    price: "$$$",
+    dietaryOptions: ["Organic", "Vegan"],
+    cuisine: "Various",
   },
   {
     id: "5",
@@ -47,6 +59,9 @@ const mockLocations = [
     distance: "1.5 mi",
     address: "202 Salad Rd",
     openNow: true,
+    price: "$",
+    dietaryOptions: ["Low Fat", "High Fiber"],
+    cuisine: "Mediterranean",
   },
 ];
 
@@ -61,7 +76,7 @@ const LocationList = () => {
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="p-4 border-b border-border flex items-center justify-between">
-        <h3 className="font-medium">Nearby Locations</h3>
+        <h3 className="font-medium">Recommended Locations</h3>
         <div className="flex items-center gap-2">
           <button className="p-2 rounded-md hover:bg-muted transition-colors">
             <Filter className="w-4 h-4" />
@@ -107,6 +122,8 @@ const LocationList = () => {
                     {location.type}
                   </span>
                   <span>•</span>
+                  <span>{location.price}</span>
+                  <span>•</span>
                   <span>{location.distance}</span>
                 </div>
               </div>
@@ -114,6 +131,15 @@ const LocationList = () => {
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-medium">{location.rating}</span>
               </div>
+            </div>
+            
+            {/* Show dietary options */}
+            <div className="mt-1 flex flex-wrap gap-1">
+              {location.dietaryOptions && location.dietaryOptions.map((option, idx) => (
+                <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                  {option}
+                </span>
+              ))}
             </div>
             
             <div className="mt-2 flex items-center gap-4 text-sm">

@@ -34,30 +34,44 @@ const MapPage = () => {
                 <h3 className="font-medium mb-3">Filter Options</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-sm text-muted-foreground block mb-1">Distance</label>
+                    <label className="text-sm text-muted-foreground block mb-1">Price Range</label>
                     <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>Any Distance</option>
-                      <option>Within 1 mile</option>
-                      <option>Within 5 miles</option>
-                      <option>Within 10 miles</option>
+                      <option>Any Price</option>
+                      <option>$</option>
+                      <option>$$</option>
+                      <option>$$$</option>
+                      <option>$$$$</option>
                     </select>
                   </div>
                   <div>
-                    <label className="text-sm text-muted-foreground block mb-1">Category</label>
+                    <label className="text-sm text-muted-foreground block mb-1">Dietary Preferences</label>
                     <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>All Places</option>
-                      <option>Restaurants</option>
-                      <option>Grocery Stores</option>
-                      <option>Convenience Stores</option>
+                      <option>All Options</option>
+                      <option>High Protein</option>
+                      <option>High Fiber</option>
+                      <option>Low Fat</option>
+                      <option>Keto Friendly</option>
+                      <option>Vegan</option>
                     </select>
                   </div>
                   <div>
-                    <label className="text-sm text-muted-foreground block mb-1">Rating</label>
+                    <label className="text-sm text-muted-foreground block mb-1">Cuisine Type</label>
                     <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>Any Rating</option>
-                      <option>4+ Stars</option>
-                      <option>3+ Stars</option>
+                      <option>All Cuisines</option>
+                      <option>American</option>
+                      <option>Italian</option>
+                      <option>Mexican</option>
+                      <option>Asian</option>
+                      <option>Mediterranean</option>
                     </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1">Exclude Ingredients</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g., peanuts, gluten, MSG" 
+                      className="w-full p-2 rounded-md border border-gray-200 text-sm"
+                    />
                   </div>
                   <button className="w-full bg-primary text-white p-2 rounded-md text-sm mt-2">
                     Apply Filters
