@@ -6,9 +6,17 @@ import Container from "@/components/ui/Container";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
 import { Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MapPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [priceFilter, setPriceFilter] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -35,35 +43,53 @@ const MapPage = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm text-muted-foreground block mb-1">Price Range</label>
-                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>Any Price</option>
-                      <option>$</option>
-                      <option>$$</option>
-                      <option>$$$</option>
-                      <option>$$$$</option>
-                    </select>
+                    <div className="flex gap-2 mt-1">
+                      {['$', '$$', '$$$', '$$$$'].map((price) => (
+                        <button
+                          key={price}
+                          onClick={() => setPriceFilter(price === priceFilter ? null : price)}
+                          className={`flex-1 py-1 px-2 rounded-md border ${
+                            price === priceFilter
+                              ? 'bg-primary text-white border-primary'
+                              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                          } transition-colors text-center`}
+                        >
+                          {price}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground block mb-1">Dietary Preferences</label>
-                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>All Options</option>
-                      <option>High Protein</option>
-                      <option>High Fiber</option>
-                      <option>Low Fat</option>
-                      <option>Keto Friendly</option>
-                      <option>Vegan</option>
-                    </select>
+                    <Select>
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue placeholder="All Options" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Options</SelectItem>
+                        <SelectItem value="high-protein">High Protein</SelectItem>
+                        <SelectItem value="high-fiber">High Fiber</SelectItem>
+                        <SelectItem value="low-fat">Low Fat</SelectItem>
+                        <SelectItem value="keto">Keto Friendly</SelectItem>
+                        <SelectItem value="vegan">Vegan</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground block mb-1">Cuisine Type</label>
-                    <select className="w-full p-2 rounded-md border border-gray-200 text-sm">
-                      <option>All Cuisines</option>
-                      <option>American</option>
-                      <option>Italian</option>
-                      <option>Mexican</option>
-                      <option>Asian</option>
-                      <option>Mediterranean</option>
-                    </select>
+                    <Select>
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue placeholder="All Cuisines" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Cuisines</SelectItem>
+                        <SelectItem value="american">American</SelectItem>
+                        <SelectItem value="italian">Italian</SelectItem>
+                        <SelectItem value="mexican">Mexican</SelectItem>
+                        <SelectItem value="asian">Asian</SelectItem>
+                        <SelectItem value="mediterranean">Mediterranean</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground block mb-1">Exclude Ingredients</label>
