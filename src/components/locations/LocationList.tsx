@@ -230,7 +230,7 @@ const LocationList = () => {
         {filteredAndSortedLocations.map((location) => (
           <div 
             key={location.id}
-            className={`p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative`}
+            className="border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative"
           >
             {/* Hazy overlay for closed locations */}
             {!location.openNow && (
@@ -241,9 +241,9 @@ const LocationList = () => {
               </div>
             )}
             
-            <div className="flex gap-3 sm:gap-4">
-              {/* Image Carousel with floating controls */}
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 relative overflow-hidden rounded-md">
+            <div className="flex">
+              {/* Image Carousel with floating controls - maximized with less spacing */}
+              <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden">
                 <Carousel className="w-full h-full">
                   <CarouselContent className="h-full">
                     {location.images.map((image, index) => (
@@ -265,7 +265,7 @@ const LocationList = () => {
               </div>
               
               {/* Location Details */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 p-3 pl-3 sm:p-4 sm:pl-4">
                 <div className="flex justify-between items-start">
                   <div className="min-w-0">
                     <h4 className="font-medium text-sm sm:text-base truncate pr-2">{location.name}</h4>
