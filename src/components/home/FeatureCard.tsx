@@ -1,20 +1,25 @@
 
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 interface FeatureCardProps {
   title: string;
   description: string;
   icon: LucideIcon;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const FeatureCard = ({ title, description, icon: Icon, className }: FeatureCardProps) => {
+const FeatureCard = ({ title, description, icon: Icon, className, style }: FeatureCardProps) => {
   return (
-    <div className={cn(
-      "rounded-xl p-6 border border-border bg-background hover:shadow-md transition-all duration-300 hover-scale",
-      className
-    )}>
+    <div 
+      className={cn(
+        "rounded-xl p-6 border border-border bg-background hover:shadow-md transition-all duration-300 hover-scale",
+        className
+      )}
+      style={style}
+    >
       <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-5">
         <Icon className="w-6 h-6" />
       </div>
