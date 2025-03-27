@@ -120,16 +120,7 @@ const LocationList = () => {
 
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-          <button className="p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors">
-            <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-          <button className="p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors">
-            <ArrowUpDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-        </div>
-      </div>
+      
       
       <div className="flex border-b border-border">
         <button 
