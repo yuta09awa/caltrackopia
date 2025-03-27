@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Star, MapPin, Clock, Filter, ArrowUpDown } from "lucide-react";
 import {
@@ -158,7 +157,7 @@ const LocationList = () => {
         {filteredAndSortedLocations.map((location) => (
           <div 
             key={location.id}
-            className="p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer"
+            className={`p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer ${!location.openNow ? 'opacity-60' : ''}`}
           >
             <div className="flex gap-3 sm:gap-4">
               {/* Image Carousel with floating controls */}
@@ -214,10 +213,7 @@ const LocationList = () => {
                 </div>
                 
                 <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                  <div className={`flex items-center gap-0.5 sm:gap-1 ${location.openNow ? 'text-green-600' : 'text-red-500'}`}>
-                    <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    <span>{location.openNow ? 'Open Now' : 'Closed'}</span>
-                  </div>
+                  
                 </div>
               </div>
             </div>
