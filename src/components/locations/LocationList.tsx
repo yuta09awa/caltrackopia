@@ -230,8 +230,17 @@ const LocationList = () => {
         {filteredAndSortedLocations.map((location) => (
           <div 
             key={location.id}
-            className={`p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer ${!location.openNow ? 'opacity-60' : ''}`}
+            className={`p-3 sm:p-4 border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative`}
           >
+            {/* Hazy overlay for closed locations */}
+            {!location.openNow && (
+              <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                <div className="bg-black/60 text-white px-3 py-1 rounded-md text-sm font-medium">
+                  Closed
+                </div>
+              </div>
+            )}
+            
             <div className="flex gap-3 sm:gap-4">
               {/* Image Carousel with floating controls */}
               <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 flex-shrink-0 relative overflow-hidden rounded-md">
