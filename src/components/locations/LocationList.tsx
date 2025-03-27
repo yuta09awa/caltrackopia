@@ -1,5 +1,6 @@
+
 import { useState, useMemo } from "react";
-import { Star, MapPin, Clock, Filter, ArrowUpDown } from "lucide-react";
+import { Star, ArrowUpDown } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -7,6 +8,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 // Update mock data to include images
 const mockLocations = [
@@ -95,8 +103,9 @@ const mockLocations = [
 const LocationList = () => {
   const [locations, setLocations] = useState(mockLocations);
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [sortOption, setSortOption] = useState<string>("default");
   
-  // Filter locations by type and sort by open status
+  // Filter locations by type and sort by selected option
   const filteredAndSortedLocations = useMemo(() => {
     let filtered = [...locations];
     
@@ -106,13 +115,39 @@ const LocationList = () => {
       filtered = filtered.filter(loc => loc.type.toLowerCase() === "grocery");
     }
     
-    // Sort open locations first
-    return filtered.sort((a, b) => {
-      if (a.openNow && !b.openNow) return -1;
-      if (!a.openNow && b.openNow) return 1;
-      return 0;
-    });
-  }, [locations, activeTab]);
+    // Apply sorting based on selected option
+    switch (sortOption) {
+      case "rating-high":
+        return filtered.sort((a, b) => b.rating - a.rating);
+      case "rating-low":
+        return filtered.sort((a, b) => a.rating - b.rating);
+      case "distance-near":
+        return filtered.sort((a, b) => {
+          const distanceA = parseFloat(a.distance.replace(" mi", ""));
+          const distanceB = parseFloat(b.distance.replace(" mi", ""));
+          return distanceA - distanceB;
+        });
+      case "distance-far":
+        return filtered.sort((a, b) => {
+          const distanceA = parseFloat(a.distance.replace(" mi", ""));
+          const distanceB = parseFloat(b.distance.replace(" mi", ""));
+          return distanceB - distanceA;
+        });
+      case "open-first":
+        return filtered.sort((a, b) => {
+          if (a.openNow && !b.openNow) return -1;
+          if (!a.openNow && b.openNow) return 1;
+          return 0;
+        });
+      default:
+        // Default: open locations first
+        return filtered.sort((a, b) => {
+          if (a.openNow && !b.openNow) return -1;
+          if (!a.openNow && b.openNow) return 1;
+          return 0;
+        });
+    }
+  }, [locations, activeTab, sortOption]);
   
   const filterByType = (type: string) => {
     setActiveTab(type);
@@ -120,27 +155,75 @@ const LocationList = () => {
 
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
-      
-      
-      <div className="flex border-b border-border">
-        <button 
-          className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex-1 ${activeTab === 'all' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => filterByType('all')}
-        >
-          All
-        </button>
-        <button 
-          className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex-1 ${activeTab === 'restaurant' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => filterByType('restaurant')}
-        >
-          Restaurants
-        </button>
-        <button 
-          className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex-1 ${activeTab === 'grocery' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => filterByType('grocery')}
-        >
-          Groceries
-        </button>
+      <div className="flex items-center justify-between p-3 border-b border-border">
+        <div className="flex flex-1">
+          <button 
+            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'all' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => filterByType('all')}
+          >
+            All
+          </button>
+          <button 
+            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'restaurant' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => filterByType('restaurant')}
+          >
+            Restaurants
+          </button>
+          <button 
+            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'grocery' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+            onClick={() => filterByType('grocery')}
+          >
+            Groceries
+          </button>
+        </div>
+        
+        {/* Sort dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
+              <ArrowUpDown className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:text-xs">Sort</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem 
+              onClick={() => setSortOption("default")}
+              className={sortOption === "default" ? "bg-muted" : ""}
+            >
+              Default (Open first)
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSortOption("rating-high")}
+              className={sortOption === "rating-high" ? "bg-muted" : ""}
+            >
+              Highest Rated
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSortOption("rating-low")}
+              className={sortOption === "rating-low" ? "bg-muted" : ""}
+            >
+              Lowest Rated
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSortOption("distance-near")}
+              className={sortOption === "distance-near" ? "bg-muted" : ""}
+            >
+              Closest First
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSortOption("distance-far")}
+              className={sortOption === "distance-far" ? "bg-muted" : ""}
+            >
+              Farthest First
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => setSortOption("open-first")}
+              className={sortOption === "open-first" ? "bg-muted" : ""}
+            >
+              Open Now
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       
       <div className="max-h-[500px] overflow-auto">
