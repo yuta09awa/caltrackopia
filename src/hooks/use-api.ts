@@ -17,7 +17,11 @@ export function useApi<T = any>() {
 
   const execute = useCallback(async <R = T>(
     endpoint: string,
-    options: RequestInit = {},
+    options: {
+      method?: string;
+      headers?: Record<string, string>;
+      body?: any;
+    } = {},
     apiOptions: UseApiOptions<R> = {}
   ): Promise<R | undefined> => {
     setLoading(true);
