@@ -3,8 +3,11 @@ import { HttpClient } from './http_client';
 import { FetchHttpClient } from './fetch_http_client';
 import { AxiosHttpClient } from './axios_http_client';
 
+// Define a string literal type for supported HTTP client types
+type HttpClientType = 'fetch' | 'axios';
+
 // Default to fetch - this would typically come from environment variables
-const HTTP_CLIENT_TYPE = 'fetch'; 
+const HTTP_CLIENT_TYPE: HttpClientType = 'fetch'; 
 
 export class HttpClientFactory {
   static createHttpClient(baseURL?: string): HttpClient {
