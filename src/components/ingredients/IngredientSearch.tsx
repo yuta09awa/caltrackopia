@@ -9,11 +9,13 @@ import { Loading } from '@/components/ui/loading';
 interface IngredientSearchProps {
   onSelectIngredient?: (ingredient: Ingredient) => void;
   className?: string;
+  compact?: boolean; // New prop to support compact mode
 }
 
 const IngredientSearch: React.FC<IngredientSearchProps> = ({ 
   onSelectIngredient, 
-  className = '' 
+  className = '',
+  compact = false
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { 
@@ -55,6 +57,63 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm, searchIngredients]);
 
+  if (compact) {
+    return (
+      <div className={className}>
+        <div className="relative">
+          <Input
+            type="text"
+            placeholder="Search ingredient to find..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="w-full p-2 rounded-md border border-gray-200 text-sm"
+          />
+          {loading && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+        
+        {error && (
+          <div className="mt-1 text-xs text-destructive">
+            {error}
+          </div>
+        )}
+
+        {!loading && results.length > 0 && (
+          <div className="border rounded-md overflow-hidden mt-1">
+            <ul className="divide-y max-h-[150px] overflow-y-auto bg-white">
+              {results.map((ingredient) => (
+                <li
+                  key={ingredient.id}
+                  className="p-2 hover:bg-muted cursor-pointer transition-colors text-sm"
+                  onClick={() => handleSelectIngredient(ingredient)}
+                >
+                  <div className="font-medium">{ingredient.name}</div>
+                  {ingredient.locations && ingredient.locations.length > 0 && (
+                    <div className="text-xs text-primary flex items-center">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      <span>{ingredient.locations.length} location{ingredient.locations.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {!loading && !error && searchTerm && results.length === 0 && (
+          <div className="text-center p-1 text-muted-foreground text-xs mt-1">
+            No ingredients found
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original non-compact version
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="flex gap-2">

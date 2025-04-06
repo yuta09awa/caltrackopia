@@ -43,17 +43,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     <div className="absolute top-16 right-4 z-20 w-80 bg-white rounded-lg shadow-lg p-4 border border-gray-100 animate-fade-in max-h-[80vh] overflow-y-auto">
       <h3 className="font-medium mb-3">Filter Options</h3>
       
-      <Accordion type="single" collapsible defaultValue="ingredients" className="mb-3">
-        <AccordionItem value="ingredients">
-          <AccordionTrigger className="py-2 text-sm font-medium">Find Ingredients</AccordionTrigger>
-          <AccordionContent>
-            <div className="pt-2">
-              <IngredientSearch onSelectIngredient={onSelectIngredient} className="mb-0" />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
       <div className="space-y-3">
         <div>
           <label className="text-sm text-muted-foreground block mb-1">Price Range</label>
@@ -103,6 +92,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               ))}
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <label className="text-sm text-muted-foreground block mb-1">Find Ingredients</label>
+          <IngredientSearch 
+            onSelectIngredient={onSelectIngredient} 
+            className="p-0 m-0" 
+            compact={true}
+          />
         </div>
         <div>
           <label className="text-sm text-muted-foreground block mb-1">Exclude Ingredients</label>
