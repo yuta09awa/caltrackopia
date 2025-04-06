@@ -1,16 +1,12 @@
+
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
+import FilterPanel from "@/components/map/FilterPanel";
 import { Filter } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useAppStore } from "@/store/appStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const MapPage = () => {
@@ -24,18 +20,14 @@ const MapPage = () => {
     { value: "asian", label: "Asian" },
     { value: "mediterranean", label: "Mediterranean" },
   ]);
+  
+  const { mapFilters, updateMapFilters } = useAppStore();
   const isMobile = useIsMobile();
 
-  // This would typically fetch from a geolocation API
-  // For demo purposes, we're just setting a static location
+  // Load cuisine options based on location
   useEffect(() => {
-    // Example: get user location then update cuisine options based on location
-    // navigator.geolocation.getCurrentPosition((position) => {
-    //   fetchCuisinesByLocation(position.coords.latitude, position.coords.longitude)
-    //     .then(data => setCuisineOptions(data));
-    // });
-
-    // Simulating different cuisine options based on location
+    // This would typically fetch from a geolocation API
+    // For demo purposes, we're just setting a static location
     const mockLocationBasedCuisines = [
       { value: "all", label: "All Cuisines" },
       { value: "american", label: "American" },
@@ -43,11 +35,19 @@ const MapPage = () => {
       { value: "mexican", label: "Mexican" },
       { value: "asian", label: "Asian" },
       { value: "mediterranean", label: "Mediterranean" },
-      { value: "local", label: "Local Specialties" }, // Location-specific cuisine
+      { value: "local", label: "Local Specialties" },
     ];
     
     setCuisineOptions(mockLocationBasedCuisines);
   }, []);
+
+  const handleApplyFilters = () => {
+    updateMapFilters({
+      priceRange: priceFilter,
+    });
+    // Could also close the filter panel after applying
+    // setIsFilterOpen(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -66,77 +66,17 @@ const MapPage = () => {
             <Filter className="w-5 h-5 text-gray-700" />
           </button>
           
-          {/* Filter Panel (shows when filter is clicked) */}
-          {isFilterOpen && (
-            <div className="absolute top-16 right-4 z-20 w-64 bg-white rounded-lg shadow-lg p-4 border border-gray-100 animate-fade-in">
-              <h3 className="font-medium mb-3">Filter Options</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">Price Range</label>
-                  <div className="flex gap-2 mt-1">
-                    {['$', '$$', '$$$', '$$$$'].map((price) => (
-                      <button
-                        key={price}
-                        onClick={() => setPriceFilter(price === priceFilter ? null : price)}
-                        className={`flex-1 py-1 px-2 rounded-md border ${
-                          price === priceFilter
-                            ? 'bg-primary text-white border-primary'
-                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                        } transition-colors text-center`}
-                      >
-                        {price}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">Dietary Preferences</label>
-                  <Select>
-                    <SelectTrigger className="w-full text-sm">
-                      <SelectValue placeholder="All Options" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Options</SelectItem>
-                      <SelectItem value="high-protein">High Protein</SelectItem>
-                      <SelectItem value="high-fiber">High Fiber</SelectItem>
-                      <SelectItem value="low-fat">Low Fat</SelectItem>
-                      <SelectItem value="keto">Keto Friendly</SelectItem>
-                      <SelectItem value="vegan">Vegan</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">Cuisine Type</label>
-                  <Select>
-                    <SelectTrigger className="w-full text-sm">
-                      <SelectValue placeholder="All Cuisines" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cuisineOptions.map((cuisine) => (
-                        <SelectItem key={cuisine.value} value={cuisine.value}>
-                          {cuisine.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-1">Exclude Ingredients</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g., peanuts, gluten, MSG" 
-                    className="w-full p-2 rounded-md border border-gray-200 text-sm"
-                  />
-                </div>
-                <button className="w-full bg-primary text-white p-2 rounded-md text-sm mt-2">
-                  Apply Filters
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Filter Panel */}
+          <FilterPanel 
+            isOpen={isFilterOpen}
+            priceFilter={priceFilter}
+            setPriceFilter={setPriceFilter}
+            cuisineOptions={cuisineOptions}
+            onApplyFilters={handleApplyFilters}
+          />
         </div>
         
-        {/* Listings Section - removed Container and padding */}
+        {/* Listings Section */}
         <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
           <LocationList />
         </div>
