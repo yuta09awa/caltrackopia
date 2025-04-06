@@ -16,6 +16,7 @@ const MapPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
   const [showIngredientSearch, setShowIngredientSearch] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [cuisineOptions, setCuisineOptions] = useState([
     { value: "all", label: "All Cuisines" },
     { value: "american", label: "American" },
@@ -54,9 +55,13 @@ const MapPage = () => {
   };
 
   const handleSelectIngredient = (ingredient: Ingredient) => {
-    toast.success(`Selected: ${ingredient.name}`);
-    // Here you would typically do something with the selected ingredient
-    // For example, add it to a list of filters or display its details
+    setSelectedIngredient(ingredient);
+    
+    if (ingredient.locations && ingredient.locations.length > 0) {
+      toast.success(`Found ${ingredient.locations.length} locations for ${ingredient.name}`);
+    } else {
+      toast.info(`Selected: ${ingredient.name}`);
+    }
   };
 
   return (
@@ -66,7 +71,7 @@ const MapPage = () => {
       <main className="flex-1 pt-16 pb-16">
         {/* Full-width map container */}
         <div className="relative w-full h-[40vh] md:h-[50vh]">
-          <MapView />
+          <MapView selectedIngredient={selectedIngredient} />
           
           {/* Floating Filter Button */}
           <button 
@@ -91,7 +96,12 @@ const MapPage = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Find Locations by Ingredient</h2>
             <button
-              onClick={() => setShowIngredientSearch(!showIngredientSearch)}
+              onClick={() => {
+                setShowIngredientSearch(!showIngredientSearch);
+                if (!showIngredientSearch) {
+                  setSelectedIngredient(null);
+                }
+              }}
               className="text-sm text-primary hover:underline"
             >
               {showIngredientSearch ? "Hide Search" : "Search Ingredients"}
@@ -101,6 +111,50 @@ const MapPage = () => {
           {showIngredientSearch && (
             <div className="mb-6 p-4 bg-muted/50 rounded-lg">
               <IngredientSearch onSelectIngredient={handleSelectIngredient} />
+            </div>
+          )}
+
+          {/* Selected Ingredient Info */}
+          {selectedIngredient && (
+            <div className="mb-6 p-4 bg-primary/10 rounded-lg animate-fade-in">
+              <h3 className="font-medium text-lg mb-2">{selectedIngredient.name}</h3>
+              {selectedIngredient.description && (
+                <p className="text-sm text-muted-foreground mb-2">{selectedIngredient.description}</p>
+              )}
+              {selectedIngredient.nutrition && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+                  {selectedIngredient.nutrition.calories !== undefined && (
+                    <div className="bg-white p-2 rounded shadow-sm">
+                      <div className="font-medium">Calories</div>
+                      <div>{selectedIngredient.nutrition.calories}</div>
+                    </div>
+                  )}
+                  {selectedIngredient.nutrition.protein !== undefined && (
+                    <div className="bg-white p-2 rounded shadow-sm">
+                      <div className="font-medium">Protein</div>
+                      <div>{selectedIngredient.nutrition.protein}g</div>
+                    </div>
+                  )}
+                  {selectedIngredient.nutrition.carbs !== undefined && (
+                    <div className="bg-white p-2 rounded shadow-sm">
+                      <div className="font-medium">Carbs</div>
+                      <div>{selectedIngredient.nutrition.carbs}g</div>
+                    </div>
+                  )}
+                  {selectedIngredient.nutrition.fat !== undefined && (
+                    <div className="bg-white p-2 rounded shadow-sm">
+                      <div className="font-medium">Fat</div>
+                      <div>{selectedIngredient.nutrition.fat}g</div>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button 
+                onClick={() => setSelectedIngredient(null)} 
+                className="mt-4 text-sm text-primary hover:underline"
+              >
+                Clear Selection
+              </button>
             </div>
           )}
         </div>

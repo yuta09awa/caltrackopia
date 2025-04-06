@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useIngredientSearch, Ingredient } from '@/hooks/useIngredientSearch';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import { Loading } from '@/components/ui/loading';
 
 interface IngredientSearchProps {
@@ -16,7 +16,14 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
   className = '' 
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { results, loading, error, searchIngredients } = useIngredientSearch();
+  const { 
+    results, 
+    loading, 
+    error, 
+    searchIngredients,
+    selectedIngredient,
+    selectIngredient
+  } = useIngredientSearch();
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -27,6 +34,13 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
+    }
+  };
+
+  const handleSelectIngredient = (ingredient: Ingredient) => {
+    selectIngredient(ingredient);
+    if (onSelectIngredient) {
+      onSelectIngredient(ingredient);
     }
   };
 
@@ -77,12 +91,18 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
               <li
                 key={ingredient.id}
                 className="p-3 hover:bg-muted cursor-pointer transition-colors"
-                onClick={() => onSelectIngredient && onSelectIngredient(ingredient)}
+                onClick={() => handleSelectIngredient(ingredient)}
               >
                 <div className="font-medium">{ingredient.name}</div>
                 {ingredient.description && (
                   <div className="text-sm text-muted-foreground line-clamp-1">
                     {ingredient.description}
+                  </div>
+                )}
+                {ingredient.locations && ingredient.locations.length > 0 && (
+                  <div className="mt-1 text-xs text-primary flex items-center">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    <span>Available at {ingredient.locations.length} location{ingredient.locations.length !== 1 ? 's' : ''}</span>
                   </div>
                 )}
               </li>
