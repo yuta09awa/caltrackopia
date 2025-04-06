@@ -1,5 +1,6 @@
 
 import { toast } from "sonner";
+import { httpClient } from "./http_client/http_client_factory";
 
 type ApiOptions = {
   method?: string;
@@ -11,23 +12,25 @@ export async function apiRequest<T>(
   endpoint: string, 
   options: ApiOptions = {}
 ): Promise<T> {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-  
   try {
-    const response = await fetch(endpoint, {
-      method: options.method || 'GET',
-      headers,
-      ...(options.body ? { body: JSON.stringify(options.body) } : {}),
-    });
+    const method = options.method || 'GET';
     
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+    switch (method) {
+      case 'GET':
+        return await httpClient.get<T>(endpoint, options.headers);
+      case 'POST':
+        return await httpClient.post<T>(endpoint, options.body, options.headers);
+      case 'PUT':
+        return await httpClient.put<T>(endpoint, options.body, options.headers);
+      case 'DELETE':
+        return await httpClient.delete<T>(endpoint, options.headers);
+      default:
+        return await httpClient.request<T>(endpoint, {
+          method,
+          headers: options.headers,
+          body: options.body
+        });
     }
-    
-    return await response.json();
   } catch (error) {
     console.error('API request failed:', error);
     toast.error('Failed to fetch data. Please try again.');
