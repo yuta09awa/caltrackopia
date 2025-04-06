@@ -94,7 +94,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           </Select>
         </div>
         <div>
-          <label className="text-sm text-muted-foreground block mb-1">Find Ingredients</label>
+          <label className="text-sm text-muted-foreground block mb-1">Include Ingredients</label>
           <IngredientSearch 
             onSelectIngredient={onSelectIngredient} 
             className="p-0 m-0" 

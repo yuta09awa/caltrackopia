@@ -63,7 +63,7 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
         <div className="relative">
           <Input
             type="text"
-            placeholder="Search ingredient to find..."
+            placeholder="Search ingredients to include..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}
