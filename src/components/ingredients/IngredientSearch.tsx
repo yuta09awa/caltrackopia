@@ -71,9 +71,6 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
             <Search className="h-4 w-4" />
           </div>
         </div>
-        <Button onClick={handleSearch} disabled={loading || !searchTerm.trim()}>
-          Search
-        </Button>
       </div>
 
       {loading && <Loading text="Searching ingredients..." />}
@@ -86,7 +83,7 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
 
       {!loading && results.length > 0 && (
         <div className="border rounded-md overflow-hidden">
-          <ul className="divide-y">
+          <ul className="divide-y max-h-[200px] overflow-y-auto">
             {results.map((ingredient) => (
               <li
                 key={ingredient.id}
@@ -112,7 +109,7 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
       )}
 
       {!loading && !error && searchTerm && results.length === 0 && (
-        <div className="text-center p-4 text-muted-foreground">
+        <div className="text-center p-2 text-muted-foreground text-sm">
           No ingredients found matching "{searchTerm}"
         </div>
       )}

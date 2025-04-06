@@ -5,7 +5,6 @@ import Footer from "@/components/layout/Footer";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
 import FilterPanel from "@/components/map/FilterPanel";
-import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import { Filter } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,7 +14,6 @@ import { toast } from "sonner";
 const MapPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
-  const [showIngredientSearch, setShowIngredientSearch] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [cuisineOptions, setCuisineOptions] = useState([
     { value: "all", label: "All Cuisines" },
@@ -62,6 +60,9 @@ const MapPage = () => {
     } else {
       toast.info(`Selected: ${ingredient.name}`);
     }
+    
+    // Close filter panel after selection
+    setIsFilterOpen(false);
   };
 
   return (
@@ -88,76 +89,55 @@ const MapPage = () => {
             setPriceFilter={setPriceFilter}
             cuisineOptions={cuisineOptions}
             onApplyFilters={handleApplyFilters}
+            onSelectIngredient={handleSelectIngredient}
           />
         </div>
 
-        {/* Ingredient Search Section */}
-        <div className="max-w-4xl mx-auto px-4 pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Find Locations by Ingredient</h2>
-            <button
-              onClick={() => {
-                setShowIngredientSearch(!showIngredientSearch);
-                if (!showIngredientSearch) {
-                  setSelectedIngredient(null);
-                }
-              }}
-              className="text-sm text-primary hover:underline"
-            >
-              {showIngredientSearch ? "Hide Search" : "Search Ingredients"}
-            </button>
-          </div>
-          
-          {showIngredientSearch && (
-            <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-              <IngredientSearch onSelectIngredient={handleSelectIngredient} />
-            </div>
-          )}
-
-          {/* Selected Ingredient Info */}
-          {selectedIngredient && (
-            <div className="mb-6 p-4 bg-primary/10 rounded-lg animate-fade-in">
-              <h3 className="font-medium text-lg mb-2">{selectedIngredient.name}</h3>
-              {selectedIngredient.description && (
-                <p className="text-sm text-muted-foreground mb-2">{selectedIngredient.description}</p>
-              )}
-              {selectedIngredient.nutrition && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
-                  {selectedIngredient.nutrition.calories !== undefined && (
-                    <div className="bg-white p-2 rounded shadow-sm">
-                      <div className="font-medium">Calories</div>
-                      <div>{selectedIngredient.nutrition.calories}</div>
-                    </div>
-                  )}
-                  {selectedIngredient.nutrition.protein !== undefined && (
-                    <div className="bg-white p-2 rounded shadow-sm">
-                      <div className="font-medium">Protein</div>
-                      <div>{selectedIngredient.nutrition.protein}g</div>
-                    </div>
-                  )}
-                  {selectedIngredient.nutrition.carbs !== undefined && (
-                    <div className="bg-white p-2 rounded shadow-sm">
-                      <div className="font-medium">Carbs</div>
-                      <div>{selectedIngredient.nutrition.carbs}g</div>
-                    </div>
-                  )}
-                  {selectedIngredient.nutrition.fat !== undefined && (
-                    <div className="bg-white p-2 rounded shadow-sm">
-                      <div className="font-medium">Fat</div>
-                      <div>{selectedIngredient.nutrition.fat}g</div>
-                    </div>
-                  )}
-                </div>
-              )}
+        {/* Selected Ingredient Info - moved from separate section to appear always if ingredient is selected */}
+        {selectedIngredient && (
+          <div className="max-w-4xl mx-auto px-4 pt-6 mb-6 p-4 bg-primary/10 rounded-lg animate-fade-in">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-lg">{selectedIngredient.name}</h3>
               <button 
                 onClick={() => setSelectedIngredient(null)} 
-                className="mt-4 text-sm text-primary hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 Clear Selection
               </button>
             </div>
-          )}
-        </div>
+            {selectedIngredient.description && (
+              <p className="text-sm text-muted-foreground mb-2">{selectedIngredient.description}</p>
+            )}
+            {selectedIngredient.nutrition && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+                {selectedIngredient.nutrition.calories !== undefined && (
+                  <div className="bg-white p-2 rounded shadow-sm">
+                    <div className="font-medium">Calories</div>
+                    <div>{selectedIngredient.nutrition.calories}</div>
+                  </div>
+                )}
+                {selectedIngredient.nutrition.protein !== undefined && (
+                  <div className="bg-white p-2 rounded shadow-sm">
+                    <div className="font-medium">Protein</div>
+                    <div>{selectedIngredient.nutrition.protein}g</div>
+                  </div>
+                )}
+                {selectedIngredient.nutrition.carbs !== undefined && (
+                  <div className="bg-white p-2 rounded shadow-sm">
+                    <div className="font-medium">Carbs</div>
+                    <div>{selectedIngredient.nutrition.carbs}g</div>
+                  </div>
+                )}
+                {selectedIngredient.nutrition.fat !== undefined && (
+                  <div className="bg-white p-2 rounded shadow-sm">
+                    <div className="font-medium">Fat</div>
+                    <div>{selectedIngredient.nutrition.fat}g</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         
         {/* Listings Section */}
         <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
