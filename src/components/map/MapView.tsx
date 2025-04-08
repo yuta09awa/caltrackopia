@@ -1,8 +1,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { Search, Plus, Minus } from "lucide-react";
+import { Search, Plus, Minus, MapPin } from "lucide-react";
 import { Ingredient } from "@/hooks/useIngredientSearch";
+import { toast } from "sonner";
 
 // The API key should ideally be in environment variables for production
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
@@ -31,11 +32,50 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
     title: string;
   }>>([]);
   const [center, setCenter] = useState(defaultCenter);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: GOOGLE_MAPS_API_KEY
   });
+
+  // Get user's location on component mount
+  useEffect(() => {
+    const getUserLocation = () => {
+      setLocationLoading(true);
+      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userPos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            setUserLocation(userPos);
+            setCenter(userPos);
+            setLocationLoading(false);
+            toast.success("Using your current location");
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+            setLocationLoading(false);
+            toast.error("Couldn't access your location. Using default location.");
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        toast.error("Geolocation is not supported by your browser");
+        setLocationLoading(false);
+      }
+    };
+
+    getUserLocation();
+  }, []);
 
   // Update markers when selectedIngredient changes
   useEffect(() => {
@@ -63,20 +103,34 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         }
       }
     } else {
-      // Clear markers if no ingredient is selected
-      setMarkers([]);
-      setCenter(defaultCenter);
-      if (map) {
-        map.setCenter(defaultCenter);
+      // If no ingredient is selected, show user location if available
+      if (userLocation && map) {
+        setMarkers([]);
+        setCenter(userLocation);
+        map.setCenter(userLocation);
         setZoom(14);
         map.setZoom(14);
+      } else {
+        // Fall back to default center if no user location
+        setMarkers([]);
+        setCenter(defaultCenter);
+        if (map) {
+          map.setCenter(defaultCenter);
+          setZoom(14);
+          map.setZoom(14);
+        }
       }
     }
-  }, [selectedIngredient, map]);
+  }, [selectedIngredient, map, userLocation]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
-  }, []);
+    
+    // If user location is already available, center the map on it
+    if (userLocation) {
+      map.setCenter(userLocation);
+    }
+  }, [userLocation]);
 
   const onUnmount = useCallback(() => {
     setMap(null);
@@ -97,6 +151,52 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         map.setZoom(currentZoom - 1);
         setZoom(currentZoom - 1);
       }
+    }
+  };
+
+  const handleRecenterToUserLocation = () => {
+    if (userLocation && map) {
+      map.setCenter(userLocation);
+      setZoom(14);
+      map.setZoom(14);
+      toast.info("Map centered to your location");
+    } else {
+      getUserLocation();
+    }
+  };
+
+  // Function to get user location
+  const getUserLocation = () => {
+    setLocationLoading(true);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userPos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(userPos);
+          setCenter(userPos);
+          
+          if (map) {
+            map.setCenter(userPos);
+            setZoom(14);
+            map.setZoom(14);
+          }
+          
+          setLocationLoading(false);
+          toast.success("Using your current location");
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+          setLocationLoading(false);
+          toast.error("Couldn't access your location");
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser");
+      setLocationLoading(false);
     }
   };
 
@@ -147,6 +247,22 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
             fullscreenControl: false,
           }}
         >
+          {/* User location marker */}
+          {userLocation && (
+            <Marker
+              position={userLocation}
+              title="Your Location"
+              icon={{
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: "#4285F4",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+              }}
+            />
+          )}
+          
           {/* Render all location markers */}
           {markers.map((marker) => (
             <Marker
@@ -162,8 +278,8 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         </div>
       )}
 
-      {/* Zoom controls */}
-      <div className="absolute bottom-4 right-4 z-10 bg-white rounded-lg overflow-hidden shadow-md">
+      {/* Map controls */}
+      <div className="absolute bottom-4 right-4 z-10 bg-white rounded-lg overflow-hidden shadow-md flex flex-col">
         <button 
           className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
           onClick={handleZoomIn}
@@ -171,10 +287,17 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
           <Plus className="w-5 h-5" />
         </button>
         <button 
-          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center"
+          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
           onClick={handleZoomOut}
         >
           <Minus className="w-5 h-5" />
+        </button>
+        <button 
+          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center"
+          onClick={handleRecenterToUserLocation}
+          disabled={locationLoading}
+        >
+          <MapPin className={`w-5 h-5 ${locationLoading ? 'animate-pulse text-gray-400' : ''}`} />
         </button>
       </div>
     </div>
