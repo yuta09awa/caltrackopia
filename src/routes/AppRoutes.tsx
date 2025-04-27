@@ -6,16 +6,25 @@ import { AppRoute } from './types';
 
 // Helper function to recursively generate routes
 const generateRoutes = (routes: AppRoute[]): React.ReactNode => {
-  return routes.map((route) => (
-    <Route 
-      key={route.path}
-      path={route.path}
-      element={route.element}
-      index={route.index}
-    >
-      {route.children && generateRoutes(route.children)}
-    </Route>
-  ));
+  return routes.map((route) => {
+    // Create a clean props object without any undefined values
+    const routeProps: Record<string, any> = {
+      key: route.path,
+      path: route.path,
+      element: route.element,
+    };
+
+    // Only add the index prop if it's explicitly true
+    if (route.index === true) {
+      routeProps.index = true;
+    }
+
+    return (
+      <Route {...routeProps}>
+        {route.children && generateRoutes(route.children)}
+      </Route>
+    );
+  });
 };
 
 const AppRoutes: React.FC = () => {

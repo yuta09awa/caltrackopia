@@ -31,8 +31,8 @@ export function useIngredientSearch(
         description: 'Fresh locally grown kale',
         category: 'Vegetables',
         locations: [
-          { id: 'loc1', name: 'Farmers Market', lat: 37.7749, lng: -122.4194 },
-          { id: 'loc2', name: 'Green Grocery', lat: 37.7833, lng: -122.4167 }
+          { id: 'loc1', name: 'Farmers Market', address: '123 Market St', lat: 37.7749, lng: -122.4194 },
+          { id: 'loc2', name: 'Green Grocery', address: '456 Organic Ave', lat: 37.7833, lng: -122.4167 }
         ]
       },
       {
@@ -41,7 +41,7 @@ export function useIngredientSearch(
         description: 'Sustainably raised beef',
         category: 'Meat',
         locations: [
-          { id: 'loc3', name: 'Butcher Shop', lat: 37.7700, lng: -122.4200 }
+          { id: 'loc3', name: 'Butcher Shop', address: '789 Meat St', lat: 37.7700, lng: -122.4200 }
         ]
       },
       {
@@ -50,8 +50,8 @@ export function useIngredientSearch(
         description: 'Ripe Hass avocados',
         category: 'Fruits',
         locations: [
-          { id: 'loc4', name: 'Grocery Store', lat: 37.7800, lng: -122.4100 },
-          { id: 'loc5', name: 'Farmers Market', lat: 37.7749, lng: -122.4194 }
+          { id: 'loc4', name: 'Grocery Store', address: '101 Fresh Blvd', lat: 37.7800, lng: -122.4100 },
+          { id: 'loc5', name: 'Farmers Market', address: '123 Market St', lat: 37.7749, lng: -122.4194 }
         ]
       }
     ];
@@ -68,8 +68,10 @@ export function useIngredientSearch(
     queryKey: ['ingredients', 'search', searchOptions],
     queryFn: () => mockSearchIngredients(searchOptions.term),
     enabled: !!searchOptions.term && searchOptions.term.length > 2 && (options.enabled !== false),
-    onSuccess: options.onSuccess,
-    onError: options.onError,
+    meta: {
+      onSuccess: options.onSuccess,
+      onError: options.onError
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
   });

@@ -7,21 +7,23 @@ import { apiService, ApiMethod, ApiRequestOptions } from '@/services/api/apiServ
 interface UseApiOptions<TData = unknown, TError = Error, TVariables = unknown> {
   onSuccess?: (data: TData) => void;
   onError?: (error: TError) => void;
-  onSettled?: UseMutationOptions<TData, TError, TVariables>['onSettled'];
+  onSettled?: (data: TData | undefined, error: TError | null, variables: TVariables) => void;
 }
 
-export function useApi<TData = unknown, TError = Error, TVariables = unknown>(
-  options: UseApiOptions<TData, TError, TVariables> = {}
+type ApiExecuteVariables = {
+  endpoint: string;
+  options?: ApiRequestOptions;
+};
+
+export function useApi<TData = unknown, TError = Error, TVariables = ApiExecuteVariables>(
+  options: UseApiOptions<TData, TError, ApiExecuteVariables> = {}
 ) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<TError | null>(null);
   const queryClient = useQueryClient();
   
   // Setup mutation using React Query
-  const mutation = useMutation<TData, TError, {
-    endpoint: string;
-    options?: ApiRequestOptions;
-  }>({
+  const mutation = useMutation<TData, TError, ApiExecuteVariables>({
     mutationFn: async ({ endpoint, options }) => {
       return await apiService.request<TData>(endpoint, options);
     },
@@ -36,7 +38,11 @@ export function useApi<TData = unknown, TError = Error, TVariables = unknown>(
         options.onError(err);
       }
     },
-    onSettled: options.onSettled
+    onSettled: (data, err, variables) => {
+      if (options.onSettled) {
+        options.onSettled(data, err, variables);
+      }
+    }
   });
 
   const execute = useCallback(async (
