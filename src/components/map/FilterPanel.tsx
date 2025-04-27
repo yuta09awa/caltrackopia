@@ -113,17 +113,17 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 p-4 space-y-6 overflow-y-auto">
+      <div className="flex-1 space-y-4 p-3 overflow-y-auto">
         <div>
-          <label className="text-sm text-muted-foreground block mb-2">Price Range</label>
-          <div className="flex gap-2">
+          <label className="text-sm font-medium text-muted-foreground mb-2 block">Price Range</label>
+          <div className="flex gap-1">
             {['$', '$$', '$$$', '$$$$'].map((price) => (
               <button
                 key={price}
                 onClick={() => setPriceFilter(price === priceFilter ? null : price)}
-                className={`flex-1 py-1 px-2 rounded-md border ${
+                className={`flex-1 py-1 px-2 rounded-md border text-sm ${
                   price === priceFilter
-                    ? 'bg-primary text-primary-foreground border-primary'
+                    ? 'bg-green-500 text-white border-green-500'
                     : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                 } transition-colors text-center`}
               >
@@ -134,7 +134,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
 
         <div>
-          <label className="text-sm text-muted-foreground block mb-2">Cuisine Type</label>
+          <label className="text-sm font-medium text-muted-foreground mb-2 block">Cuisine Type</label>
           <Select
             value={mapFilters.cuisine}
             onValueChange={(value) => updateMapFilters({ cuisine: value })}
@@ -153,22 +153,23 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
 
         {filterCategories.map((category) => (
-          <div key={category.id} className="space-y-3">
-            <label className="text-sm text-muted-foreground block">
+          <div key={category.id} className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground block">
               {category.label}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-1">
               {category.options.map((option) => (
                 <label
                   key={option.id}
-                  className="flex items-center space-x-2 text-sm p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center space-x-2 text-sm p-1.5 rounded-md hover:bg-gray-50 cursor-pointer"
                 >
                   <Checkbox
                     id={option.id}
                     checked={(selectedFilters[category.id] || []).includes(option.id)}
                     onCheckedChange={() => handleCheckboxChange(category.id, option.id)}
+                    className="h-4 w-4 rounded-sm border-gray-300 text-green-500 focus:ring-green-500"
                   />
-                  <span>{option.label}</span>
+                  <span className="text-sm">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -177,17 +178,16 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 text-sm"
           onClick={clearAllFilters}
         >
-          <XCircle className="h-4 w-4" />
           Clear All Filters
         </Button>
       </div>
 
-      <div className="p-4 border-t">
-        <Card className="bg-primary/5 border-primary/10">
-          <CardContent className="p-4">
+      <div className="p-3 border-t bg-green-50/50">
+        <Card className="bg-white border-green-100">
+          <CardContent className="p-3">
             <p className="text-sm text-center text-muted-foreground">
               Connect with a Nutritionist
               <br />

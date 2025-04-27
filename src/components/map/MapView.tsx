@@ -1,9 +1,9 @@
-
 import { useState, useCallback, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { Search, Plus, Minus, MapPin } from "lucide-react";
+import { Plus, Minus, MapPin } from "lucide-react";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
+import { Search } from "lucide-react";
 
 // The API key should ideally be in environment variables for production
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
@@ -23,7 +23,6 @@ interface MapViewProps {
 }
 
 const MapView = ({ selectedIngredient }: MapViewProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [zoom, setZoom] = useState(14);
   const [markers, setMarkers] = useState<Array<{
@@ -202,25 +201,8 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
 
   return (
     <div className="relative w-full h-full bg-gray-100 overflow-hidden">
-      {/* Search bar */}
-      <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
-        <div className="relative flex items-center w-full bg-white rounded-full shadow-md">
-          <div className="flex-shrink-0 pl-4 pr-2 py-3">
-            <Search className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search locations..."
-            className="py-3 pl-0 pr-4 w-full bg-transparent focus:outline-none text-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Ingredient info if selected */}
       {selectedIngredient && (
-        <div className="absolute top-16 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
+        <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
           <div className="bg-white rounded-md shadow-md p-3">
             <h3 className="font-medium">{selectedIngredient.name}</h3>
             <p className="text-xs text-muted-foreground">
