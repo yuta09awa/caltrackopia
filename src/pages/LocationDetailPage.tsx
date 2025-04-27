@@ -30,8 +30,96 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 
+// Define types for our location data
+interface MenuCategory {
+  category: string;
+  items: MenuItem[];
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+  dietaryTags: string[];
+  rating: number;
+  thumbsUp: number;
+  thumbsDown: number;
+}
+
+interface NutritionItem {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber?: number;
+}
+
+interface FeaturedItem {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+  dietaryTags: string[];
+  rating: number;
+  thumbsUp: number;
+  thumbsDown: number;
+}
+
+interface Section {
+  name: string;
+  description: string;
+  popular: string[];
+}
+
+interface BaseLocation {
+  id: string;
+  name: string;
+  type: string;
+  rating: number;
+  distance: string;
+  address: string;
+  phone: string;
+  website: string;
+  openNow: boolean;
+  hours: { day: string; hours: string }[];
+  price: string;
+  dietaryOptions: string[];
+  cuisine: string;
+  description: string;
+  images: string[];
+}
+
+interface RestaurantLocation extends BaseLocation {
+  menu: MenuCategory[];
+  nutrition: {
+    show: boolean;
+    items: NutritionItem[];
+  };
+}
+
+interface GroceryLocation extends BaseLocation {
+  sections: Section[];
+  featuredItems: FeaturedItem[];
+}
+
+type Location = RestaurantLocation | GroceryLocation;
+
+// Function to check if location is a restaurant
+function isRestaurant(location: Location): location is RestaurantLocation {
+  return location.type === "Restaurant";
+}
+
+// Function to check if location is a grocery
+function isGrocery(location: Location): location is GroceryLocation {
+  return location.type === "Grocery";
+}
+
 // Mock data for locations
-const mockLocations = {
+const mockLocations: Record<string, Location> = {
   "1": {
     id: "1",
     name: "Healthy Greens Cafe",
@@ -425,7 +513,7 @@ const LocationDetailPage = () => {
               
               {/* Menu Tab */}
               <TabsContent value="menu" className="mt-4">
-                {location.type === "Restaurant" && location.menu && (
+                {isRestaurant(location) && location.menu && (
                   <Accordion type="single" collapsible className="w-full">
                     {location.menu.map((category) => (
                       <AccordionItem key={category.category} value={category.category}>
@@ -497,7 +585,7 @@ const LocationDetailPage = () => {
                   </Accordion>
                 )}
 
-                {location.type === "Grocery" && (
+                {isGrocery(location) && (
                   <>
                     <h3 className="text-lg font-medium mb-3">Featured Items</h3>
                     <div className="space-y-4">
@@ -629,7 +717,7 @@ const LocationDetailPage = () => {
                 <div className="space-y-4">
                   <div className="py-2 px-4 bg-muted/50 rounded-md">
                     <h3 className="font-medium">Nutritional Information</h3>
-                    {location.type === "Restaurant" && location.nutrition && location.nutrition.show && (
+                    {isRestaurant(location) && location.nutrition && location.nutrition.show && (
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -653,7 +741,7 @@ const LocationDetailPage = () => {
                         </TableBody>
                       </Table>
                     )}
-                    {(!location.nutrition || !location.nutrition.show) && (
+                    {(!isRestaurant(location) || (isRestaurant(location) && (!location.nutrition || !location.nutrition.show))) && (
                       <p className="text-sm text-muted-foreground mt-2">
                         Detailed nutritional information is being added soon.
                       </p>
@@ -697,3 +785,4 @@ const LocationDetailPage = () => {
 };
 
 export default LocationDetailPage;
+
