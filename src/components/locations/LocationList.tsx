@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sort, Filter } from "lucide-react";
+import { ArrowDownAZ, Filter } from "lucide-react";
 import LocationCard from './LocationCard';
 import { useDebounce } from "@/hooks/use-debounce";
 import { Ingredient } from "@/hooks/useIngredientSearch";
@@ -119,7 +120,7 @@ const LocationList = () => {
               variant="outline"
               onClick={() => handleSort(sortBy === "distance" ? "price" : "distance")}
             >
-              <Sort className="w-4 h-4 mr-2" />
+              <ArrowDownAZ className="w-4 h-4 mr-2" />
               Sort by {sortBy === "distance" ? "Price" : "Distance"}
             </Button>
 
