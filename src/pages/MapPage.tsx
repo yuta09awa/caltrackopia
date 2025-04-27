@@ -75,7 +75,7 @@ const MapPage = () => {
           </div>
         </Navbar>
         
-        <div className="flex-1 pt-16 pb-16 relative flex w-full">
+        <div className="flex-1 pt-16 pb-16 relative flex">
           <MapSidebar
             priceFilter={priceFilter}
             setPriceFilter={setPriceFilter}
@@ -83,7 +83,7 @@ const MapPage = () => {
             onApplyFilters={handleApplyFilters}
           />
           
-          <main className="flex-1 flex flex-col w-full overflow-hidden">
+          <main className="flex-1 flex flex-col">
             <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
               <MapView selectedIngredient={selectedIngredient} />
               
