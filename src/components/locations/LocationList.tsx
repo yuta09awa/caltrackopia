@@ -17,6 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppStore } from "@/store/appStore";
+import IngredientSearch from "@/components/ingredients/IngredientSearch";
+import CuisineFilter from "@/components/map/filters/CuisineFilter";
 
 // Update mock data to include images
 const mockLocations = [
@@ -159,25 +161,57 @@ const LocationList = () => {
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="flex items-center justify-between p-3 border-b border-border">
-        <div className="flex flex-1">
-          <button 
-            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'all' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => filterByType('all')}
-          >
-            All
-          </button>
-          <button 
-            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'restaurant' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => filterByType('restaurant')}
-          >
-            Restaurants
-          </button>
-          <button 
-            className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'grocery' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-            onClick={() => filterByType('grocery')}
-          >
-            Groceries
-          </button>
+        <div className="flex flex-1 items-center gap-2">
+          {/* Include Ingredients Search */}
+          <IngredientSearch
+            compact={true}
+            className="w-40 sm:w-48"
+            onSelectIngredient={(ingredient) => {
+              // Handle included ingredient selection
+            }}
+          />
+
+          {/* Exclude Ingredients Search */}
+          <IngredientSearch
+            compact={true}
+            className="w-40 sm:w-48"
+            onSelectIngredient={(ingredient) => {
+              // Handle excluded ingredient selection
+            }}
+          />
+
+          {/* Cuisine Type Dropdown */}
+          <CuisineFilter
+            cuisineOptions={[
+              { value: "all", label: "All Cuisines" },
+              { value: "american", label: "American" },
+              { value: "mediterranean", label: "Mediterranean" },
+              { value: "asian", label: "Asian" },
+              { value: "italian", label: "Italian" },
+            ]}
+          />
+
+          {/* Tab buttons for All/Restaurant/Groceries */}
+          <div className="flex">
+            <button 
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'all' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+              onClick={() => filterByType('all')}
+            >
+              All
+            </button>
+            <button 
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'restaurant' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+              onClick={() => filterByType('restaurant')}
+            >
+              Restaurants
+            </button>
+            <button 
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'grocery' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+              onClick={() => filterByType('grocery')}
+            >
+              Groceries
+            </button>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -192,39 +226,61 @@ const LocationList = () => {
             <DropdownMenuContent align="end" className="w-56">
               <div className="p-2">
                 <div className="space-y-4">
-                  {/* Price Range */}
+                  {/* Ingredient Sources */}
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Price Range</label>
-                    <div className="flex gap-1">
-                      {['$', '$$', '$$$', '$$$$'].map((price) => (
-                        <button
-                          key={price}
-                          onClick={() => updateMapFilters({ priceRange: price === mapFilters.priceRange ? null : price })}
-                          className={`flex-1 py-1 px-2 rounded-md border text-sm ${
-                            price === mapFilters.priceRange
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'bg-background text-foreground border-input hover:bg-accent'
-                          } transition-colors text-center`}
-                        >
-                          {price}
-                        </button>
+                    <label className="text-sm font-medium mb-2 block">Ingredient Sources</label>
+                    <div className="grid grid-cols-2 gap-1">
+                      {['organic', 'local', 'seasonal', 'sustainable'].map((option) => (
+                        <label key={option} className="flex items-center gap-2">
+                          <Checkbox
+                            checked={mapFilters.sources.includes(option)}
+                            onCheckedChange={(checked) => {
+                              const newSources = checked
+                                ? [...mapFilters.sources, option]
+                                : mapFilters.sources.filter(s => s !== option);
+                              updateMapFilters({ sources: newSources });
+                            }}
+                          />
+                          <span className="text-sm capitalize">{option}</span>
+                        </label>
                       ))}
                     </div>
                   </div>
 
-                  {/* Dietary Options */}
+                  {/* Nutrition Focus */}
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Dietary</label>
+                    <label className="text-sm font-medium mb-2 block">Nutrition Focus</label>
+                    <div className="grid grid-cols-2 gap-1">
+                      {['high-protein', 'low-carb', 'low-fat', 'keto'].map((option) => (
+                        <label key={option} className="flex items-center gap-2">
+                          <Checkbox
+                            checked={mapFilters.nutrition.includes(option)}
+                            onCheckedChange={(checked) => {
+                              const newNutrition = checked
+                                ? [...mapFilters.nutrition, option]
+                                : mapFilters.nutrition.filter(n => n !== option);
+                              updateMapFilters({ nutrition: newNutrition });
+                            }}
+                          />
+                          <span className="text-sm capitalize">{option.replace('-', ' ')}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dietary Restrictions */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Dietary Restrictions</label>
                     <div className="grid grid-cols-2 gap-1">
                       {['vegan', 'vegetarian', 'gluten-free', 'dairy-free'].map((option) => (
                         <label key={option} className="flex items-center gap-2">
                           <Checkbox
                             checked={mapFilters.dietary.includes(option)}
                             onCheckedChange={(checked) => {
-                              const newFilters = checked
+                              const newDietary = checked
                                 ? [...mapFilters.dietary, option]
-                                : mapFilters.dietary.filter(f => f !== option);
-                              updateMapFilters({ dietary: newFilters });
+                                : mapFilters.dietary.filter(d => d !== option);
+                              updateMapFilters({ dietary: newDietary });
                             }}
                           />
                           <span className="text-sm capitalize">{option}</span>
