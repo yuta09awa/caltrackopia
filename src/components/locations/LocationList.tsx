@@ -161,7 +161,7 @@ const LocationList = () => {
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="flex items-center justify-between p-3 border-b border-border">
-        <div className="flex flex-1 items-center gap-2">
+        <div className="flex items-center gap-2">
           {/* Tab buttons for All/Restaurant/Groceries */}
           <div className="flex mr-4">
             <button 
@@ -183,20 +183,19 @@ const LocationList = () => {
               Groceries
             </button>
           </div>
-
+        </div>
+        
+        <div className="flex items-center gap-2">
           {/* Cuisine Type Dropdown */}
           <CuisineFilter
             cuisineOptions={[
-              { value: "all", label: "Cuisine Type" },
               { value: "american", label: "American" },
               { value: "mediterranean", label: "Mediterranean" },
               { value: "asian", label: "Asian" },
               { value: "italian", label: "Italian" },
             ]}
           />
-        </div>
-        
-        <div className="flex items-center gap-2">
+
           {/* Filter Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -208,31 +207,6 @@ const LocationList = () => {
             <DropdownMenuContent align="end" className="w-72">
               <div className="p-2">
                 <div className="space-y-4">
-                  {/* Include Ingredients Search */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
-                    <IngredientSearch
-                      compact={true}
-                      className="w-full"
-                      onSelectIngredient={(ingredient) => {
-                        // Handle included ingredient selection
-                      }}
-                    />
-                  </div>
-
-                  {/* Exclude Ingredients Search */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
-                    <IngredientSearch
-                      compact={true}
-                      className="w-full"
-                      onSelectIngredient={(ingredient) => {
-                        // Handle excluded ingredient selection
-                      }}
-                    />
-                  </div>
-
-                  {/* Rest of the filter options */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Ingredient Sources</label>
                     <div className="grid grid-cols-2 gap-1">
@@ -293,6 +267,32 @@ const LocationList = () => {
                         </label>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Include Ingredients Search */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
+                    <IngredientSearch
+                      compact={true}
+                      className="w-full"
+                      placeholder="Search ingredients to include..."
+                      onSelectIngredient={(ingredient) => {
+                        // Handle included ingredient selection
+                      }}
+                    />
+                  </div>
+
+                  {/* Exclude Ingredients Search */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
+                    <IngredientSearch
+                      compact={true}
+                      className="w-full"
+                      placeholder="Search ingredients to exclude..."
+                      onSelectIngredient={(ingredient) => {
+                        // Handle excluded ingredient selection
+                      }}
+                    />
                   </div>
                 </div>
               </div>

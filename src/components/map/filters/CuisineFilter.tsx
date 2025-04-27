@@ -15,7 +15,7 @@ interface CuisineFilterProps {
 
 const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const cuisineValue = mapFilters.cuisine || "all";
+  const cuisineValue = mapFilters.cuisine || "";
 
   return (
     <div>
@@ -23,12 +23,12 @@ const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
         value={cuisineValue}
         onValueChange={(value) => updateMapFilters({ cuisine: value })}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-[140px] h-8">
           <SelectValue placeholder="Cuisine Type" />
         </SelectTrigger>
         <SelectContent>
           {cuisineOptions.map((cuisine) => (
-            <SelectItem key={cuisine.value} value={cuisine.value || "all"}>
+            <SelectItem key={cuisine.value} value={cuisine.value}>
               {cuisine.label}
             </SelectItem>
           ))}
