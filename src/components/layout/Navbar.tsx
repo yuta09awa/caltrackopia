@@ -43,8 +43,8 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
             aria-label="Home"
           >
             <img 
-              src="/lovable-uploads/4f7dca84-f83b-4674-b6e1-991e27befcd3.png" 
-              alt="Nutrackr" 
+              src="/lovable-uploads/0b3bf1b1-20e6-4b84-a220-f978cdf6b783.png" 
+              alt="Recipe Book" 
               className="h-10 w-auto" 
             />
           </Link>
