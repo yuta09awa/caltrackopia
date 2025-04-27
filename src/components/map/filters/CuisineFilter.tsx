@@ -18,23 +18,21 @@ const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
   const cuisineValue = mapFilters.cuisine || "";
 
   return (
-    <div>
-      <Select
-        value={cuisineValue}
-        onValueChange={(value) => updateMapFilters({ cuisine: value })}
-      >
-        <SelectTrigger className="w-[140px] h-8">
-          <SelectValue placeholder="Cuisine Type" />
-        </SelectTrigger>
-        <SelectContent>
-          {cuisineOptions.map((cuisine) => (
-            <SelectItem key={cuisine.value} value={cuisine.value}>
-              {cuisine.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={cuisineValue}
+      onValueChange={(value) => updateMapFilters({ cuisine: value })}
+    >
+      <SelectTrigger className="w-[140px] h-8">
+        <SelectValue placeholder="Cuisine" />
+      </SelectTrigger>
+      <SelectContent>
+        {cuisineOptions.map((cuisine) => (
+          <SelectItem key={cuisine.value} value={cuisine.value}>
+            {cuisine.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
 

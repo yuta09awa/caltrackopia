@@ -2,7 +2,6 @@
 import React from 'react';
 import { ArrowUpDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +11,7 @@ import {
 import { useAppStore } from "@/store/appStore";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import CuisineFilter from "@/components/map/filters/CuisineFilter";
+import OpenNowFilter from "@/features/locations/components/OpenNowFilter";
 import { SortOption } from '../hooks/useLocations';
 
 interface LocationFiltersProps {
@@ -21,10 +21,19 @@ interface LocationFiltersProps {
 
 const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOption }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
+  const [isOpenNow, setIsOpenNow] = React.useState(false);
+
+  const handleOpenNowChange = (checked: boolean) => {
+    setIsOpenNow(checked);
+    if (checked) {
+      setSortOption("open-first");
+    }
+  };
 
   return (
     <div className="flex items-center gap-2">
-      {/* Cuisine Type Dropdown */}
+      <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
+      
       <CuisineFilter
         cuisineOptions={[
           { value: "american", label: "American" },
@@ -34,7 +43,6 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
         ]}
       />
 
-      {/* Filter Button */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
@@ -45,27 +53,7 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
         <DropdownMenuContent align="end" className="w-72">
           <div className="p-2">
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Ingredient Sources</label>
-                <div className="grid grid-cols-2 gap-1">
-                  {['organic', 'local', 'seasonal', 'sustainable'].map((option) => (
-                    <label key={option} className="flex items-center gap-2">
-                      <Checkbox
-                        checked={mapFilters.sources.includes(option)}
-                        onCheckedChange={(checked) => {
-                          const newSources = checked
-                            ? [...mapFilters.sources, option]
-                            : mapFilters.sources.filter(s => s !== option);
-                          updateMapFilters({ sources: newSources });
-                        }}
-                      />
-                      <span className="text-sm capitalize">{option}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Nutrition Focus */}
+              {/* Nutrition Focus Section */}
               <div>
                 <label className="text-sm font-medium mb-2 block">Nutrition Focus</label>
                 <div className="grid grid-cols-2 gap-1">
@@ -107,12 +95,33 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
                 </div>
               </div>
 
+              {/* Ingredient Sources */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Ingredient Sources</label>
+                <div className="grid grid-cols-2 gap-1">
+                  {['organic', 'local', 'seasonal', 'sustainable'].map((option) => (
+                    <label key={option} className="flex items-center gap-2">
+                      <Checkbox
+                        checked={mapFilters.sources.includes(option)}
+                        onCheckedChange={(checked) => {
+                          const newSources = checked
+                            ? [...mapFilters.sources, option]
+                            : mapFilters.sources.filter(s => s !== option);
+                          updateMapFilters({ sources: newSources });
+                        }}
+                      />
+                      <span className="text-sm capitalize">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               {/* Ingredients Search Section */}
               <div className="space-y-4">
                 <IngredientSearch
                   compact={true}
                   className="w-full"
-                  placeholder="Search ingredients to include..."
+                  placeholder="Include..."
                   onSelectIngredient={(ingredient) => {
                     // Handle included ingredient selection
                   }}
@@ -121,7 +130,7 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
                 <IngredientSearch
                   compact={true}
                   className="w-full"
-                  placeholder="Search ingredients to exclude..."
+                  placeholder="Exclude..."
                   onSelectIngredient={(ingredient) => {
                     // Handle excluded ingredient selection
                   }}
@@ -145,7 +154,7 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
             onClick={() => setSortOption("default")}
             className={sortOption === "default" ? "bg-muted" : ""}
           >
-            Default (Open first)
+            Default
           </DropdownMenuItem>
           <DropdownMenuItem 
             onClick={() => setSortOption("rating-high")}
@@ -170,12 +179,6 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
             className={sortOption === "distance-far" ? "bg-muted" : ""}
           >
             Farthest First
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => setSortOption("open-first")}
-            className={sortOption === "open-first" ? "bg-muted" : ""}
-          >
-            Open Now
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
