@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, ArrowUpDown, Filter } from "lucide-react";
@@ -190,14 +191,14 @@ const LocationList = () => {
           <div className="flex items-center justify-between gap-2">
             {/* Price Range Dropdown */}
             <Select
-              value={priceFilter || ""}
-              onValueChange={(value) => setPriceFilter(value === "" ? null : value)}
+              value={priceFilter || "all"}
+              onValueChange={(value) => setPriceFilter(value === "all" ? null : value)}
             >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Price Range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Prices</SelectItem>
+                <SelectItem value="all">All Prices</SelectItem>
                 <SelectItem value="$">$</SelectItem>
                 <SelectItem value="$$">$$</SelectItem>
                 <SelectItem value="$$$">$$$</SelectItem>
@@ -257,14 +258,14 @@ const LocationList = () => {
 
               {/* Nutrition Focus */}
               <Select
-                value={mapFilters.nutrition[0] || ""}
-                onValueChange={(value) => updateMapFilters({ nutrition: value ? [value] : [] })}
+                value={mapFilters.nutrition[0] || "all"}
+                onValueChange={(value) => updateMapFilters({ nutrition: value === "all" ? [] : [value] })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Nutrition Focus" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="all">Any</SelectItem>
                   <SelectItem value="high-protein">High Protein</SelectItem>
                   <SelectItem value="low-carb">Low Carb</SelectItem>
                   <SelectItem value="keto">Keto Friendly</SelectItem>
@@ -274,14 +275,14 @@ const LocationList = () => {
 
               {/* Sources */}
               <Select
-                value={mapFilters.sources[0] || ""}
-                onValueChange={(value) => updateMapFilters({ sources: value ? [value] : [] })}
+                value={mapFilters.sources[0] || "all"}
+                onValueChange={(value) => updateMapFilters({ sources: value === "all" ? [] : [value] })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Ingredient Sources" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="all">Any</SelectItem>
                   <SelectItem value="organic">Organic</SelectItem>
                   <SelectItem value="local">Local</SelectItem>
                   <SelectItem value="sustainable">Sustainable</SelectItem>
