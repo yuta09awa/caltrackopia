@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Star, ArrowUpDown } from "lucide-react";
+import { Star, ArrowUpDown, Filter } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useAppStore } from "@/store/appStore";
 
 // Update mock data to include images
 const mockLocations = [
@@ -103,6 +105,7 @@ const LocationList = () => {
   const [locations, setLocations] = useState(mockLocations);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>("default");
+  const { mapFilters, updateMapFilters } = useAppStore();
   
   // Filter locations by type and sort by selected option
   const filteredAndSortedLocations = useMemo(() => {
@@ -176,53 +179,111 @@ const LocationList = () => {
           </button>
         </div>
         
-        {/* Sort dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
-              <ArrowUpDown className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:text-xs">Sort</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem 
-              onClick={() => setSortOption("default")}
-              className={sortOption === "default" ? "bg-muted" : ""}
-            >
-              Default (Open first)
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSortOption("rating-high")}
-              className={sortOption === "rating-high" ? "bg-muted" : ""}
-            >
-              Highest Rated
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSortOption("rating-low")}
-              className={sortOption === "rating-low" ? "bg-muted" : ""}
-            >
-              Lowest Rated
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSortOption("distance-near")}
-              className={sortOption === "distance-near" ? "bg-muted" : ""}
-            >
-              Closest First
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSortOption("distance-far")}
-              className={sortOption === "distance-far" ? "bg-muted" : ""}
-            >
-              Farthest First
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSortOption("open-first")}
-              className={sortOption === "open-first" ? "bg-muted" : ""}
-            >
-              Open Now
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          {/* Filter Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
+                <Filter className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:text-xs">Filter</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="p-2">
+                <div className="space-y-4">
+                  {/* Price Range */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Price Range</label>
+                    <div className="flex gap-1">
+                      {['$', '$$', '$$$', '$$$$'].map((price) => (
+                        <button
+                          key={price}
+                          onClick={() => updateMapFilters({ priceRange: price === mapFilters.priceRange ? null : price })}
+                          className={`flex-1 py-1 px-2 rounded-md border text-sm ${
+                            price === mapFilters.priceRange
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-input hover:bg-accent'
+                          } transition-colors text-center`}
+                        >
+                          {price}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dietary Options */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Dietary</label>
+                    <div className="grid grid-cols-2 gap-1">
+                      {['vegan', 'vegetarian', 'gluten-free', 'dairy-free'].map((option) => (
+                        <label key={option} className="flex items-center gap-2">
+                          <Checkbox
+                            checked={mapFilters.dietary.includes(option)}
+                            onCheckedChange={(checked) => {
+                              const newFilters = checked
+                                ? [...mapFilters.dietary, option]
+                                : mapFilters.dietary.filter(f => f !== option);
+                              updateMapFilters({ dietary: newFilters });
+                            }}
+                          />
+                          <span className="text-sm capitalize">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Sort Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1 h-8 px-2">
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:text-xs">Sort</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => setSortOption("default")}
+                className={sortOption === "default" ? "bg-muted" : ""}
+              >
+                Default (Open first)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption("rating-high")}
+                className={sortOption === "rating-high" ? "bg-muted" : ""}
+              >
+                Highest Rated
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption("rating-low")}
+                className={sortOption === "rating-low" ? "bg-muted" : ""}
+              >
+                Lowest Rated
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption("distance-near")}
+                className={sortOption === "distance-near" ? "bg-muted" : ""}
+              >
+                Closest First
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption("distance-far")}
+                className={sortOption === "distance-far" ? "bg-muted" : ""}
+              >
+                Farthest First
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption("open-first")}
+                className={sortOption === "open-first" ? "bg-muted" : ""}
+              >
+                Open Now
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       
       <div className="max-h-[500px] overflow-auto">
