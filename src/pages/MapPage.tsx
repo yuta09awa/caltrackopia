@@ -1,10 +1,9 @@
+
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
-import MapSidebar from "@/components/map/MapSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Filter } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,11 +11,16 @@ import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import FilterSheet from "@/components/map/FilterSheet";
+import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
 
 const MapPage = () => {
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
-  const [cuisineOptions, setCuisineOptions] = useState([
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const [cuisineOptions] = useState([
     { value: "all", label: "All Cuisines" },
     { value: "american", label: "American" },
     { value: "italian", label: "Italian" },
@@ -28,29 +32,6 @@ const MapPage = () => {
   const { mapFilters, updateMapFilters } = useAppStore();
   const isMobile = useIsMobile();
 
-  // Load cuisine options based on location
-  useEffect(() => {
-    // This would typically fetch from a geolocation API
-    // For demo purposes, we're just setting a static location
-    const mockLocationBasedCuisines = [
-      { value: "all", label: "All Cuisines" },
-      { value: "american", label: "American" },
-      { value: "italian", label: "Italian" },
-      { value: "mexican", label: "Mexican" },
-      { value: "asian", label: "Asian" },
-      { value: "mediterranean", label: "Mediterranean" },
-      { value: "local", label: "Local Specialties" },
-    ];
-    
-    setCuisineOptions(mockLocationBasedCuisines);
-  }, []);
-
-  const handleApplyFilters = () => {
-    updateMapFilters({
-      priceRange: priceFilter,
-    });
-  };
-
   const handleSelectIngredient = (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
     
@@ -61,100 +42,86 @@ const MapPage = () => {
     }
   };
 
-  return (
-    <SidebarProvider defaultOpen={!isMobile}>
-      <div className="flex flex-col min-h-screen w-full bg-background">
-        <Navbar>
-          <div className="flex-1 max-w-2xl mx-4">
-            <GlobalSearch 
-              onSelectIngredient={handleSelectIngredient}
-              className="w-full" 
-              compact={true}
-            />
-          </div>
-        </Navbar>
-        
-        <div className="flex flex-1 w-full max-w-full relative">
-          {/* Fixed sidebar with top offset matching header height */}
-          <div className="fixed left-0 top-16 bottom-16 z-10">
-            <MapSidebar
-              priceFilter={priceFilter}
-              setPriceFilter={setPriceFilter}
-              cuisineOptions={cuisineOptions}
-              onApplyFilters={handleApplyFilters}
-            />
-          </div>
-          
-          {/* Main content with padding to account for fixed sidebar */}
-          <div className="flex-1 pl-[280px] pt-16 pb-16">
-            <main className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
-              <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
-                <MapView selectedIngredient={selectedIngredient} />
-                
-                <div className="absolute top-4 right-4 z-20 md:hidden">
-                  <SidebarTrigger>
-                    <Button variant="default" size="icon" className="rounded-full shadow-md">
-                      <Filter className="h-[1.2rem] w-[1.2rem]" />
-                    </Button>
-                  </SidebarTrigger>
-                </div>
-              </div>
+  const handleApplyFilters = () => {
+    updateMapFilters({
+      priceRange: priceFilter,
+    });
+  };
 
-              {selectedIngredient && (
-              <div className="max-w-full mx-auto px-4 pt-6 mb-6 p-4 w-full bg-primary/10 rounded-lg animate-fade-in">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-lg">{selectedIngredient.name}</h3>
-                  <button 
-                    onClick={() => setSelectedIngredient(null)} 
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Clear Selection
-                  </button>
-                </div>
-                {selectedIngredient.description && (
-                  <p className="text-sm text-muted-foreground mb-2">{selectedIngredient.description}</p>
-                )}
-                {selectedIngredient.nutrition && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
-                    {selectedIngredient.nutrition.calories !== undefined && (
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="font-medium">Calories</div>
-                        <div>{selectedIngredient.nutrition.calories}</div>
-                      </div>
-                    )}
-                    {selectedIngredient.nutrition.protein !== undefined && (
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="font-medium">Protein</div>
-                        <div>{selectedIngredient.nutrition.protein}g</div>
-                      </div>
-                    )}
-                    {selectedIngredient.nutrition.carbs !== undefined && (
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="font-medium">Carbs</div>
-                        <div>{selectedIngredient.nutrition.carbs}g</div>
-                      </div>
-                    )}
-                    {selectedIngredient.nutrition.fat !== undefined && (
-                      <div className="bg-white p-2 rounded shadow-sm">
-                        <div className="font-medium">Fat</div>
-                        <div>{selectedIngredient.nutrition.fat}g</div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-              
-              <div className="animate-fade-in w-full max-w-full" style={{ animationDelay: "100ms" }}>
-                <LocationList />
-              </div>
-            </main>
-          </div>
+  return (
+    <div className="flex flex-col min-h-screen w-full bg-background">
+      <Navbar>
+        <div className="flex-1 max-w-2xl mx-4">
+          <GlobalSearch 
+            onSelectIngredient={handleSelectIngredient}
+            className="w-full" 
+            compact={true}
+          />
         </div>
-        
-        <Footer />
-      </div>
-    </SidebarProvider>
+      </Navbar>
+      
+      <main className="flex-1 flex flex-col relative w-full">
+        {/* Map Container */}
+        <div className={cn(
+          "relative w-full transition-all duration-300",
+          mapExpanded ? "h-[85vh]" : "h-[25vh]"
+        )}>
+          <MapView selectedIngredient={selectedIngredient} />
+          
+          {/* Filter Button - Always visible on map */}
+          {isMobile ? (
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button 
+                  variant="default" 
+                  size="icon"
+                  className="absolute top-4 right-4 rounded-full shadow-md z-20"
+                >
+                  <Filter className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+              </DrawerTrigger>
+              <FilterSheet 
+                priceFilter={priceFilter}
+                setPriceFilter={setPriceFilter}
+                cuisineOptions={cuisineOptions}
+                onApplyFilters={handleApplyFilters}
+              />
+            </Drawer>
+          ) : (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button 
+                  variant="default" 
+                  size="icon"
+                  className="absolute top-4 right-4 rounded-full shadow-md z-20"
+                >
+                  <Filter className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+              </SheetTrigger>
+              <FilterSheet 
+                priceFilter={priceFilter}
+                setPriceFilter={setPriceFilter}
+                cuisineOptions={cuisineOptions}
+                onApplyFilters={handleApplyFilters}
+              />
+            </Sheet>
+          )}
+        </div>
+
+        {/* Location List with Drag Handle */}
+        <div className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10">
+          <div 
+            className="w-full flex justify-center py-2 cursor-pointer"
+            onClick={() => setMapExpanded(!mapExpanded)}
+          >
+            <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
+          </div>
+          <LocationList />
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
   );
 };
 
