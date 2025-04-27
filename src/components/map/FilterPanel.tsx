@@ -66,7 +66,20 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onApplyFilters,
 }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const [selectedFilters, setSelectedFilters] = React.useState<Record<string, string[]>>({});
+  const [selectedFilters, setSelectedFilters] = React.useState<Record<string, string[]>>({
+    sources: mapFilters.sources || [],
+    dietary: mapFilters.dietary || [],
+    nutrition: mapFilters.nutrition || [],
+  });
+
+  // Sync selected filters with store when categories change
+  React.useEffect(() => {
+    updateMapFilters({
+      sources: selectedFilters.sources,
+      dietary: selectedFilters.dietary,
+      nutrition: selectedFilters.nutrition,
+    });
+  }, [selectedFilters, updateMapFilters]);
 
   const handleCheckboxChange = (categoryId: string, optionId: string) => {
     setSelectedFilters(prev => {
@@ -83,9 +96,19 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({});
+    setSelectedFilters({
+      sources: [],
+      dietary: [],
+      nutrition: [],
+    });
     setPriceFilter(null);
-    updateMapFilters({ cuisine: 'all' });
+    updateMapFilters({ 
+      cuisine: 'all',
+      priceRange: null,
+      sources: [],
+      dietary: [],
+      nutrition: [],
+    });
   };
 
   return (

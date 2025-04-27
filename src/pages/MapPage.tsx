@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -83,7 +84,7 @@ const MapPage = () => {
           />
           
           <main className="flex-1 flex flex-col">
-            <div className="relative w-full h-[40vh] md:h-[50vh]">
+            <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
               <MapView selectedIngredient={selectedIngredient} />
               
               <div className="absolute top-4 right-4 z-20 md:hidden">

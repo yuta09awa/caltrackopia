@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 import FilterPanel from "./FilterPanel";
 import { Filter } from "lucide-react";
-import { Ingredient } from "@/hooks/useIngredientSearch";
 
 interface MapSidebarProps {
   isFilterOpen?: boolean;
@@ -36,7 +35,6 @@ const MapSidebar = ({
       </div>
       <div className="overflow-y-auto h-[calc(100vh-4rem)]">
         <FilterPanel
-          isOpen={true}
           priceFilter={priceFilter}
           setPriceFilter={setPriceFilter}
           cuisineOptions={cuisineOptions}
