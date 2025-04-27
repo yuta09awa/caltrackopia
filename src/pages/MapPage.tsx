@@ -11,7 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import IngredientSearch from "@/components/ingredients/IngredientSearch";
+import GlobalSearch from "@/components/search/GlobalSearch";
 
 const MapPage = () => {
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
@@ -65,9 +65,9 @@ const MapPage = () => {
     <SidebarProvider defaultOpen={!isMobile}>
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar>
-          <div className="flex-1 max-w-xl mx-4">
-            <IngredientSearch 
-              onSelectIngredient={handleSelectIngredient} 
+          <div className="flex-1 max-w-2xl mx-4">
+            <GlobalSearch 
+              onSelectIngredient={handleSelectIngredient}
               className="w-full" 
               compact={true}
             />
