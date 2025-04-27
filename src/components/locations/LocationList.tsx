@@ -162,37 +162,8 @@ const LocationList = () => {
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="flex items-center justify-between p-3 border-b border-border">
         <div className="flex flex-1 items-center gap-2">
-          {/* Include Ingredients Search */}
-          <IngredientSearch
-            compact={true}
-            className="w-40 sm:w-48"
-            onSelectIngredient={(ingredient) => {
-              // Handle included ingredient selection
-            }}
-          />
-
-          {/* Exclude Ingredients Search */}
-          <IngredientSearch
-            compact={true}
-            className="w-40 sm:w-48"
-            onSelectIngredient={(ingredient) => {
-              // Handle excluded ingredient selection
-            }}
-          />
-
-          {/* Cuisine Type Dropdown */}
-          <CuisineFilter
-            cuisineOptions={[
-              { value: "all", label: "All Cuisines" },
-              { value: "american", label: "American" },
-              { value: "mediterranean", label: "Mediterranean" },
-              { value: "asian", label: "Asian" },
-              { value: "italian", label: "Italian" },
-            ]}
-          />
-
           {/* Tab buttons for All/Restaurant/Groceries */}
-          <div className="flex">
+          <div className="flex mr-4">
             <button 
               className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'all' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
               onClick={() => filterByType('all')}
@@ -212,6 +183,17 @@ const LocationList = () => {
               Groceries
             </button>
           </div>
+
+          {/* Cuisine Type Dropdown */}
+          <CuisineFilter
+            cuisineOptions={[
+              { value: "all", label: "Cuisine Type" },
+              { value: "american", label: "American" },
+              { value: "mediterranean", label: "Mediterranean" },
+              { value: "asian", label: "Asian" },
+              { value: "italian", label: "Italian" },
+            ]}
+          />
         </div>
         
         <div className="flex items-center gap-2">
@@ -223,10 +205,34 @@ const LocationList = () => {
                 <span className="sr-only sm:not-sr-only sm:text-xs">Filter</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-72">
               <div className="p-2">
                 <div className="space-y-4">
-                  {/* Ingredient Sources */}
+                  {/* Include Ingredients Search */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
+                    <IngredientSearch
+                      compact={true}
+                      className="w-full"
+                      onSelectIngredient={(ingredient) => {
+                        // Handle included ingredient selection
+                      }}
+                    />
+                  </div>
+
+                  {/* Exclude Ingredients Search */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
+                    <IngredientSearch
+                      compact={true}
+                      className="w-full"
+                      onSelectIngredient={(ingredient) => {
+                        // Handle excluded ingredient selection
+                      }}
+                    />
+                  </div>
+
+                  {/* Rest of the filter options */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Ingredient Sources</label>
                     <div className="grid grid-cols-2 gap-1">
