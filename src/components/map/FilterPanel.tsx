@@ -1,15 +1,10 @@
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import PriceRangeFilter from './filters/PriceRangeFilter';
+import CuisineFilter from './filters/CuisineFilter';
+import CategoryFilter from './filters/CategoryFilter';
 
 type FilterCategory = {
   id: string;
@@ -70,7 +65,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     nutrition: mapFilters.nutrition || [],
   });
 
-  // Sync selected filters with store when categories change
   React.useEffect(() => {
     updateMapFilters({
       sources: selectedFilters.sources,
@@ -112,71 +106,26 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 space-y-3 p-3 overflow-y-auto">
-        <div>
-          <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Price Range</label>
-          <div className="flex gap-1">
-            {['$', '$$', '$$$', '$$$$'].map((price) => (
-              <button
-                key={price}
-                onClick={() => setPriceFilter(price === priceFilter ? null : price)}
-                className={`flex-1 py-1 px-2 rounded-md border text-sm ${
-                  price === priceFilter
-                    ? 'bg-green-500 text-white border-green-500'
-                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                } transition-colors text-center`}
-              >
-                {price}
-              </button>
-            ))}
-          </div>
-        </div>
+        <PriceRangeFilter 
+          priceFilter={priceFilter}
+          setPriceFilter={setPriceFilter}
+        />
 
-        <div>
-          <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Cuisine Type</label>
-          <Select
-            value={mapFilters.cuisine}
-            onValueChange={(value) => updateMapFilters({ cuisine: value })}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select cuisine" />
-            </SelectTrigger>
-            <SelectContent>
-              {cuisineOptions.map((cuisine) => (
-                <SelectItem key={cuisine.value} value={cuisine.value}>
-                  {cuisine.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <CuisineFilter cuisineOptions={cuisineOptions} />
 
         {filterCategories.map((category) => (
-          <div key={category.id} className="space-y-1.5">
-            <label className="text-sm font-medium text-muted-foreground block">
-              {category.label}
-            </label>
-            <div className="grid grid-cols-2 gap-1">
-              {category.options.map((option) => (
-                <label
-                  key={option.id}
-                  className="flex items-center space-x-2 text-sm py-1 px-1.5 rounded-md hover:bg-gray-50 cursor-pointer"
-                >
-                  <Checkbox
-                    id={option.id}
-                    checked={(selectedFilters[category.id] || []).includes(option.id)}
-                    onCheckedChange={() => handleCheckboxChange(category.id, option.id)}
-                    className="h-4 w-4 rounded-sm border-gray-300 text-green-500 focus:ring-green-500"
-                  />
-                  <span className="text-sm">{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <CategoryFilter
+            key={category.id}
+            label={category.label}
+            options={category.options}
+            selectedOptions={selectedFilters[category.id] || []}
+            onOptionChange={(optionId) => handleCheckboxChange(category.id, optionId)}
+          />
         ))}
 
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2 text-sm mt-2"
+          className="w-full flex items-center justify-center gap-2 text-sm"
           onClick={clearAllFilters}
         >
           Clear All Filters
