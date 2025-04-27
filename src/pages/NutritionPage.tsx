@@ -1,6 +1,4 @@
-
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import Container from "@/components/ui/Container";
 import NutritionTracker from "@/components/nutrition/NutritionTracker";
 import { Utensils, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
@@ -49,8 +47,6 @@ const NutritionPage = () => {
           </div>
         </Container>
       </main>
-      
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,5 @@
-
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import MapView from "@/components/map/MapView";
 import LocationList from "@/components/locations/LocationList";
 import { useAppStore } from "@/store/appStore";
@@ -76,8 +74,6 @@ const MapPage = () => {
           <LocationList />
         </div>
       </main>
-      
-      <Footer />
     </div>
   );
 };
