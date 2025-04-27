@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MapPin, Utensils, User } from "lucide-react";
+import { MapPin, Utensils, User, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +13,7 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
 
   const menuItems = [
     { name: "Map", path: "/map", icon: MapPin },
+    { name: "Shopping List", path: "/shopping", icon: ShoppingCart },
     { name: "Nutrition", path: "/nutrition", icon: Utensils },
   ];
 
