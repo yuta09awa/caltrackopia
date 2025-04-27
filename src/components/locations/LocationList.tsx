@@ -25,6 +25,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext
+} from "@/components/ui/carousel";
 
 // Update mock data to include images
 const mockLocations = [
