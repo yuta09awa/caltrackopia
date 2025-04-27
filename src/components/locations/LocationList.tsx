@@ -269,9 +269,8 @@ const LocationList = () => {
                     </div>
                   </div>
 
-                  {/* Include Ingredients Search */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
+                  {/* Ingredients Search Section */}
+                  <div className="space-y-4">
                     <IngredientSearch
                       compact={true}
                       className="w-full"
@@ -280,11 +279,7 @@ const LocationList = () => {
                         // Handle included ingredient selection
                       }}
                     />
-                  </div>
-
-                  {/* Exclude Ingredients Search */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
+                    
                     <IngredientSearch
                       compact={true}
                       className="w-full"
