@@ -5,6 +5,7 @@ import Index from '../pages/Index';
 import MapPage from '../pages/MapPage';
 import NutritionPage from '../pages/NutritionPage';
 import NotFound from '../pages/NotFound';
+import LocationDetailPage from '../pages/LocationDetailPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={<Index />} />
       <Route path="/map" element={<MapPage />} />
       <Route path="/nutrition" element={<NutritionPage />} />
+      <Route path="/location/:id" element={<LocationDetailPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

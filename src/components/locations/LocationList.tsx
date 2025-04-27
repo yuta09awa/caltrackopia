@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Star, ArrowUpDown, Filter } from "lucide-react";
 import {
   Carousel,
@@ -288,9 +289,10 @@ const LocationList = () => {
       
       <div className="max-h-[500px] overflow-auto">
         {filteredAndSortedLocations.map((location) => (
-          <div 
+          <Link 
             key={location.id}
-            className="border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
+            to={`/location/${location.id}`} 
+            className="block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
           >
             {/* Hazy overlay for closed locations - reduced opacity */}
             {!location.openNow && (
@@ -351,13 +353,9 @@ const LocationList = () => {
                     </span>
                   ))}
                 </div>
-                
-                <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                  
-                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
