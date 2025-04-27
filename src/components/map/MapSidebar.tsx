@@ -18,7 +18,6 @@ interface MapSidebarProps {
   setPriceFilter: (price: string | null) => void;
   cuisineOptions: Array<{ value: string; label: string }>;
   onApplyFilters: () => void;
-  onSelectIngredient?: (ingredient: Ingredient) => void;
 }
 
 const MapSidebar = ({
@@ -26,32 +25,25 @@ const MapSidebar = ({
   setPriceFilter,
   cuisineOptions,
   onApplyFilters,
-  onSelectIngredient,
 }: MapSidebarProps) => {
   return (
-    <Sidebar>
-      <SidebarHeader className="p-4 border-b">
+    <div className="w-[300px] hidden md:block border-r border-border bg-card">
+      <div className="p-4 border-b">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Filter className="w-5 h-5" />
           <span>Filters</span>
         </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Search & Filter</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <FilterPanel
-              isOpen={true}
-              priceFilter={priceFilter}
-              setPriceFilter={setPriceFilter}
-              cuisineOptions={cuisineOptions}
-              onApplyFilters={onApplyFilters}
-              onSelectIngredient={onSelectIngredient}
-            />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+      </div>
+      <div className="overflow-y-auto h-[calc(100vh-4rem)]">
+        <FilterPanel
+          isOpen={true}
+          priceFilter={priceFilter}
+          setPriceFilter={setPriceFilter}
+          cuisineOptions={cuisineOptions}
+          onApplyFilters={onApplyFilters}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MapPin, Utensils, User } from "lucide-react";
@@ -6,7 +5,7 @@ import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const Navbar = () => {
+const Navbar = ({ children }: { children?: React.ReactNode }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -35,7 +34,7 @@ const Navbar = () => {
       )}
     >
       <Container>
-        <nav className="flex items-center justify-between">
+        <nav className="flex items-center justify-between gap-4">
           <Link
             to="/"
             className="flex items-center space-x-2"
@@ -48,7 +47,8 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Navigation - Always showing icons (mobile & desktop) */}
+          {children}
+
           <div className="flex items-center space-x-4">
             {menuItems.map((item) => (
               <Link

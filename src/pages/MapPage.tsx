@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -12,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import IngredientSearch from "@/components/ingredients/IngredientSearch";
 
 const MapPage = () => {
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
@@ -64,7 +64,15 @@ const MapPage = () => {
   return (
     <SidebarProvider defaultOpen={!isMobile}>
       <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+        <Navbar>
+          <div className="flex-1 max-w-xl mx-4">
+            <IngredientSearch 
+              onSelectIngredient={handleSelectIngredient} 
+              className="w-full" 
+              compact={true}
+            />
+          </div>
+        </Navbar>
         
         <div className="flex-1 pt-16 pb-16 relative flex">
           <MapSidebar
@@ -72,7 +80,6 @@ const MapPage = () => {
             setPriceFilter={setPriceFilter}
             cuisineOptions={cuisineOptions}
             onApplyFilters={handleApplyFilters}
-            onSelectIngredient={handleSelectIngredient}
           />
           
           <main className="flex-1 flex flex-col">
