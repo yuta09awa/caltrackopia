@@ -9,13 +9,15 @@ import { Loading } from '@/components/ui/loading';
 interface IngredientSearchProps {
   onSelectIngredient?: (ingredient: Ingredient) => void;
   className?: string;
-  compact?: boolean; // New prop to support compact mode
+  compact?: boolean; // Prop to support compact mode
+  placeholder?: string; // Added placeholder prop
 }
 
 const IngredientSearch: React.FC<IngredientSearchProps> = ({ 
   onSelectIngredient, 
   className = '',
-  compact = false
+  compact = false,
+  placeholder = 'Search ingredients...' // Default placeholder
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { 
@@ -63,7 +65,7 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
         <div className="relative">
           <Input
             type="text"
-            placeholder="Search ingredients to include..."
+            placeholder={placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -120,7 +122,7 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
         <div className="relative flex-1">
           <Input
             type="text"
-            placeholder="Search ingredients..."
+            placeholder={placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}
