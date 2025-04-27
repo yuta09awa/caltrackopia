@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/store/appStore";
+import { Checkbox } from "@/components/ui/checkbox"; // Added this import for Checkbox
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import CuisineFilter from "@/components/map/filters/CuisineFilter";
 import OpenNowFilter from "@/features/locations/components/OpenNowFilter";
