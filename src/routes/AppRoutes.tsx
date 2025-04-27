@@ -1,22 +1,25 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Index from '../pages/Index';
-import MapPage from '../pages/MapPage';
-import NutritionPage from '../pages/NutritionPage';
-import NotFound from '../pages/NotFound';
-import LocationDetailPage from '../pages/LocationDetailPage';
+import { routes } from './routeConfig';
+import { AppRoute } from './types';
+
+// Helper function to recursively generate routes
+const generateRoutes = (routes: AppRoute[]): React.ReactNode => {
+  return routes.map((route) => (
+    <Route 
+      key={route.path}
+      path={route.path}
+      element={route.element}
+      index={route.index}
+    >
+      {route.children && generateRoutes(route.children)}
+    </Route>
+  ));
+};
 
 const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/map" element={<MapPage />} />
-      <Route path="/nutrition" element={<NutritionPage />} />
-      <Route path="/location/:id" element={<LocationDetailPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
+  return <Routes>{generateRoutes(routes)}</Routes>;
 };
 
 export default AppRoutes;

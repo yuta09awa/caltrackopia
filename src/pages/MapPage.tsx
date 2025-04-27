@@ -1,13 +1,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import MapView from "@/components/map/MapView";
-import LocationList from "@/components/locations/LocationList";
-import { useAppStore } from "@/store/appStore";
-import { useIsMobile } from "@/hooks/use-mobile";
+import MapView from "@/features/map/components/MapView";
+import LocationList from "@/features/locations/components/LocationList";
+import GlobalSearch from "@/components/search/GlobalSearch";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
-import GlobalSearch from "@/components/search/GlobalSearch";
 import { cn } from "@/lib/utils";
 
 const MapPage = () => {
