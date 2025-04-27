@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -75,28 +74,33 @@ const MapPage = () => {
           </div>
         </Navbar>
         
-        <div className="flex flex-1 pt-16 pb-16 w-full max-w-full">
-          <MapSidebar
-            priceFilter={priceFilter}
-            setPriceFilter={setPriceFilter}
-            cuisineOptions={cuisineOptions}
-            onApplyFilters={handleApplyFilters}
-          />
+        <div className="flex flex-1 w-full max-w-full relative">
+          {/* Fixed sidebar with top offset matching header height */}
+          <div className="fixed left-0 top-16 bottom-16 z-10">
+            <MapSidebar
+              priceFilter={priceFilter}
+              setPriceFilter={setPriceFilter}
+              cuisineOptions={cuisineOptions}
+              onApplyFilters={handleApplyFilters}
+            />
+          </div>
           
-          <main className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
-            <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
-              <MapView selectedIngredient={selectedIngredient} />
-              
-              <div className="absolute top-4 right-4 z-20 md:hidden">
-                <SidebarTrigger>
-                  <Button variant="default" size="icon" className="rounded-full shadow-md">
-                    <Filter className="h-[1.2rem] w-[1.2rem]" />
-                  </Button>
-                </SidebarTrigger>
+          {/* Main content with padding to account for fixed sidebar */}
+          <div className="flex-1 pl-[280px] pt-16 pb-16">
+            <main className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
+              <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
+                <MapView selectedIngredient={selectedIngredient} />
+                
+                <div className="absolute top-4 right-4 z-20 md:hidden">
+                  <SidebarTrigger>
+                    <Button variant="default" size="icon" className="rounded-full shadow-md">
+                      <Filter className="h-[1.2rem] w-[1.2rem]" />
+                    </Button>
+                  </SidebarTrigger>
+                </div>
               </div>
-            </div>
 
-            {selectedIngredient && (
+              {selectedIngredient && (
               <div className="max-w-full mx-auto px-4 pt-6 mb-6 p-4 w-full bg-primary/10 rounded-lg animate-fade-in">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-lg">{selectedIngredient.name}</h3>
@@ -140,11 +144,12 @@ const MapPage = () => {
                 )}
               </div>
             )}
-            
-            <div className="animate-fade-in w-full max-w-full" style={{ animationDelay: "100ms" }}>
-              <LocationList />
-            </div>
-          </main>
+              
+              <div className="animate-fade-in w-full max-w-full" style={{ animationDelay: "100ms" }}>
+                <LocationList />
+              </div>
+            </main>
+          </div>
         </div>
         
         <Footer />
