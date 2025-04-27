@@ -2,13 +2,6 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, ArrowUpDown, Filter } from "lucide-react";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,10 +10,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/appStore";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import IngredientSearch from '@/components/ingredients/IngredientSearch';
 
 // Update mock data to include images
 const mockLocations = [
@@ -112,8 +116,8 @@ const LocationList = () => {
   const [sortOption, setSortOption] = useState<string>("default");
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
   const { mapFilters, updateMapFilters } = useAppStore();
-  
-  // Filter locations by type and sort by selected option
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
   const filteredAndSortedLocations = useMemo(() => {
     let filtered = [...locations];
     
@@ -164,7 +168,7 @@ const LocationList = () => {
   return (
     <div className="w-full bg-background rounded-xl border border-border shadow-sm overflow-hidden">
       {/* Filter Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 space-y-4 border-b border-border">
         <div className="space-y-4">
           {/* Type Tabs */}
           <Tabs defaultValue={activeTab} onValueChange={filterByType} className="w-full">
@@ -175,48 +179,24 @@ const LocationList = () => {
             </TabsList>
           </Tabs>
 
-          {/* Price Range */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Price:</span>
-            <div className="flex gap-1">
-              {['$', '$$', '$$$', '$$$$'].map((price) => (
-                <button
-                  key={price}
-                  onClick={() => setPriceFilter(price === priceFilter ? null : price)}
-                  className={`py-1 px-2.5 rounded-md border text-sm ${
-                    price === priceFilter
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-background border-input hover:bg-accent'
-                  } transition-colors`}
-                >
-                  {price}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sort and Filters Row */}
-          <div className="flex items-center gap-4">
-            {/* Cuisine Select */}
-            <div className="flex-1">
-              <Select
-                value={mapFilters.cuisine}
-                onValueChange={(value) => updateMapFilters({ cuisine: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Cuisine Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Cuisines</SelectItem>
-                  <SelectItem value="american">American</SelectItem>
-                  <SelectItem value="italian">Italian</SelectItem>
-                  <SelectItem value="japanese">Japanese</SelectItem>
-                  <SelectItem value="mexican">Mexican</SelectItem>
-                  <SelectItem value="indian">Indian</SelectItem>
-                  <SelectItem value="thai">Thai</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Filter Toggles */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Price Range Dropdown */}
+            <Select
+              value={priceFilter || ""}
+              onValueChange={(value) => setPriceFilter(value === "" ? null : value)}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Price Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Prices</SelectItem>
+                <SelectItem value="$">$</SelectItem>
+                <SelectItem value="$$">$$</SelectItem>
+                <SelectItem value="$$$">$$$</SelectItem>
+                <SelectItem value="$$$$">$$$$</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Sort Dropdown */}
             <DropdownMenu>
@@ -240,72 +220,111 @@ const LocationList = () => {
                   Highest Rated
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => setSortOption("rating-low")}
-                  className={sortOption === "rating-low" ? "bg-muted" : ""}
-                >
-                  Lowest Rated
-                </DropdownMenuItem>
-                <DropdownMenuItem 
                   onClick={() => setSortOption("distance-near")}
                   className={sortOption === "distance-near" ? "bg-muted" : ""}
                 >
                   Closest First
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortOption("distance-far")}
-                  className={sortOption === "distance-far" ? "bg-muted" : ""}
-                >
-                  Farthest First
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortOption("open-first")}
-                  className={sortOption === "open-first" ? "bg-muted" : ""}
-                >
-                  Open Now
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
-          {/* Quick Filters */}
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={mapFilters.dietary.includes('vegetarian')}
-                onCheckedChange={(checked) => {
-                  const newDietary = checked 
-                    ? [...mapFilters.dietary, 'vegetarian']
-                    : mapFilters.dietary.filter(d => d !== 'vegetarian');
-                  updateMapFilters({ dietary: newDietary });
-                }}
-              />
-              <span className="text-sm">Vegetarian</span>
+          {/* Advanced Filters Collapsible */}
+          <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full flex items-center justify-center gap-2">
+                <Filter className="h-4 w-4" />
+                <span>Advanced Filters</span>
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              {/* Ingredient Search */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Include Ingredients</label>
+                <IngredientSearch compact={true} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Exclude Ingredients</label>
+                <IngredientSearch compact={true} />
+              </div>
+
+              {/* Nutrition Focus */}
+              <Select
+                value={mapFilters.nutrition[0] || ""}
+                onValueChange={(value) => updateMapFilters({ nutrition: value ? [value] : [] })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Nutrition Focus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="high-protein">High Protein</SelectItem>
+                  <SelectItem value="low-carb">Low Carb</SelectItem>
+                  <SelectItem value="keto">Keto Friendly</SelectItem>
+                  <SelectItem value="low-fat">Low Fat</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Sources */}
+              <Select
+                value={mapFilters.sources[0] || ""}
+                onValueChange={(value) => updateMapFilters({ sources: value ? [value] : [] })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Ingredient Sources" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="organic">Organic</SelectItem>
+                  <SelectItem value="local">Local</SelectItem>
+                  <SelectItem value="sustainable">Sustainable</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Cuisine Type */}
+              <Select
+                value={mapFilters.cuisine}
+                onValueChange={(value) => updateMapFilters({ cuisine: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Cuisine Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Cuisines</SelectItem>
+                  <SelectItem value="american">American</SelectItem>
+                  <SelectItem value="italian">Italian</SelectItem>
+                  <SelectItem value="japanese">Japanese</SelectItem>
+                  <SelectItem value="mediterranean">Mediterranean</SelectItem>
+                </SelectContent>
+              </Select>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Active Filters Display */}
+          {(priceFilter || mapFilters.nutrition.length > 0 || mapFilters.sources.length > 0 || mapFilters.cuisine !== 'all') && (
+            <div className="flex flex-wrap gap-2">
+              {priceFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  Price: {priceFilter}
+                </Badge>
+              )}
+              {mapFilters.nutrition.map((n) => (
+                <Badge key={n} variant="secondary" className="text-xs">
+                  {n}
+                </Badge>
+              ))}
+              {mapFilters.sources.map((s) => (
+                <Badge key={s} variant="secondary" className="text-xs">
+                  {s}
+                </Badge>
+              ))}
+              {mapFilters.cuisine !== 'all' && (
+                <Badge variant="secondary" className="text-xs">
+                  {mapFilters.cuisine}
+                </Badge>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={mapFilters.dietary.includes('vegan')}
-                onCheckedChange={(checked) => {
-                  const newDietary = checked 
-                    ? [...mapFilters.dietary, 'vegan']
-                    : mapFilters.dietary.filter(d => d !== 'vegan');
-                  updateMapFilters({ dietary: newDietary });
-                }}
-              />
-              <span className="text-sm">Vegan</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={mapFilters.nutrition.includes('high-protein')}
-                onCheckedChange={(checked) => {
-                  const newNutrition = checked 
-                    ? [...mapFilters.nutrition, 'high-protein']
-                    : mapFilters.nutrition.filter(n => n !== 'high-protein');
-                  updateMapFilters({ nutrition: newNutrition });
-                }}
-              />
-              <span className="text-sm">High Protein</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
       
