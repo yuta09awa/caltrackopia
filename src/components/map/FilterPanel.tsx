@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Checkbox } from "@/components/ui/checkbox";
@@ -182,21 +181,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         >
           Clear All Filters
         </Button>
-      </div>
 
-      <div className="mt-auto p-3 border-t bg-green-50/50">
-        <Card className="bg-white border-green-100">
+        <Card className="bg-white border-green-100 mt-4">
           <CardContent className="p-4">
-            <div className="text-center space-y-2">
+            <div className="text-center">
               <p className="text-sm font-medium text-muted-foreground">
-                Connect with a Nutritionist
+                Advertisement Space
               </p>
-              <p className="text-xs text-muted-foreground/80">
-                Get personalized meal plans and expert advice
-              </p>
-              <Button variant="default" className="w-full mt-2 bg-green-500 hover:bg-green-600">
-                Learn More
-              </Button>
             </div>
           </CardContent>
         </Card>
