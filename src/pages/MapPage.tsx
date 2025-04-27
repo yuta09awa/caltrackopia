@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -79,7 +80,7 @@ const MapPage = () => {
               <MapView selectedIngredient={selectedIngredient} />
               
               <div className="absolute top-4 right-4 z-20 md:hidden">
-                <SidebarTrigger asChild>
+                <SidebarTrigger>
                   <Button variant="default" size="icon" className="rounded-full shadow-md">
                     <Filter className="h-[1.2rem] w-[1.2rem]" />
                   </Button>
