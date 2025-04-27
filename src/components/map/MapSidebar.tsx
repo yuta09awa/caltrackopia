@@ -1,4 +1,3 @@
-
 import React from "react";
 import FilterPanel from "./FilterPanel";
 import { Filter } from "lucide-react";
@@ -17,7 +16,7 @@ const MapSidebar = ({
   onApplyFilters,
 }: MapSidebarProps) => {
   return (
-    <div className="w-[280px] hidden md:block border-r border-border bg-card">
+    <div className="w-[240px] hidden md:block border-r border-border bg-card">
       <div className="p-3 border-b">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Filter className="w-5 h-5" />
