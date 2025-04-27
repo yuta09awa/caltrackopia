@@ -64,7 +64,7 @@ const MapPage = () => {
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen w-full bg-background">
         <Navbar>
           <div className="flex-1 max-w-2xl mx-4">
             <GlobalSearch 
@@ -75,7 +75,7 @@ const MapPage = () => {
           </div>
         </Navbar>
         
-        <div className="flex flex-1 pt-16 pb-16 w-full">
+        <div className="flex flex-1 pt-16 pb-16 w-full max-w-full">
           <MapSidebar
             priceFilter={priceFilter}
             setPriceFilter={setPriceFilter}
@@ -83,7 +83,7 @@ const MapPage = () => {
             onApplyFilters={handleApplyFilters}
           />
           
-          <main className="flex-1 flex flex-col w-full">
+          <main className="flex-1 flex flex-col w-full max-w-full overflow-hidden">
             <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh]">
               <MapView selectedIngredient={selectedIngredient} />
               
@@ -97,7 +97,7 @@ const MapPage = () => {
             </div>
 
             {selectedIngredient && (
-              <div className="max-w-4xl mx-auto px-4 pt-6 mb-6 p-4 w-full bg-primary/10 rounded-lg animate-fade-in">
+              <div className="max-w-full mx-auto px-4 pt-6 mb-6 p-4 w-full bg-primary/10 rounded-lg animate-fade-in">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-lg">{selectedIngredient.name}</h3>
                   <button 
@@ -141,7 +141,7 @@ const MapPage = () => {
               </div>
             )}
             
-            <div className="animate-fade-in w-full" style={{ animationDelay: "100ms" }}>
+            <div className="animate-fade-in w-full max-w-full" style={{ animationDelay: "100ms" }}>
               <LocationList />
             </div>
           </main>
