@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import { Plus, Minus, MapPin } from "lucide-react";
 import { Ingredient } from "@/hooks/useIngredientSearch";
@@ -33,6 +33,7 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
   const [center, setCenter] = useState(defaultCenter);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const mapContainer = useRef<HTMLDivElement>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -200,7 +201,7 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
   };
 
   return (
-    <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+    <div className="relative w-full h-full bg-gray-100 overflow-hidden" ref={mapContainer}>
       {selectedIngredient && (
         <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
           <div className="bg-white rounded-md shadow-md p-3">
@@ -214,7 +215,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         </div>
       )}
 
-      {/* Google Map */}
       {isLoaded ? (
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -229,7 +229,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
             fullscreenControl: false,
           }}
         >
-          {/* User location marker */}
           {userLocation && (
             <Marker
               position={userLocation}
@@ -245,7 +244,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
             />
           )}
           
-          {/* Render all location markers */}
           {markers.map((marker) => (
             <Marker
               key={marker.id}
@@ -260,7 +258,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         </div>
       )}
 
-      {/* Map controls */}
       <div className="absolute bottom-4 right-4 z-10 bg-white rounded-lg overflow-hidden shadow-md flex flex-col">
         <button 
           className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
