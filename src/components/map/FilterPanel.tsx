@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import PriceRangeFilter from './filters/PriceRangeFilter';
 import CuisineFilter from './filters/CuisineFilter';
 import CategoryFilter from './filters/CategoryFilter';
+import IngredientSearch from '@/components/ingredients/IngredientSearch';
 
 type FilterCategory = {
   id: string;
@@ -12,17 +14,8 @@ type FilterCategory = {
   options: { id: string; label: string }[];
 };
 
+// Reordered filter categories based on importance
 const filterCategories: FilterCategory[] = [
-  {
-    id: 'sources',
-    label: 'Ingredient Sources',
-    options: [
-      { id: 'organic', label: 'Organic' },
-      { id: 'local', label: 'Local' },
-      { id: 'seasonal', label: 'Seasonal' },
-      { id: 'sustainable', label: 'Sustainable' }
-    ]
-  },
   {
     id: 'dietary',
     label: 'Dietary Restrictions',
@@ -41,6 +34,16 @@ const filterCategories: FilterCategory[] = [
       { id: 'low-carb', label: 'Low Carb' },
       { id: 'low-fat', label: 'Low Fat' },
       { id: 'keto', label: 'Keto Friendly' }
+    ]
+  },
+  {
+    id: 'sources',
+    label: 'Ingredient Sources',
+    options: [
+      { id: 'organic', label: 'Organic' },
+      { id: 'local', label: 'Local' },
+      { id: 'seasonal', label: 'Seasonal' },
+      { id: 'sustainable', label: 'Sustainable' }
     ]
   }
 ];
@@ -106,6 +109,18 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 space-y-3 p-3 overflow-y-auto">
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
+            <IngredientSearch compact={true} />
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
+            <IngredientSearch compact={true} />
+          </div>
+        </div>
+
         <PriceRangeFilter 
           priceFilter={priceFilter}
           setPriceFilter={setPriceFilter}
@@ -146,3 +161,4 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 };
 
 export default FilterPanel;
+
