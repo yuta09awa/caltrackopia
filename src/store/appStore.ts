@@ -8,7 +8,9 @@ interface UserPreferences {
 interface MapFilters {
   priceRange: string | null;
   cuisine: string;
-  dietaryPreferences: string[];
+  sources: string[];
+  dietary: string[];
+  nutrition: string[];
   excludeIngredients: string[];
 }
 
@@ -31,7 +33,9 @@ export const useAppStore = create<AppState>((set) => ({
   mapFilters: {
     priceRange: null,
     cuisine: 'all',
-    dietaryPreferences: [],
+    sources: [],
+    dietary: [],
+    nutrition: [],
     excludeIngredients: [],
   },
   
