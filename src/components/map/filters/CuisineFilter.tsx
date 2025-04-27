@@ -16,13 +16,16 @@ interface CuisineFilterProps {
 const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
 
+  // Ensure there's a default value for cuisine if it's empty
+  const cuisineValue = mapFilters.cuisine || "all";
+
   return (
     <div>
       <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
         Cuisine Type
       </label>
       <Select
-        value={mapFilters.cuisine}
+        value={cuisineValue}
         onValueChange={(value) => updateMapFilters({ cuisine: value })}
       >
         <SelectTrigger className="w-full">
@@ -30,7 +33,7 @@ const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
         </SelectTrigger>
         <SelectContent>
           {cuisineOptions.map((cuisine) => (
-            <SelectItem key={cuisine.value} value={cuisine.value}>
+            <SelectItem key={cuisine.value} value={cuisine.value || "all"}>
               {cuisine.label}
             </SelectItem>
           ))}

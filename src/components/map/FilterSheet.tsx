@@ -94,7 +94,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     });
     setPriceFilter(null);
     updateMapFilters({ 
-      cuisine: 'all',
+      cuisine: 'all', // Using 'all' instead of empty string
       priceRange: null,
       sources: [],
       dietary: [],
