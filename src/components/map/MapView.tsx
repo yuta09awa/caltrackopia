@@ -1,9 +1,10 @@
+
 import { useState, useCallback, useEffect, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import { Plus, Minus, MapPin } from "lucide-react";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import MapControls from "./MapControls";
 
 // The API key should ideally be in environment variables for production
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
@@ -42,38 +43,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
 
   // Get user's location on component mount
   useEffect(() => {
-    const getUserLocation = () => {
-      setLocationLoading(true);
-      
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userPos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            setUserLocation(userPos);
-            setCenter(userPos);
-            setLocationLoading(false);
-            toast.success("Using your current location");
-          },
-          (error) => {
-            console.error("Error getting user location:", error);
-            setLocationLoading(false);
-            toast.error("Couldn't access your location. Using default location.");
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        toast.error("Geolocation is not supported by your browser");
-        setLocationLoading(false);
-      }
-    };
-
     getUserLocation();
   }, []);
 
@@ -258,27 +227,12 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         </div>
       )}
 
-      <div className="absolute bottom-4 right-4 z-10 bg-white rounded-lg overflow-hidden shadow-md flex flex-col">
-        <button 
-          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
-          onClick={handleZoomIn}
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-        <button 
-          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center border-b border-gray-200"
-          onClick={handleZoomOut}
-        >
-          <Minus className="w-5 h-5" />
-        </button>
-        <button 
-          className="p-2 hover:bg-gray-100 w-10 h-10 flex items-center justify-center"
-          onClick={handleRecenterToUserLocation}
-          disabled={locationLoading}
-        >
-          <MapPin className={`w-5 h-5 ${locationLoading ? 'animate-pulse text-gray-400' : ''}`} />
-        </button>
-      </div>
+      <MapControls 
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onRecenter={handleRecenterToUserLocation}
+        locationLoading={locationLoading}
+      />
     </div>
   );
 };

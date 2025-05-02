@@ -1,12 +1,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import MapView from "@/features/map/components/MapView";
+import MapView from "@/components/map/MapView";
 import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const MapPage = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);

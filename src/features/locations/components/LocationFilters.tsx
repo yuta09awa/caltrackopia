@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/store/appStore";
-import { Checkbox } from "@/components/ui/checkbox"; // Added this import for Checkbox
+import { Checkbox } from "@/components/ui/checkbox";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import CuisineFilter from "@/components/map/filters/CuisineFilter";
 import OpenNowFilter from "@/features/locations/components/OpenNowFilter";
@@ -22,19 +22,9 @@ interface LocationFiltersProps {
 
 const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOption }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const [isOpenNow, setIsOpenNow] = React.useState(false);
-
-  const handleOpenNowChange = (checked: boolean) => {
-    setIsOpenNow(checked);
-    if (checked) {
-      setSortOption("open-first");
-    }
-  };
 
   return (
     <div className="flex items-center gap-2">
-      <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
-      
       <CuisineFilter
         cuisineOptions={[
           { value: "american", label: "American" },
@@ -180,6 +170,12 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOp
             className={sortOption === "distance-far" ? "bg-muted" : ""}
           >
             Farthest First
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={() => setSortOption("open-first")}
+            className={sortOption === "open-first" ? "bg-muted" : ""}
+          >
+            Open Now
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

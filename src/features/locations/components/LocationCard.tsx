@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import {
@@ -9,7 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Location } from '../hooks/useLocations';
+import { Location } from "../hooks/useLocations";
 
 interface LocationCardProps {
   location: Location;
@@ -24,7 +24,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
     >
       {/* Hazy overlay for closed locations - reduced opacity */}
       {!location.openNow && (
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10"></div>
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10" />
       )}
       
       <div className="flex">
@@ -45,8 +45,8 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
               ))}
             </CarouselContent>
             {/* Floating overlay navigation buttons */}
-            <CarouselPrevious className="absolute left-1 top-1/2 transform -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
-            <CarouselNext className="absolute right-1 top-1/2 transform -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
+            <CarouselPrevious className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
+            <CarouselNext className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
           </Carousel>
         </div>
         

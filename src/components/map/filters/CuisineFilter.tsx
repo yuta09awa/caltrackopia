@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { ChevronDown } from "lucide-react";
+import { useAppStore } from '@/store/appStore';
 import {
   Select,
   SelectContent,
@@ -7,32 +9,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppStore } from '@/store/appStore';
+
+interface CuisineOption {
+  value: string;
+  label: string;
+}
 
 interface CuisineFilterProps {
-  cuisineOptions: Array<{ value: string; label: string }>;
+  cuisineOptions: CuisineOption[];
 }
 
 const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const cuisineValue = mapFilters.cuisine || "";
+
+  const handleCuisineChange = (value: string) => {
+    updateMapFilters({ cuisine: value });
+  };
 
   return (
-    <Select
-      value={cuisineValue}
-      onValueChange={(value) => updateMapFilters({ cuisine: value })}
-    >
-      <SelectTrigger className="w-[140px] h-8">
-        <SelectValue placeholder="Cuisine" />
-      </SelectTrigger>
-      <SelectContent>
-        {cuisineOptions.map((cuisine) => (
-          <SelectItem key={cuisine.value} value={cuisine.value}>
-            {cuisine.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center">
+      <Select
+        value={mapFilters.cuisine || "all"}
+        onValueChange={handleCuisineChange}
+      >
+        <SelectTrigger 
+          className="w-auto min-w-[120px] h-8 text-xs border-none bg-transparent focus:ring-0 px-2 gap-1"
+        >
+          <SelectValue placeholder="Cuisine" />
+          <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+        </SelectTrigger>
+        <SelectContent align="end" className="w-[150px]">
+          <SelectItem value="all">All Cuisines</SelectItem>
+          {cuisineOptions.map((cuisine) => (
+            <SelectItem key={cuisine.value} value={cuisine.value}>
+              {cuisine.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
 

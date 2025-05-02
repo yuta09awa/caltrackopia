@@ -107,16 +107,23 @@ export function useLocations() {
   const [locations] = useState<Location[]>(mockLocations);
   const [activeTab, setActiveTab] = useState<LocationType>('all');
   const [sortOption, setSortOption] = useState<SortOption>('default');
+  const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useAppStore();
 
-  // Filter locations by type and sort by selected option
+  // Filter locations by type, open status, and sort by selected option
   const filteredAndSortedLocations = useMemo(() => {
     let filtered = [...locations];
     
+    // Filter by location type
     if (activeTab === "restaurant") {
       filtered = filtered.filter(loc => loc.type.toLowerCase() === "restaurant");
     } else if (activeTab === "grocery") {
       filtered = filtered.filter(loc => loc.type.toLowerCase() === "grocery");
+    }
+    
+    // Filter by open status if selected
+    if (isOpenNow) {
+      filtered = filtered.filter(loc => loc.openNow);
     }
     
     // Apply sorting based on selected option
@@ -151,7 +158,7 @@ export function useLocations() {
           return 0;
         });
     }
-  }, [locations, activeTab, sortOption]);
+  }, [locations, activeTab, sortOption, isOpenNow]);
   
   const filterByType = (type: LocationType) => {
     setActiveTab(type);
@@ -162,6 +169,8 @@ export function useLocations() {
     activeTab,
     filterByType,
     sortOption,
-    setSortOption
+    setSortOption,
+    isOpenNow,
+    setIsOpenNow
   };
 }

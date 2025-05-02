@@ -1,0 +1,47 @@
+
+import React from "react";
+import LocationTabs from "./LocationTabs";
+import LocationFilters from "./LocationFilters";
+import OpenNowFilter from "./OpenNowFilter";
+import { LocationType, SortOption } from "../hooks/useLocations";
+
+interface LocationListHeaderProps {
+  activeTab: LocationType;
+  filterByType: (type: LocationType) => void;
+  sortOption: SortOption;
+  setSortOption: (option: SortOption) => void;
+  isOpenNow: boolean;
+  setIsOpenNow: (isOpen: boolean) => void;
+}
+
+const LocationListHeader: React.FC<LocationListHeaderProps> = ({
+  activeTab,
+  filterByType,
+  sortOption,
+  setSortOption,
+  isOpenNow,
+  setIsOpenNow
+}) => {
+  const handleOpenNowChange = (checked: boolean) => {
+    setIsOpenNow(checked);
+    if (checked) {
+      setSortOption("open-first");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 border-b border-border">
+      <div className="flex items-center gap-2">
+        <LocationTabs activeTab={activeTab} onTabChange={filterByType} />
+        <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
+      </div>
+      
+      <LocationFilters 
+        sortOption={sortOption}
+        setSortOption={setSortOption}
+      />
+    </div>
+  );
+};
+
+export default LocationListHeader;
