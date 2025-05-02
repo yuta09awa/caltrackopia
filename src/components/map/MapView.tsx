@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import MapControls from "./MapControls";
 import MapMarkers from "./MapMarkers";
+import MapHeader from "./MapHeader";
 import { useUserLocation } from "./hooks/useUserLocation";
 
 // The API key should ideally be in environment variables for production
@@ -43,6 +44,10 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
 
   // Update markers when selectedIngredient changes
   useEffect(() => {
+    updateMapForSelectedIngredient();
+  }, [selectedIngredient, map, userLocation]);
+
+  const updateMapForSelectedIngredient = () => {
     if (selectedIngredient?.locations?.length > 0) {
       const newMarkers = selectedIngredient.locations.map(location => ({
         id: location.id,
@@ -59,11 +64,7 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         
         // Adjust zoom level if there are multiple markers
         if (newMarkers.length > 1 && map) {
-          const bounds = new google.maps.LatLngBounds();
-          newMarkers.forEach(marker => {
-            bounds.extend(marker.position);
-          });
-          map.fitBounds(bounds);
+          fitBoundsToMarkers(newMarkers);
         }
       }
     } else {
@@ -85,7 +86,17 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
         }
       }
     }
-  }, [selectedIngredient, map, userLocation]);
+  };
+
+  const fitBoundsToMarkers = (mapMarkers: Array<{position: {lat: number, lng: number}}>) => {
+    if (!map) return;
+    
+    const bounds = new google.maps.LatLngBounds();
+    mapMarkers.forEach(marker => {
+      bounds.extend(marker.position);
+    });
+    map.fitBounds(bounds);
+  };
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -129,20 +140,19 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
     }
   };
 
+  const handleMarkerClick = (markerId: string) => {
+    // Find the location in the selected ingredient's locations
+    if (selectedIngredient?.locations) {
+      const location = selectedIngredient.locations.find(loc => loc.id === markerId);
+      if (location) {
+        toast.info(`Selected: ${location.name}`);
+      }
+    }
+  };
+
   return (
     <div className="relative w-full h-full bg-gray-100 overflow-hidden" ref={mapContainer}>
-      {selectedIngredient && (
-        <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-sm px-4 z-10">
-          <div className="bg-white rounded-md shadow-md p-3">
-            <h3 className="font-medium">{selectedIngredient.name}</h3>
-            <p className="text-xs text-muted-foreground">
-              {selectedIngredient.locations ? 
-                `Available at ${selectedIngredient.locations.length} location${selectedIngredient.locations.length !== 1 ? 's' : ''}` : 
-                'No location data available'}
-            </p>
-          </div>
-        </div>
-      )}
+      <MapHeader selectedIngredient={selectedIngredient || null} />
 
       {isLoaded ? (
         <GoogleMap
@@ -161,6 +171,7 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
           <MapMarkers 
             userLocation={userLocation}
             markers={markers}
+            onMarkerClick={handleMarkerClick}
           />
         </GoogleMap>
       ) : (

@@ -9,9 +9,20 @@ interface MapMarkersProps {
     position: { lat: number; lng: number };
     title: string;
   }>;
+  onMarkerClick?: (markerId: string) => void;
 }
 
-const MapMarkers: React.FC<MapMarkersProps> = ({ userLocation, markers }) => {
+const MapMarkers: React.FC<MapMarkersProps> = ({ 
+  userLocation, 
+  markers,
+  onMarkerClick
+}) => {
+  const handleMarkerClick = (markerId: string) => {
+    if (onMarkerClick) {
+      onMarkerClick(markerId);
+    }
+  };
+
   return (
     <>
       {userLocation && (
@@ -34,6 +45,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({ userLocation, markers }) => {
           key={marker.id}
           position={marker.position}
           title={marker.title}
+          onClick={() => handleMarkerClick(marker.id)}
         />
       ))}
     </>
