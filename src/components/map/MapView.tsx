@@ -1,10 +1,11 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { Plus, Minus, MapPin } from "lucide-react";
-import { Ingredient } from "@/hooks/useIngredientSearch";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { toast } from "sonner";
+import { Ingredient } from "@/hooks/useIngredientSearch";
 import MapControls from "./MapControls";
+import MapMarkers from "./MapMarkers";
+import { useUserLocation } from "./hooks/useUserLocation";
 
 // The API key should ideally be in environment variables for production
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
@@ -32,23 +33,17 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
     title: string;
   }>>([]);
   const [center, setCenter] = useState(defaultCenter);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationLoading, setLocationLoading] = useState(false);
   const mapContainer = useRef<HTMLDivElement>(null);
+  const { userLocation, locationLoading, getUserLocation } = useUserLocation();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: GOOGLE_MAPS_API_KEY
   });
 
-  // Get user's location on component mount
-  useEffect(() => {
-    getUserLocation();
-  }, []);
-
   // Update markers when selectedIngredient changes
   useEffect(() => {
-    if (selectedIngredient && selectedIngredient.locations && selectedIngredient.locations.length > 0) {
+    if (selectedIngredient?.locations?.length > 0) {
       const newMarkers = selectedIngredient.locations.map(location => ({
         id: location.id,
         position: { lat: location.lat, lng: location.lng },
@@ -134,41 +129,6 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
     }
   };
 
-  // Function to get user location
-  const getUserLocation = () => {
-    setLocationLoading(true);
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userPos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setUserLocation(userPos);
-          setCenter(userPos);
-          
-          if (map) {
-            map.setCenter(userPos);
-            setZoom(14);
-            map.setZoom(14);
-          }
-          
-          setLocationLoading(false);
-          toast.success("Using your current location");
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-          setLocationLoading(false);
-          toast.error("Couldn't access your location");
-        }
-      );
-    } else {
-      toast.error("Geolocation is not supported by your browser");
-      setLocationLoading(false);
-    }
-  };
-
   return (
     <div className="relative w-full h-full bg-gray-100 overflow-hidden" ref={mapContainer}>
       {selectedIngredient && (
@@ -198,28 +158,10 @@ const MapView = ({ selectedIngredient }: MapViewProps) => {
             fullscreenControl: false,
           }}
         >
-          {userLocation && (
-            <Marker
-              position={userLocation}
-              title="Your Location"
-              icon={{
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 8,
-                fillColor: "#4285F4",
-                fillOpacity: 1,
-                strokeColor: "#ffffff",
-                strokeWeight: 2,
-              }}
-            />
-          )}
-          
-          {markers.map((marker) => (
-            <Marker
-              key={marker.id}
-              position={marker.position}
-              title={marker.title}
-            />
-          ))}
+          <MapMarkers 
+            userLocation={userLocation}
+            markers={markers}
+          />
         </GoogleMap>
       ) : (
         <div className="w-full h-full flex items-center justify-center">

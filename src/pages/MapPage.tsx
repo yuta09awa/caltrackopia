@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import MapView from "@/components/map/MapView";
+import MapContainer from "@/components/map/MapContainer";
 import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { Ingredient } from "@/hooks/useIngredientSearch";
@@ -53,12 +53,10 @@ const MapPage = () => {
       
       <main className="flex-1 flex flex-col relative w-full">
         {/* Map Container */}
-        <div 
-          className="relative w-full transition-all duration-300 ease-out"
-          style={{ height: mapHeight }}
-        >
-          <MapView selectedIngredient={selectedIngredient} />
-        </div>
+        <MapContainer
+          height={mapHeight}
+          selectedIngredient={selectedIngredient}
+        />
 
         {/* Scrollable Location List */}
         <div 

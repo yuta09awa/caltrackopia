@@ -33,13 +33,16 @@ const LocationListHeader: React.FC<LocationListHeaderProps> = ({
     <div className="flex items-center justify-between p-3 border-b border-border">
       <div className="flex items-center gap-2">
         <LocationTabs activeTab={activeTab} onTabChange={filterByType} />
-        <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
       </div>
       
-      <LocationFilters 
-        sortOption={sortOption}
-        setSortOption={setSortOption}
-      />
+      <div className="flex items-center gap-3">
+        <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
+        
+        <LocationFilters 
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+        />
+      </div>
     </div>
   );
 };
