@@ -11,8 +11,8 @@ import {
 import { useAppStore } from "@/store/appStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
-import CuisineFilter from "@/components/map/filters/CuisineFilter";
-import OpenNowFilter from "@/features/locations/components/OpenNowFilter";
+import CuisineFilter from "@/features/map/components/filters/CuisineFilter";
+import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
 import { SortOption } from '../hooks/useLocations';
 
 interface LocationFiltersProps {

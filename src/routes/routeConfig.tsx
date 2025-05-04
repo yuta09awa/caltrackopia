@@ -1,21 +1,12 @@
 
 import { ReactNode } from 'react';
-import { RouteObject } from 'react-router-dom';
-
-import { Flame, Map, Home, Utensils, ChefHat, Store, Info } from 'lucide-react';
+import { Flame, Map, Home } from 'lucide-react';
 import IndexPage from '@/pages/Index';
 import MapPage from '@/pages/MapPage';
 import NotFound from '@/pages/NotFound';
 import NutritionPage from '@/pages/NutritionPage';
 import LocationDetailPage from '@/pages/LocationDetailPage';
-
-export interface AppRoute extends RouteObject {
-  title?: string;
-  navLabel?: string;
-  icon?: ReactNode;
-  showInNav?: boolean;
-  protected?: boolean;
-}
+import { AppRoute } from './types';
 
 export const routes: AppRoute[] = [
   {

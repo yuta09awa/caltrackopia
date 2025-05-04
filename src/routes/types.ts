@@ -1,9 +1,11 @@
 
 import { ReactNode } from "react";
+import { RouteObject } from 'react-router-dom';
 
-export interface AppRoute {
-  path: string;
-  element: ReactNode;
-  children?: AppRoute[];
-  index?: boolean;
+export interface AppRoute extends RouteObject {
+  title?: string;
+  navLabel?: string;
+  icon?: ReactNode;
+  showInNav?: boolean;
+  protected?: boolean;
 }
