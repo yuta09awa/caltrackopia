@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
 import { DrawerContent } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
-import PriceRangeFilter from './filters/PriceRangeFilter';
-import CuisineFilter from './filters/CuisineFilter';
-import CategoryFilter from './filters/CategoryFilter';
+import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
+import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
+import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
 
 type FilterSheetProps = {

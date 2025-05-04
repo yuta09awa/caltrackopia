@@ -1,13 +1,12 @@
-
 import { useState, useCallback, useRef } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { toast } from "sonner";
 import { Ingredient } from "@/hooks/useIngredientSearch";
-import MapControls from "./MapControls";
-import MapMarkers from "./MapMarkers";
-import MapHeader from "./MapHeader";
-import { useUserLocation } from "./hooks/useUserLocation";
-import { useMapState } from "./hooks/useMapState";
+import MapControls from "@/components/map/MapControls";
+import MapMarkers from "@/components/map/MapMarkers";
+import MapHeader from "@/components/map/MapHeader";
+import { useUserLocation } from "@/components/map/hooks/useUserLocation";
+import { useMapState } from "@/components/map/hooks/useMapState";
 
 // The API key should ideally be in environment variables for production
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key

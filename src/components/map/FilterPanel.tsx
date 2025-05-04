@@ -3,9 +3,9 @@ import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import PriceRangeFilter from './filters/PriceRangeFilter';
-import CuisineFilter from './filters/CuisineFilter';
-import CategoryFilter from './filters/CategoryFilter';
+import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
+import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
+import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
 
 type FilterCategory = {
