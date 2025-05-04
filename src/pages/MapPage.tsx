@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import MapContainer from "@/components/map/MapContainer";
+import MapContainer from "@/features/map/components/MapContainer";
 import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { Ingredient } from "@/hooks/useIngredientSearch";

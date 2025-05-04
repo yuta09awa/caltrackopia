@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Marker } from "@react-google-maps/api";
-import { useMapMarkerStyles } from "./hooks/useMapMarkerStyles";
+import { useMapMarkerStyles } from "../hooks/useMapMarkerStyles";
 
 interface MarkerData {
   id: string;
@@ -21,7 +21,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   markers,
   onMarkerClick
 }) => {
-  const { getUserLocationIcon, getMarkerIcon, getMarkerByType } = useMapMarkerStyles();
+  const { getMarkerByType } = useMapMarkerStyles();
   
   const handleMarkerClick = (markerId: string) => {
     if (onMarkerClick) {

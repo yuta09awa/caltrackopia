@@ -2,7 +2,7 @@
 import React from "react";
 import LocationTabs from "./LocationTabs";
 import LocationFilters from "./LocationFilters";
-import OpenNowFilter from "./OpenNowFilter";
+import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
 import { LocationType, SortOption } from "../hooks/useLocations";
 
 interface LocationListHeaderProps {

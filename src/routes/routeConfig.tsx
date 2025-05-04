@@ -1,32 +1,57 @@
 
-import React from 'react';
-import { AppRoute } from './types';
-import Index from '../pages/Index';
-import MapPage from '../pages/MapPage';
-import NutritionPage from '../pages/NutritionPage';
-import NotFound from '../pages/NotFound';
-import LocationDetailPage from '../pages/LocationDetailPage';
+import { ReactNode } from 'react';
+import { RouteObject } from 'react-router-dom';
 
-// Define all application routes
+import { Flame, Map, Home, Utensils, ChefHat, Store, Info } from 'lucide-react';
+import IndexPage from '@/pages/Index';
+import MapPage from '@/pages/MapPage';
+import NotFound from '@/pages/NotFound';
+import NutritionPage from '@/pages/NutritionPage';
+import LocationDetailPage from '@/pages/LocationDetailPage';
+
+export interface AppRoute extends RouteObject {
+  title?: string;
+  navLabel?: string;
+  icon?: ReactNode;
+  showInNav?: boolean;
+  protected?: boolean;
+}
+
 export const routes: AppRoute[] = [
   {
     path: '/',
-    element: <Index />,
+    element: <IndexPage />,
+    title: 'Home',
+    navLabel: 'Home',
+    icon: <Home className="w-4 h-4" />,
+    showInNav: true,
   },
   {
     path: '/map',
     element: <MapPage />,
+    title: 'Map',
+    navLabel: 'Map',
+    icon: <Map className="w-4 h-4" />,
+    showInNav: true,
   },
   {
     path: '/nutrition',
     element: <NutritionPage />,
+    title: 'Nutrition',
+    navLabel: 'Nutrition',
+    icon: <Flame className="w-4 h-4" />,
+    showInNav: true,
   },
   {
-    path: '/location/:id',
+    path: '/locations/:id',
     element: <LocationDetailPage />,
+    title: 'Location Details',
   },
   {
     path: '*',
     element: <NotFound />,
-  }
+    title: 'Page Not Found',
+  },
 ];
+
+export default routes;

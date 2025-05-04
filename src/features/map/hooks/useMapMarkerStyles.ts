@@ -8,6 +8,8 @@ export interface MarkerIconOptions {
   scale?: number;
 }
 
+export type MarkerType = 'user' | 'selected' | 'default' | 'highlighted';
+
 export const useMapMarkerStyles = () => {
   const getUserLocationIcon = useCallback((options?: MarkerIconOptions) => {
     return {
@@ -39,13 +41,19 @@ export const useMapMarkerStyles = () => {
 
   /**
    * Get marker icons for different states
-   * @param type Optional marker type ('selected', 'default', etc)
-   * @param options Custom styling options
    */
-  const getMarkerByType = useCallback((type: 'selected' | 'default' | 'user' = 'default', options?: MarkerIconOptions) => {
+  const getMarkerByType = useCallback((type: MarkerType = 'default', options?: MarkerIconOptions) => {
     switch (type) {
       case 'selected':
-        return getMarkerIcon(true, options);
+        return getMarkerIcon(true, {
+          ...options,
+          fillColor: options?.fillColor || "#22C55E" // Green for selected
+        });
+      case 'highlighted':
+        return getMarkerIcon(true, {
+          ...options,
+          fillColor: options?.fillColor || "#F59E0B" // Amber for highlighted
+        });
       case 'user':
         return getUserLocationIcon(options);
       default:
