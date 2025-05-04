@@ -1,14 +1,18 @@
 
 import React from "react";
 import { Marker } from "@react-google-maps/api";
+import { useMapMarkerStyles } from "./hooks/useMapMarkerStyles";
+
+interface MarkerData {
+  id: string;
+  position: { lat: number; lng: number };
+  title: string;
+  isSelected?: boolean;
+}
 
 interface MapMarkersProps {
   userLocation: { lat: number; lng: number } | null;
-  markers: Array<{
-    id: string;
-    position: { lat: number; lng: number };
-    title: string;
-  }>;
+  markers: MarkerData[];
   onMarkerClick?: (markerId: string) => void;
 }
 
@@ -17,6 +21,8 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   markers,
   onMarkerClick
 }) => {
+  const { getUserLocationIcon, getMarkerIcon } = useMapMarkerStyles();
+  
   const handleMarkerClick = (markerId: string) => {
     if (onMarkerClick) {
       onMarkerClick(markerId);
@@ -29,14 +35,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
         <Marker
           position={userLocation}
           title="Your Location"
-          icon={{
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#4285F4",
-            fillOpacity: 1,
-            strokeColor: "#ffffff",
-            strokeWeight: 2,
-          }}
+          icon={getUserLocationIcon()}
         />
       )}
       
@@ -46,6 +45,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
           position={marker.position}
           title={marker.title}
           onClick={() => handleMarkerClick(marker.id)}
+          icon={getMarkerIcon(marker.isSelected)}
         />
       ))}
     </>

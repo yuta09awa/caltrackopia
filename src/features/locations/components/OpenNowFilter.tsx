@@ -23,10 +23,11 @@ const OpenNowFilter: React.FC<OpenNowFilterProps> = ({
           id={id}
           checked={checked}
           onCheckedChange={onChange}
+          aria-label="Filter by locations that are open now"
         />
         <Label 
           htmlFor={id} 
-          className="text-sm font-medium leading-none cursor-pointer"
+          className="text-sm font-medium leading-none cursor-pointer select-none"
         >
           Open Now
         </Label>
