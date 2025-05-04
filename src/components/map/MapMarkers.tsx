@@ -21,7 +21,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   markers,
   onMarkerClick
 }) => {
-  const { getUserLocationIcon, getMarkerIcon } = useMapMarkerStyles();
+  const { getUserLocationIcon, getMarkerIcon, getMarkerByType } = useMapMarkerStyles();
   
   const handleMarkerClick = (markerId: string) => {
     if (onMarkerClick) {
@@ -35,7 +35,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
         <Marker
           position={userLocation}
           title="Your Location"
-          icon={getUserLocationIcon()}
+          icon={getMarkerByType('user')}
         />
       )}
       
@@ -45,7 +45,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
           position={marker.position}
           title={marker.title}
           onClick={() => handleMarkerClick(marker.id)}
-          icon={getMarkerIcon(marker.isSelected)}
+          icon={getMarkerByType(marker.isSelected ? 'selected' : 'default')}
         />
       ))}
     </>

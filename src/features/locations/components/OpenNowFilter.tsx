@@ -8,13 +8,15 @@ interface OpenNowFilterProps {
   onChange: (checked: boolean) => void;
   id?: string;
   className?: string;
+  label?: string;
 }
 
 const OpenNowFilter: React.FC<OpenNowFilterProps> = ({
   checked,
   onChange,
   id = "open-now-filter",
-  className = ""
+  className = "",
+  label = "Open Now"
 }) => {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -23,13 +25,13 @@ const OpenNowFilter: React.FC<OpenNowFilterProps> = ({
           id={id}
           checked={checked}
           onCheckedChange={onChange}
-          aria-label="Filter by locations that are open now"
+          aria-label={`Filter by locations that are ${label.toLowerCase()}`}
         />
         <Label 
           htmlFor={id} 
           className="text-sm font-medium leading-none cursor-pointer select-none"
         >
-          Open Now
+          {label}
         </Label>
       </div>
     </div>
