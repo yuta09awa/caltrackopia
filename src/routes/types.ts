@@ -1,7 +1,6 @@
 
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
-// Define our custom route type without extending RouteObject
 export interface AppRoute {
   path?: string;
   element?: ReactNode;
@@ -9,7 +8,6 @@ export interface AppRoute {
   navLabel?: string;
   icon?: ReactNode;
   showInNav?: boolean;
-  protected?: boolean;
-  children?: AppRoute[];
   index?: boolean;
+  children?: AppRoute[];
 }
