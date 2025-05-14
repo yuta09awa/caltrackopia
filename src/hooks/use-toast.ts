@@ -1,7 +1,7 @@
 
 import {
   toast as sonnerToast,
-  ToastOptions as SonnerToastOptions,
+  type ToastT,
 } from "sonner";
 
 export type ToastProps = {
@@ -9,7 +9,7 @@ export type ToastProps = {
   description?: string;
   action?: React.ReactNode;
   variant?: "default" | "destructive";
-} & SonnerToastOptions;
+} & Omit<ToastT, 'title' | 'description' | 'action'>;
 
 export function toast(props: ToastProps) {
   const { title, description, variant, action, ...options } = props;
