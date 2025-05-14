@@ -4,12 +4,13 @@ import {
   type ToastT,
 } from "sonner";
 
+// Make the id field optional by adding a question mark
 export type ToastProps = {
   title?: string;
   description?: string;
   action?: React.ReactNode;
   variant?: "default" | "destructive";
-} & Omit<ToastT, 'title' | 'description' | 'action'>;
+} & Partial<Omit<ToastT, 'title' | 'description' | 'action'>>;
 
 export function toast(props: ToastProps) {
   const { title, description, variant, action, ...options } = props;
