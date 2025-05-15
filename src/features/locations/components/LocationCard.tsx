@@ -16,10 +16,19 @@ interface LocationCardProps {
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
+  // Determine the correct route based on location type
+  const getDetailLink = () => {
+    if (location.type.toLowerCase() === "grocery") {
+      return `/markets/${location.id}`;
+    } else {
+      return `/location/${location.id}`;
+    }
+  };
+
   return (
     <Link 
       key={location.id}
-      to={`/location/${location.id}`} 
+      to={getDetailLink()}
       className="block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
     >
       {/* Hazy overlay for closed locations - reduced opacity */}
@@ -59,6 +68,12 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
                 <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded-full text-xs whitespace-nowrap">
                   {location.type}
                 </span>
+                {location.subType && (
+                  <>
+                    <span>•</span>
+                    <span className="text-xs">{location.subType}</span>
+                  </>
+                )}
                 <span>•</span>
                 <span>{location.price}</span>
                 <span>•</span>

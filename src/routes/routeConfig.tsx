@@ -6,6 +6,7 @@ import MapPage from '@/pages/MapPage';
 import NotFound from '@/pages/NotFound';
 import NutritionPage from '@/pages/NutritionPage';
 import LocationDetailPage from '@/pages/LocationDetailPage';
+import MarketDetailPage from '@/pages/MarketDetailPage';
 import AuthPage from '@/pages/AuthPage';
 import ProfilePage from '@/pages/ProfilePage';
 import { AppRoute } from './types';
@@ -36,9 +37,14 @@ export const routes: AppRoute[] = [
     showInNav: true,
   },
   {
-    path: '/locations/:id',
+    path: '/location/:id',
     element: <LocationDetailPage />,
     title: 'Location Details',
+  },
+  {
+    path: '/markets/:id',
+    element: <MarketDetailPage />,
+    title: 'Market Details',
   },
   {
     path: '/auth',
