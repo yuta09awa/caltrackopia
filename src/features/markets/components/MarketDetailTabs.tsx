@@ -6,6 +6,7 @@ import FoodFestivalDetails from "./FoodFestivalDetails";
 import GenericMarketDetails from "./GenericMarketDetails";
 import MarketInfoTab from "./MarketInfoTab";
 import MarketReviewsTab from "./MarketReviewsTab";
+import MarketHighlights from "./MarketHighlights";
 import { Market } from "../types";
 
 interface MarketDetailTabsProps {
@@ -40,6 +41,11 @@ const MarketDetailTabs = ({ market, similarMarkets }: MarketDetailTabsProps) => 
         </TabsList>
         
         <TabsContent value="details" className="mt-4">
+          {market.highlights && market.highlights.length > 0 && (
+            <div className="mb-6">
+              <MarketHighlights items={market.highlights} />
+            </div>
+          )}
           {renderMarketSpecificContent()}
         </TabsContent>
         

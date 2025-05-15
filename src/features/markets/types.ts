@@ -24,6 +24,15 @@ export interface Section {
   popular: string[];
 }
 
+export interface HighlightItem {
+  id: string;
+  name: string;
+  type: "new" | "popular" | "seasonal";
+  description: string;
+  image?: string;
+  vendor?: string;
+}
+
 export interface Market extends Location {
   phone: string;
   website: string;
@@ -37,4 +46,5 @@ export interface Market extends Location {
   vendorCount?: number;
   schedule?: string;
   cuisine: string; // Required by the Location interface
+  highlights?: HighlightItem[]; // Add highlights to the Market interface
 }

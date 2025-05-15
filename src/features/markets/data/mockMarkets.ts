@@ -1,4 +1,3 @@
-
 import { Market } from "../types";
 
 // Mock market data (this would come from an API in a real app)
@@ -77,7 +76,30 @@ export const mockMarkets: Record<string, Market> = {
         description: "Hands-on gardening activities for children ages 5-12."
       }
     ],
-    features: ["Public Restrooms", "Parking Available", "Pet Friendly", "Credit Cards Accepted"]
+    features: ["Public Restrooms", "Parking Available", "Pet Friendly", "Credit Cards Accepted"],
+    highlights: [
+      {
+        id: "h1",
+        name: "Organic Strawberries",
+        type: "seasonal",
+        description: "Just harvested organic strawberries, perfect for summer desserts.",
+        vendor: "Green Valley Farms"
+      },
+      {
+        id: "h2",
+        name: "Artisanal Sourdough",
+        type: "popular",
+        description: "Our most requested bread, featuring a 100-year-old starter.",
+        vendor: "Artisan Bread Co."
+      },
+      {
+        id: "h3",
+        name: "Honey Lavender Ice Cream",
+        type: "new",
+        description: "Made with local honey and fresh lavender.",
+        vendor: "Sweet Treats"
+      }
+    ]
   },
   "7": {
     id: "7",
@@ -124,7 +146,21 @@ export const mockMarkets: Record<string, Market> = {
         popular: ["Paper Towels", "Cleaning Supplies", "First Aid"]
       }
     ],
-    features: ["ATM", "Lottery", "Self-Checkout", "Coffee Station"]
+    features: ["ATM", "Lottery", "Self-Checkout", "Coffee Station"],
+    highlights: [
+      {
+        id: "h4",
+        name: "Protein Energy Drink",
+        type: "popular",
+        description: "Customer favorite with 20g of protein per bottle."
+      },
+      {
+        id: "h5",
+        name: "Cold Brew Coffee",
+        type: "new",
+        description: "Freshly made in-house, available in regular and vanilla."
+      }
+    ]
   },
   "8": {
     id: "8",
@@ -201,6 +237,22 @@ export const mockMarkets: Record<string, Market> = {
         description: "Panel discussion on sustainable farming and food practices."
       }
     ],
-    features: ["Tickets Required", "Live Music", "Cooking Demonstrations", "VIP Areas"]
+    features: ["Tickets Required", "Live Music", "Cooking Demonstrations", "VIP Areas"],
+    highlights: [
+      {
+        id: "h6",
+        name: "Spring Wine Collection",
+        type: "seasonal",
+        description: "Limited edition wines featuring spring botanicals.",
+        vendor: "Bella Vineyards"
+      },
+      {
+        id: "h7",
+        name: "Truffle Tasting Experience",
+        type: "new",
+        description: "Sample rare seasonal truffles prepared by Chef James.",
+        vendor: "Pacific Coast Seafood"
+      }
+    ]
   }
 };

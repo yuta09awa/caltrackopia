@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Star, CalendarDays, LeafyGreen } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Location } from "../hooks/useLocations";
+import { Market } from "@/features/markets/types";
 
 interface LocationCardProps {
   location: Location;
@@ -23,6 +24,49 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
     } else {
       return `/location/${location.id}`;
     }
+  };
+
+  // Check if this location has highlights (for markets)
+  const hasHighlights = () => {
+    const marketLocation = location as Market;
+    return marketLocation.highlights && marketLocation.highlights.length > 0;
+  };
+
+  // Get highlight types present in this market
+  const getHighlightTypes = () => {
+    const marketLocation = location as Market;
+    if (!marketLocation.highlights) return [];
+    
+    const types = new Set(marketLocation.highlights.map(h => h.type));
+    return Array.from(types);
+  };
+
+  // Show badge for each highlight type
+  const renderHighlightBadges = () => {
+    const types = getHighlightTypes();
+    
+    return (
+      <div className="flex gap-1.5 mt-1">
+        {types.includes("new") && (
+          <div className="flex items-center gap-0.5 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full text-[10px]">
+            <CalendarDays className="w-2.5 h-2.5" />
+            <span>New</span>
+          </div>
+        )}
+        {types.includes("popular") && (
+          <div className="flex items-center gap-0.5 bg-yellow-50 text-yellow-700 px-1.5 py-0.5 rounded-full text-[10px]">
+            <Star className="w-2.5 h-2.5 fill-yellow-500" />
+            <span>Popular</span>
+          </div>
+        )}
+        {types.includes("seasonal") && (
+          <div className="flex items-center gap-0.5 bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full text-[10px]">
+            <LeafyGreen className="w-2.5 h-2.5" />
+            <span>Seasonal</span>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -79,6 +123,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
                 <span>•</span>
                 <span>{location.distance}</span>
               </div>
+              
+              {/* Show highlight badges if any */}
+              {hasHighlights() && renderHighlightBadges()}
             </div>
             <div className="flex items-center gap-0.5 sm:gap-1 ml-1 flex-shrink-0">
               <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500 fill-yellow-500" />
