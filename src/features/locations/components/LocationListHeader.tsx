@@ -41,6 +41,7 @@ const LocationListHeader: React.FC<LocationListHeaderProps> = ({
         <LocationFilters 
           sortOption={sortOption}
           setSortOption={setSortOption}
+          activeTab={activeTab}
         />
       </div>
     </div>

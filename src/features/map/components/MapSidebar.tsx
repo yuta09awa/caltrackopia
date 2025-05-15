@@ -2,18 +2,23 @@
 import React from "react";
 import FilterPanel from "./FilterPanel";
 import { Filter } from "lucide-react";
+import { LocationType } from "@/features/locations/hooks/useLocations";
 
 interface MapSidebarProps {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
+  activeTab?: LocationType;
   cuisineOptions: Array<{ value: string; label: string }>;
+  groceryCategoryOptions: Array<{ value: string; label: string }>;
   onApplyFilters: () => void;
 }
 
 const MapSidebar = ({
   priceFilter,
   setPriceFilter,
+  activeTab = 'all',
   cuisineOptions,
+  groceryCategoryOptions,
   onApplyFilters,
 }: MapSidebarProps) => {
   return (
@@ -29,6 +34,8 @@ const MapSidebar = ({
           priceFilter={priceFilter}
           setPriceFilter={setPriceFilter}
           cuisineOptions={cuisineOptions}
+          groceryCategoryOptions={groceryCategoryOptions}
+          activeTab={activeTab}
           onApplyFilters={onApplyFilters}
         />
       </div>

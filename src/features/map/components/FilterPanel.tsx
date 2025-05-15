@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
 import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
+import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
 import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
+import { LocationType } from '@/features/locations/hooks/useLocations';
 
 type FilterCategory = {
   id: string;
@@ -52,6 +54,8 @@ type FilterPanelProps = {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
   cuisineOptions: Array<{ value: string, label: string }>;
+  groceryCategoryOptions: Array<{ value: string, label: string }>;
+  activeTab?: LocationType;
   onApplyFilters: () => void;
 };
 
@@ -59,6 +63,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   priceFilter,
   setPriceFilter,
   cuisineOptions,
+  groceryCategoryOptions,
+  activeTab = 'all',
   onApplyFilters,
 }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
@@ -99,6 +105,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     setPriceFilter(null);
     updateMapFilters({ 
       cuisine: 'all',
+      groceryCategory: 'all',
       priceRange: null,
       sources: [],
       dietary: [],
@@ -126,7 +133,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           setPriceFilter={setPriceFilter}
         />
 
-        <CuisineFilter cuisineOptions={cuisineOptions} />
+        {(activeTab === 'all' || activeTab === 'restaurant') && (
+          <CuisineFilter cuisineOptions={cuisineOptions} />
+        )}
+
+        {activeTab === 'grocery' && (
+          <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
+        )}
 
         {filterCategories.map((category) => (
           <CategoryFilter

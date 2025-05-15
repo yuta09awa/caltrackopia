@@ -4,6 +4,7 @@ import { StateCreator } from 'zustand';
 export interface MapFilters {
   priceRange: string | null;
   cuisine: string;
+  groceryCategory: string;
   sources: string[];
   dietary: string[];
   nutrition: string[];
@@ -24,6 +25,7 @@ export const createMapFiltersSlice: StateCreator<
   mapFilters: {
     priceRange: null,
     cuisine: 'all',
+    groceryCategory: 'all',
     sources: [],
     dietary: [],
     nutrition: [],

@@ -12,27 +12,48 @@ import { useAppStore } from "@/store/appStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import CuisineFilter from "@/features/map/components/filters/CuisineFilter";
+import GroceryCategoryFilter from "@/features/map/components/filters/GroceryCategoryFilter";
 import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
-import { SortOption } from '../hooks/useLocations';
+import { LocationType, SortOption } from '../hooks/useLocations';
 
 interface LocationFiltersProps {
   sortOption: SortOption;
   setSortOption: (option: SortOption) => void;
+  activeTab: LocationType;
 }
 
-const LocationFilters: React.FC<LocationFiltersProps> = ({ sortOption, setSortOption }) => {
+const LocationFilters: React.FC<LocationFiltersProps> = ({ 
+  sortOption, 
+  setSortOption,
+  activeTab
+}) => {
   const { mapFilters, updateMapFilters } = useAppStore();
+
+  const cuisineOptions = [
+    { value: "american", label: "American" },
+    { value: "mediterranean", label: "Mediterranean" },
+    { value: "asian", label: "Asian" },
+    { value: "italian", label: "Italian" },
+  ];
+
+  const groceryCategoryOptions = [
+    { value: "produce", label: "Produce" },
+    { value: "dairy", label: "Dairy" },
+    { value: "bakery", label: "Bakery" },
+    { value: "meat", label: "Meat & Seafood" },
+    { value: "organic", label: "Organic" },
+    { value: "frozen", label: "Frozen Foods" },
+  ];
 
   return (
     <div className="flex items-center gap-2">
-      <CuisineFilter
-        cuisineOptions={[
-          { value: "american", label: "American" },
-          { value: "mediterranean", label: "Mediterranean" },
-          { value: "asian", label: "Asian" },
-          { value: "italian", label: "Italian" },
-        ]}
-      />
+      {activeTab === 'restaurant' && (
+        <CuisineFilter cuisineOptions={cuisineOptions} />
+      )}
+      
+      {activeTab === 'grocery' && (
+        <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
