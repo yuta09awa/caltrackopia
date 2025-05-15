@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
@@ -65,6 +64,7 @@ const mockMarkets: Record<string, Market> = {
     ],
     price: "$$",
     dietaryOptions: ["Organic", "Local", "Seasonal"],
+    cuisine: "Various", // Added the required cuisine property
     description: "A vibrant farmers market offering fresh, locally-grown produce, artisanal foods, and handcrafted goods from over 35 local vendors.",
     images: [
       "/placeholder.svg",
@@ -140,6 +140,7 @@ const mockMarkets: Record<string, Market> = {
     ],
     price: "$$",
     dietaryOptions: ["Quick Meals", "Snacks"],
+    cuisine: "Various", // Added the required cuisine property
     description: "A convenient neighborhood store offering everyday essentials, quick meals, and snacks 24/7.",
     images: [
       "/placeholder.svg",
@@ -180,6 +181,7 @@ const mockMarkets: Record<string, Market> = {
     ],
     price: "$$$",
     dietaryOptions: ["Gourmet", "Artisanal", "Vegan Options"],
+    cuisine: "Various", // Added the required cuisine property
     description: "A three-day celebration of culinary excellence featuring local chefs, wineries, breweries, and food artisans.",
     images: [
       "/placeholder.svg",
