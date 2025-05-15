@@ -40,7 +40,7 @@ export function toast(opts: ToastProps | string) {
     });
   }
   
-  if (variant === "destructive" || variant === "error") {
+  if (variant === "destructive") {
     return sonnerToast.error(title, {
       description,
       action,
