@@ -1,7 +1,7 @@
 
 import {
   toast as sonnerToast,
-  type ToastT,
+  type Toast as SonnerToast,
 } from "sonner";
 
 export interface ToastProps {
