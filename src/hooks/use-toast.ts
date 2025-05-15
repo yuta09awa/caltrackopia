@@ -1,9 +1,7 @@
 
-import {
-  toast as sonnerToast,
-  type ToastT,
-} from "sonner";
+import { toast as sonnerToast, type ToasterProps, type ToastT } from "sonner";
 
+// Define the toast props type for better TypeScript support
 export interface ToastProps {
   title?: string;
   description?: string;
@@ -11,36 +9,66 @@ export interface ToastProps {
   variant?: "default" | "destructive" | "success" | "warning" | "info";
 }
 
-export function toast(props: ToastProps) {
-  const { title, description, variant, action, ...options } = props;
+// Create wrapper for toast to handle variants
+export function toast(opts: ToastProps | string) {
+  // Handle string case
+  if (typeof opts === "string") {
+    return sonnerToast(opts);
+  }
+  
+  const { title, description, action, variant = "default" } = opts;
 
-  // Map variants to appropriate class names
-  let className = "";
-  if (variant === "destructive") {
-    className = "bg-destructive text-destructive-foreground";
-  } else if (variant === "success") {
-    className = "border-green-500 bg-green-500 text-white";
-  } else if (variant === "warning") {
-    className = "border-yellow-500 bg-yellow-500 text-white";
-  } else if (variant === "info") {
-    className = "border-blue-500 bg-blue-500 text-white";
+  // Use the appropriate variant method based on the variant prop
+  if (variant === "success") {
+    return sonnerToast.success(title, {
+      description,
+      action,
+    });
+  }
+  
+  if (variant === "info") {
+    return sonnerToast.info(title, {
+      description,
+      action,
+    });
+  }
+  
+  if (variant === "warning") {
+    return sonnerToast.warning(title, {
+      description,
+      action,
+    });
+  }
+  
+  if (variant === "destructive" || variant === "error") {
+    return sonnerToast.error(title, {
+      description,
+      action,
+    });
   }
 
+  // Default toast
   return sonnerToast(title, {
     description,
     action,
-    ...options,
-    className,
   });
 }
 
+// Re-export the useToast hook from sonner
 export const useToast = () => {
   return {
     toast,
     dismiss: sonnerToast.dismiss,
-    error: (props: ToastProps) => toast({ ...props, variant: "destructive" }),
-    success: (props: ToastProps) => toast({ ...props, variant: "success" }),
-    warning: (props: ToastProps) => toast({ ...props, variant: "warning" }),
-    info: (props: ToastProps) => toast({ ...props, variant: "info" }),
+    error: (title: string, opts?: Omit<ToastProps, "title" | "variant">) => 
+      toast({ title, ...opts, variant: "destructive" }),
+    success: (title: string, opts?: Omit<ToastProps, "title" | "variant">) => 
+      toast({ title, ...opts, variant: "success" }),
+    warning: (title: string, opts?: Omit<ToastProps, "title" | "variant">) => 
+      toast({ title, ...opts, variant: "warning" }),
+    info: (title: string, opts?: Omit<ToastProps, "title" | "variant">) => 
+      toast({ title, ...opts, variant: "info" }),
   };
 };
+
+// Types
+export type { ToasterProps, ToastT };
