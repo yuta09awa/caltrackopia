@@ -26,7 +26,7 @@ const LocationTabs: React.FC<LocationTabsProps> = ({ activeTab, onTabChange }) =
         className={`px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${activeTab === 'grocery' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
         onClick={() => onTabChange('grocery')}
       >
-        Groceries
+        Markets
       </button>
     </div>
   );
