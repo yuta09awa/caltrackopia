@@ -1,5 +1,5 @@
 
-import { Location, LocationType, SortOption } from "../hooks/useLocations";
+import { Location, LocationType, SortOption } from "../types";
 
 /**
  * Filters locations by type

@@ -1,5 +1,5 @@
 
-import { Location } from "../hooks/useLocations";
+import { Location } from "../types";
 
 // Mock data for development
 export const mockLocations: Location[] = [
