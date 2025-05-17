@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
 import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
 import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
-import { LocationType } from '@/features/locations/hooks/useLocations';
+import { LocationType } from '@/features/locations/types';
 
 type FilterCategory = {
   id: string;

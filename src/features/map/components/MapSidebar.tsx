@@ -2,7 +2,7 @@
 import React from "react";
 import FilterPanel from "./FilterPanel";
 import { Filter } from "lucide-react";
-import { LocationType } from "@/features/locations/hooks/useLocations";
+import { LocationType } from "@/features/locations/types";
 
 interface MapSidebarProps {
   priceFilter: string | null;
