@@ -9,7 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Location } from "../hooks/useLocations";
+import { Location } from "../types";
 import { Market } from "@/features/markets/types";
 
 interface LocationCardProps {

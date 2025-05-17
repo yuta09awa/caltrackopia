@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowUpDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import CuisineFilter from "@/features/map/components/filters/CuisineFilter";
 import GroceryCategoryFilter from "@/features/map/components/filters/GroceryCategoryFilter";
 import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
-import { LocationType, SortOption } from '../hooks/useLocations';
+import { LocationType, SortOption } from '../types';
 
 interface LocationFiltersProps {
   sortOption: SortOption;

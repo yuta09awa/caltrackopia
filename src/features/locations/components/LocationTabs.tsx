@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { LocationType } from '../hooks/useLocations';
+import { LocationType } from '../types';
 
 interface LocationTabsProps {
   activeTab: LocationType;

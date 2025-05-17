@@ -1,5 +1,5 @@
 
-import { Location } from "@/features/locations/hooks/useLocations";
+import { Location } from "@/features/locations/types";
 
 export interface Vendor {
   id: string;
@@ -42,9 +42,5 @@ export interface Market extends Location {
   vendors?: Vendor[];
   events?: Event[];
   sections?: Section[];
-  seasonality?: string;
-  vendorCount?: number;
-  schedule?: string;
-  cuisine: string; // Required by the Location interface
-  highlights?: HighlightItem[]; // Add highlights to the Market interface
+  highlights?: HighlightItem[];
 }
