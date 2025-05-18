@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Container } from "@/components/ui/Container";  // This is the correct import with capital C
+import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppStore } from "@/store/appStore";
@@ -63,8 +63,9 @@ const ProfilePage: React.FC = () => {
                   <TabsTrigger value="orders">Orders</TabsTrigger>
                   <TabsTrigger value="payment">Payment</TabsTrigger>
                 </TabsList>
-              
-                <CardContent className="pt-6">
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Tabs defaultValue="profile">
                   <TabsContent value="profile">
                     <ProfileInfo />
                   </TabsContent>
@@ -74,13 +75,12 @@ const ProfilePage: React.FC = () => {
                   <TabsContent value="payment">
                     <PaymentMethods />
                   </TabsContent>
-                </CardContent>
-              </Tabs>
-            </CardHeader>
-          </Card>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
   );
 };
 

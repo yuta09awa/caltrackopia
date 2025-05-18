@@ -35,12 +35,14 @@ const AuthPage: React.FC = () => {
             </Tabs>
           </CardHeader>
           <CardContent>
-            <TabsContent value="login" className="mt-0">
-              <LoginForm />
-            </TabsContent>
-            <TabsContent value="register" className="mt-0">
-              <RegisterForm />
-            </TabsContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsContent value="login">
+                <LoginForm />
+              </TabsContent>
+              <TabsContent value="register">
+                <RegisterForm />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </Container>
