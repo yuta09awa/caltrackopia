@@ -63,24 +63,25 @@ const ProfilePage: React.FC = () => {
                   <TabsTrigger value="orders">Orders</TabsTrigger>
                   <TabsTrigger value="payment">Payment</TabsTrigger>
                 </TabsList>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <Tabs defaultValue="profile">
-                  <TabsContent value="profile">
-                    <ProfileInfo />
-                  </TabsContent>
-                  <TabsContent value="orders">
-                    <OrderHistory />
-                  </TabsContent>
-                  <TabsContent value="payment">
-                    <PaymentMethods />
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
+              </Tabs>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <Tabs defaultValue="profile">
+                <TabsContent value="profile">
+                  <ProfileInfo />
+                </TabsContent>
+                <TabsContent value="orders">
+                  <OrderHistory />
+                </TabsContent>
+                <TabsContent value="payment">
+                  <PaymentMethods />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
-      </Container>
+      </div>
+    </Container>
   );
 };
 
