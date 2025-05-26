@@ -4,21 +4,10 @@ import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
 import { DrawerContent } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
-import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
-import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
-import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
-import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
+import PriceRangeFilter from './filters/PriceRangeFilter';
+import CuisineFilter from './filters/CuisineFilter';
+import CategoryFilter from './filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
-import { LocationType } from '@/features/locations/types';
-
-type FilterSheetProps = {
-  priceFilter: string | null;
-  setPriceFilter: (price: string | null) => void;
-  cuisineOptions: Array<{ value: string, label: string }>;
-  groceryCategoryOptions: Array<{ value: string, label: string }>;
-  activeTab?: LocationType;
-  onApplyFilters: () => void;
-};
 
 const filterCategories = [
   {
@@ -53,12 +42,17 @@ const filterCategories = [
   }
 ];
 
+type FilterSheetProps = {
+  priceFilter: string | null;
+  setPriceFilter: (price: string | null) => void;
+  cuisineOptions: Array<{ value: string, label: string }>;
+  onApplyFilters: () => void;
+};
+
 const FilterSheet: React.FC<FilterSheetProps> = ({
   priceFilter,
   setPriceFilter,
   cuisineOptions,
-  groceryCategoryOptions,
-  activeTab = 'all',
   onApplyFilters,
 }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
@@ -99,8 +93,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     });
     setPriceFilter(null);
     updateMapFilters({ 
-      cuisine: 'all',
-      groceryCategory: 'all',
+      cuisine: 'all', // Using 'all' instead of empty string
       priceRange: null,
       sources: [],
       dietary: [],
@@ -114,12 +107,12 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
-          <IngredientSearch compact={true} placeholder="Search ingredients to include..." />
+          <IngredientSearch compact={true} />
         </div>
         
         <div>
           <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
-          <IngredientSearch compact={true} placeholder="Search ingredients to exclude..." />
+          <IngredientSearch compact={true} />
         </div>
       </div>
 
@@ -128,13 +121,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
         setPriceFilter={setPriceFilter}
       />
 
-      {(activeTab === 'all' || activeTab === 'restaurant') && (
-        <CuisineFilter cuisineOptions={cuisineOptions} />
-      )}
-
-      {activeTab === 'grocery' && (
-        <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
-      )}
+      <CuisineFilter cuisineOptions={cuisineOptions} />
 
       {filterCategories.map((category) => (
         <CategoryFilter
