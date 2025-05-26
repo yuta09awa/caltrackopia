@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { validateSpoofedLocation } from "@/features/locations/utils/validationUtils";
 
 export const useUserLocation = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -16,9 +17,19 @@ export const useUserLocation = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
-          setUserLocation(userPos);
+          
+          // Validate the user location
+          const validatedLocation = validateSpoofedLocation(userPos);
+          setUserLocation(validatedLocation);
           setLocationLoading(false);
-          toast.success("Using your current location");
+          
+          if (validatedLocation) {
+            toast.success("Using your current location");
+          } else {
+            toast.warning("Invalid location coordinates", {
+              description: "Using default location instead"
+            });
+          }
         },
         (error) => {
           console.error("Error getting user location:", error);

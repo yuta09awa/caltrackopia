@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { LOCATION_SPOOFS, spoofUserLocation, getLocationsByRegion } from '../data/mockLocations';
+import { validateAndSanitizeLocations, validateSpoofedLocation } from '../utils/validationUtils';
 
 export function useLocationSpoof() {
   const [activeSpoof, setActiveSpoof] = useState<keyof typeof LOCATION_SPOOFS | null>(
@@ -16,7 +17,9 @@ export function useLocationSpoof() {
   useEffect(() => {
     if (activeSpoof) {
       const location = spoofUserLocation(activeSpoof);
-      setSpoofedLocation(location);
+      // Validate the spoofed location
+      const validatedLocation = validateSpoofedLocation(location);
+      setSpoofedLocation(validatedLocation);
       localStorage.setItem('location-spoof', activeSpoof);
     } else {
       setSpoofedLocation(null);
@@ -34,7 +37,9 @@ export function useLocationSpoof() {
 
   const getFilteredLocations = () => {
     if (!activeSpoof) return [];
-    return getLocationsByRegion(activeSpoof);
+    const rawLocations = getLocationsByRegion(activeSpoof);
+    // Validate and sanitize all locations before returning
+    return validateAndSanitizeLocations(rawLocations);
   };
 
   return {
