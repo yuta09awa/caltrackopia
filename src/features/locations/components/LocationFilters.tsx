@@ -50,9 +50,21 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({
 
   return (
     <div className="p-3 border-b border-border">
-      <div className="flex items-center justify-between mb-3">
-        <LocationTabs activeTab={activeTab} onTabChange={onTabChange} />
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <LocationTabs activeTab={activeTab} onTabChange={onTabChange} />
+          
+          {/* Inline filters */}
+          {activeTab === 'restaurant' && (
+            <CuisineFilter cuisineOptions={cuisineOptions} />
+          )}
+          
+          {activeTab === 'grocery' && (
+            <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
+          )}
+        </div>
+        
+        <div className="flex items-center gap-2 flex-shrink-0">
           <OpenNowFilter checked={isOpenNow} onChange={setIsOpenNow} />
           
           <DropdownMenu>
@@ -153,16 +165,6 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {activeTab === 'restaurant' && (
-          <CuisineFilter cuisineOptions={cuisineOptions} />
-        )}
-        
-        {activeTab === 'grocery' && (
-          <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
-        )}
       </div>
     </div>
   );
