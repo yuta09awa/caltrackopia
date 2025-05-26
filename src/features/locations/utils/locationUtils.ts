@@ -8,23 +8,23 @@ export function filterLocationsByType(locations: Location[], type: LocationType)
   if (type === 'all') {
     return locations;
   } else if (type === 'restaurant') {
-    return locations.filter(loc => loc.type.toLowerCase() === "restaurant");
+    return locations.filter(loc => loc.type === "Restaurant");
   } else if (type === 'grocery') {
-    return locations.filter(loc => loc.type.toLowerCase() === "grocery");
+    return locations.filter(loc => loc.type === "Grocery");
   } else if (type === 'farmers-market') {
     return locations.filter(loc => 
-      loc.type.toLowerCase() === "grocery" && 
-      loc.subType?.toLowerCase() === "farmers market"
+      loc.type === "Grocery" && 
+      loc.subType === "Farmers Market"
     );
   } else if (type === 'convenience-store') {
     return locations.filter(loc => 
-      loc.type.toLowerCase() === "grocery" && 
-      loc.subType?.toLowerCase() === "convenience store"
+      loc.type === "Grocery" && 
+      loc.subType === "Convenience Store"
     );
   } else if (type === 'food-festival') {
     return locations.filter(loc => 
-      loc.type.toLowerCase() === "grocery" && 
-      loc.subType?.toLowerCase() === "food festival"
+      loc.type === "Grocery" && 
+      loc.subType === "Food Festival"
     );
   }
   return locations;

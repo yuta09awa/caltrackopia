@@ -1,5 +1,6 @@
-export type LocationType = 'all' | 'Restaurant' | 'Grocery';
-export type SortOption = 'default' | 'rating' | 'distance';
+
+export type LocationType = 'all' | 'restaurant' | 'grocery' | 'farmers-market' | 'convenience-store' | 'food-festival';
+export type SortOption = 'default' | 'rating-high' | 'rating-low' | 'distance-near' | 'distance-far' | 'open-first';
 
 export interface Location {
   id: string;
@@ -21,5 +22,5 @@ export interface Location {
   seasonality?: string;
   vendorCount?: number;
   schedule?: string;
-  coordinates?: { lat: number; lng: number }; // Added coordinates for mapping
+  coordinates?: { lat: number; lng: number };
 }
