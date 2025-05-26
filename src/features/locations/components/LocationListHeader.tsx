@@ -1,3 +1,4 @@
+
 import React from "react";
 import LocationTabs from "./LocationTabs";
 import LocationFilters from "./LocationFilters";
@@ -5,43 +6,37 @@ import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
 import { LocationType, SortOption } from "../types";
 
 interface LocationListHeaderProps {
-  activeTab: LocationType;
-  filterByType: (type: LocationType) => void;
+  totalCount: number;
   sortOption: SortOption;
   setSortOption: (option: SortOption) => void;
-  isOpenNow: boolean;
-  setIsOpenNow: (isOpen: boolean) => void;
 }
 
 const LocationListHeader: React.FC<LocationListHeaderProps> = ({
-  activeTab,
-  filterByType,
+  totalCount,
   sortOption,
-  setSortOption,
-  isOpenNow,
-  setIsOpenNow
+  setSortOption
 }) => {
-  const handleOpenNowChange = (checked: boolean) => {
-    setIsOpenNow(checked);
-    if (checked) {
-      setSortOption("open-first");
-    }
-  };
-
   return (
     <div className="flex items-center justify-between p-3 border-b border-border">
       <div className="flex items-center gap-2">
-        <LocationTabs activeTab={activeTab} onTabChange={filterByType} />
+        <h2 className="text-lg font-semibold">
+          {totalCount} {totalCount === 1 ? 'Location' : 'Locations'}
+        </h2>
       </div>
       
       <div className="flex items-center gap-3">
-        <OpenNowFilter checked={isOpenNow} onChange={handleOpenNowChange} />
-        
-        <LocationFilters 
-          sortOption={sortOption}
-          setSortOption={setSortOption}
-          activeTab={activeTab}
-        />
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value as SortOption)}
+          className="text-sm border rounded px-2 py-1"
+        >
+          <option value="default">Default</option>
+          <option value="rating-high">Highest Rated</option>
+          <option value="rating-low">Lowest Rated</option>
+          <option value="distance-near">Closest First</option>
+          <option value="distance-far">Farthest First</option>
+          <option value="open-first">Open Now</option>
+        </select>
       </div>
     </div>
   );
