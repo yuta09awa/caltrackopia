@@ -14,6 +14,9 @@ interface MapContainerProps {
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
 }
 
+// Define libraries array outside component to prevent re-renders
+const libraries: ("marker")[] = ['marker'];
+
 const MapContainer: React.FC<MapContainerProps> = ({ 
   height, 
   selectedIngredient, 
@@ -30,15 +33,30 @@ const MapContainer: React.FC<MapContainerProps> = ({
     const fetchApiKey = async () => {
       try {
         const response = await fetch('/api/get-google-maps-api-key');
+        
+        // Check if the response is actually JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          // If it's not JSON, it means the API endpoint doesn't exist
+          setError('Google Maps API key not configured. Please set up the API endpoint.');
+          setLoading(false);
+          return;
+        }
+
         const data = await response.json();
 
         if (data && data.apiKey) {
           setApiKey(data.apiKey);
         } else {
-          setError('Failed to load API key from /api/get-google-maps-api-key');
+          setError('Google Maps API key not found in response');
         }
       } catch (e: any) {
-        setError(`Failed to load API key: ${e.message}`);
+        // Handle both network errors and JSON parsing errors
+        if (e.message.includes('Unexpected token')) {
+          setError('Google Maps API endpoint not configured properly');
+        } else {
+          setError(`Failed to load API key: ${e.message}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -47,9 +65,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
     fetchApiKey();
   }, []);
 
-  const { isLoaded } = useLoadScript({
+  const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
-    libraries: ['marker'],
+    libraries,
   });
 
   if (loading) {
@@ -62,11 +80,17 @@ const MapContainer: React.FC<MapContainerProps> = ({
     );
   }
 
-  if (error) {
+  if (error || loadError) {
     return (
       <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
         <div className="absolute top-0 left-0 w-full bg-red-500 text-white p-4 z-50">
-          Error: {error}
+          <div className="text-sm font-medium mb-2">Map Configuration Required</div>
+          <div className="text-xs">
+            {error || loadError?.message || 'Failed to load Google Maps'}
+          </div>
+          <div className="text-xs mt-2 opacity-90">
+            To use maps, please set up a Google Maps API key endpoint.
+          </div>
         </div>
       </div>
     );
@@ -76,7 +100,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     return (
       <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">
-          Failed to load map. Please check your API key.
+          Initializing map...
         </div>
       </div>
     );
