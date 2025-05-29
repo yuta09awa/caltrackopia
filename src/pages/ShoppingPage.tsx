@@ -1,34 +1,44 @@
 
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/ui/Container";
-import { ShoppingCart, Trash2, Plus, Minus, AlertCircle } from "lucide-react";
+import { ShoppingCart, Trash2, AlertCircle } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CartConflictDialog from "@/components/cart/CartConflictDialog";
+import CartItemDisplay from "@/components/cart/CartItemDisplay";
+import { useCartOperations } from "@/hooks/useCartOperations";
+import { useMemo, useCallback } from "react";
 
 const ShoppingPage = () => {
   const { 
-    items, 
-    groupedByLocation, 
-    total, 
-    itemCount, 
-    updateQuantity, 
-    removeItem, 
-    clearCart,
-    error,
-    clearError,
+    groupedByLocation,
     pendingConflict,
     resolveConflict
   } = useAppStore();
 
-  const handleConflictReplace = () => {
-    resolveConflict('replace');
-  };
+  const {
+    items,
+    itemCount,
+    formattedTotal,
+    totalWithFees,
+    formattedTotalWithFees,
+    error,
+    clearError,
+    handleClearCart
+  } = useCartOperations();
 
-  const handleConflictCancel = () => {
+  const handleConflictReplace = useCallback(() => {
+    resolveConflict('replace');
+  }, [resolveConflict]);
+
+  const handleConflictCancel = useCallback(() => {
     resolveConflict('cancel');
-  };
+  }, [resolveConflict]);
+
+  const locationEntries = useMemo(() => {
+    return Object.entries(groupedByLocation);
+  }, [groupedByLocation]);
 
   if (itemCount === 0) {
     return (
@@ -68,7 +78,7 @@ const ShoppingPage = () => {
                     {itemCount} item{itemCount !== 1 ? 's' : ''} in your cart
                   </p>
                 </div>
-                <Button variant="outline" onClick={clearCart} className="text-destructive">
+                <Button variant="outline" onClick={handleClearCart} className="text-destructive">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Clear Cart
                 </Button>
@@ -76,7 +86,7 @@ const ShoppingPage = () => {
             </div>
 
             {error && (
-              <Alert variant="destructive" className="mb-6">
+              <Alert variant="destructive" className="mb-6" role="alert">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="flex items-center justify-between">
                   {error}
@@ -88,12 +98,12 @@ const ShoppingPage = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                {Object.entries(groupedByLocation).map(([locationId, locationItems]) => (
+              <div className="lg:col-span-2 space-y-6" role="region" aria-label="Cart items">
+                {locationEntries.map(([locationId, locationItems]) => (
                   <div key={locationId} className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-border bg-muted/20">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-primary rounded-full"></div>
+                        <div className="w-3 h-3 bg-primary rounded-full" aria-hidden="true"></div>
                         <h3 className="font-medium">{locationItems[0].locationName}</h3>
                         <span className="text-sm text-muted-foreground capitalize">
                           ({locationItems[0].locationType})
@@ -103,66 +113,7 @@ const ShoppingPage = () => {
                     
                     <div className="divide-y divide-border">
                       {locationItems.map((item) => (
-                        <div key={item.id} className="p-6 flex items-center gap-4">
-                          <img 
-                            src={item.image} 
-                            alt={item.name}
-                            className="w-16 h-16 rounded-lg object-cover"
-                          />
-                          
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            {item.description && (
-                              <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                            )}
-                            <div className="flex items-center gap-1 mt-2">
-                              {item.dietaryTags.map((tag) => (
-                                <span key={tag} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                aria-label={`Decrease quantity of ${item.name}`}
-                              >
-                                <Minus className="w-4 h-4" />
-                              </Button>
-                              <span className="w-8 text-center font-medium">{item.quantity}</span>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                aria-label={`Increase quantity of ${item.name}`}
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </div>
-                            
-                            <div className="text-right">
-                              <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-                              <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
-                            </div>
-                            
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive"
-                              onClick={() => removeItem(item.id)}
-                              aria-label={`Remove ${item.name} from cart`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
+                        <CartItemDisplay key={item.id} item={item} isCompact={false} />
                       ))}
                     </div>
                   </div>
@@ -170,13 +121,13 @@ const ShoppingPage = () => {
               </div>
 
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-xl border border-border shadow-sm p-6 sticky top-32">
+                <div className="bg-white rounded-xl border border-border shadow-sm p-6 sticky top-32" role="region" aria-label="Order summary">
                   <h3 className="font-medium mb-4">Order Summary</h3>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
                       <span>Subtotal ({itemCount} items)</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span aria-live="polite">{formattedTotal}</span>
                     </div>
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Delivery fee</span>
@@ -191,7 +142,7 @@ const ShoppingPage = () => {
                   <div className="border-t border-border pt-4 mb-6">
                     <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
-                      <span>${(total + 3.99 + 1.99).toFixed(2)}</span>
+                      <span aria-live="polite">{formattedTotalWithFees}</span>
                     </div>
                   </div>
                   
