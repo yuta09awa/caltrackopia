@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import MapView from "./MapView";
 import { Ingredient } from "@/hooks/useIngredientSearch";
@@ -7,9 +6,14 @@ import { useAppStore } from "@/store/appStore";
 interface MapContainerProps {
   height: string;
   selectedIngredient: Ingredient | null;
+  onLocationSelect?: (locationId: string) => void;
 }
 
-const MapContainer: React.FC<MapContainerProps> = ({ height, selectedIngredient }) => {
+const MapContainer: React.FC<MapContainerProps> = ({ 
+  height, 
+  selectedIngredient, 
+  onLocationSelect 
+}) => {
   const { mapFilters } = useAppStore();
   
   // Log active filters whenever they change (useful for debugging)
@@ -32,7 +36,10 @@ const MapContainer: React.FC<MapContainerProps> = ({ height, selectedIngredient 
       className="relative w-full transition-all duration-300 ease-out"
       style={{ height }}
     >
-      <MapView selectedIngredient={selectedIngredient} />
+      <MapView 
+        selectedIngredient={selectedIngredient} 
+        onLocationSelect={onLocationSelect}
+      />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
@@ -14,9 +13,10 @@ import { Market } from "@/features/markets/types";
 
 interface LocationCardProps {
   location: Location;
+  isHighlighted?: boolean;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
+const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = false }) => {
   // Determine the correct route based on location type and subType
   const getDetailLink = () => {
     // Only route to markets page for specific grocery subtypes that have market-specific features
@@ -77,7 +77,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
     <Link 
       key={location.id}
       to={getDetailLink()}
-      className="block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5"
+      className={`block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5 ${
+        isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
+      }`}
     >
       {/* Hazy overlay for closed locations - reduced opacity */}
       {!location.openNow && (

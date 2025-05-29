@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import MapContainer from "@/features/map/components/MapContainer";
@@ -9,6 +8,7 @@ import { toast } from "sonner";
 
 const MapScreen = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [mapHeight, setMapHeight] = useState("40vh");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
@@ -21,6 +21,15 @@ const MapScreen = () => {
     } else {
       toast.info(`Selected: ${ingredient.name}`);
     }
+  };
+
+  const handleLocationSelect = (locationId: string) => {
+    setSelectedLocationId(locationId);
+    
+    // Scroll to the corresponding location card in the list
+    // This would require additional implementation in LocationList component
+    // to accept selectedLocationId and scroll to that item
+    console.log('Selected location from map:', locationId);
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -56,6 +65,7 @@ const MapScreen = () => {
         <MapContainer
           height={mapHeight}
           selectedIngredient={selectedIngredient}
+          onLocationSelect={handleLocationSelect}
         />
 
         {/* Scrollable Location List */}
@@ -67,7 +77,7 @@ const MapScreen = () => {
           <div className="w-full flex justify-center py-2">
             <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
           </div>
-          <LocationList />
+          <LocationList selectedLocationId={selectedLocationId} />
         </div>
       </main>
     </div>

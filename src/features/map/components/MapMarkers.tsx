@@ -12,7 +12,7 @@ interface MarkerData {
 interface MapMarkersProps {
   userLocation: { lat: number; lng: number } | null;
   markers: MarkerData[];
-  onMarkerClick?: (markerId: string) => void;
+  onMarkerClick?: (markerId: string, event?: google.maps.MapMouseEvent) => void;
 }
 
 const MapMarkers: React.FC<MapMarkersProps> = ({ 
@@ -33,20 +33,20 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     if (isSelected) {
       return {
         path: "M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z",
-        scale: 1.2,
+        scale: 1.4,
         fillColor: "#22C55E",
         fillOpacity: 1,
         strokeColor: "#ffffff",
-        strokeWeight: 2,
+        strokeWeight: 3,
         anchor: new google.maps.Point(0, 0)
       };
     }
     return undefined; // Use default marker
   };
   
-  const handleMarkerClick = (markerId: string) => {
+  const handleMarkerClick = (markerId: string) => (event: google.maps.MapMouseEvent) => {
     if (onMarkerClick) {
-      onMarkerClick(markerId);
+      onMarkerClick(markerId, event);
     }
   };
 
@@ -65,7 +65,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
           key={marker.id}
           position={marker.position}
           title={marker.title}
-          onClick={() => handleMarkerClick(marker.id)}
+          onClick={handleMarkerClick(marker.id)}
           icon={getMarkerIcon(marker.isSelected)}
         />
       ))}
