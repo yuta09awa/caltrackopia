@@ -22,5 +22,27 @@ export interface Location {
   coordinates?: { lat: number; lng: number };
 }
 
+export interface MenuItem {
+  id: string;
+  name: string;
+  price: string;
+  description?: string;
+  image: string;
+  dietaryTags?: string[];
+  rating?: number;
+  category?: string;
+}
+
+export interface FeaturedItem {
+  id: string;
+  name: string;
+  price: string;
+  description?: string;
+  image: string;
+  dietaryTags?: string[];
+  rating?: number;
+  category?: string;
+}
+
 export type LocationType = 'all' | 'restaurant' | 'grocery' | 'farmers-market' | 'convenience-store' | 'food-festival';
 export type SortOption = 'default' | 'rating-high' | 'rating-low' | 'distance-near' | 'distance-far' | 'open-first';

@@ -113,3 +113,5 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     set({ total, itemCount, groupedByLocation });
   },
 });
+
+export type { CartSlice };
