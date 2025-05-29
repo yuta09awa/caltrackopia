@@ -50,6 +50,10 @@ const EnhancedCartConflictDialog = ({
     onClose();
   };
 
+  const handleRememberChoiceChange = (checked: boolean | "indeterminate") => {
+    setRememberChoice(checked === true);
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="max-w-md">
@@ -98,7 +102,7 @@ const EnhancedCartConflictDialog = ({
             <Checkbox 
               id="remember" 
               checked={rememberChoice}
-              onCheckedChange={setRememberChoice}
+              onCheckedChange={handleRememberChoiceChange}
             />
             <Label htmlFor="remember" className="text-sm">
               Remember my choice for future conflicts
