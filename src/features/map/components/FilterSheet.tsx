@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
@@ -8,55 +9,20 @@ import PriceRangeFilter from './filters/PriceRangeFilter';
 import CuisineFilter from './filters/CuisineFilter';
 import CategoryFilter from './filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
-
-const filterCategories = [
-  {
-    id: 'dietary',
-    label: 'Dietary Restrictions',
-    options: [
-      { id: 'vegan', label: 'Vegan' },
-      { id: 'vegetarian', label: 'Vegetarian' },
-      { id: 'gluten-free', label: 'Gluten Free' },
-      { id: 'dairy-free', label: 'Dairy Free' }
-    ]
-  },
-  {
-    id: 'nutrition',
-    label: 'Nutrition Focus',
-    options: [
-      { id: 'high-protein', label: 'High Protein' },
-      { id: 'low-carb', label: 'Low Carb' },
-      { id: 'low-fat', label: 'Low Fat' },
-      { id: 'keto', label: 'Keto Friendly' }
-    ]
-  },
-  {
-    id: 'sources',
-    label: 'Ingredient Sources',
-    options: [
-      { id: 'organic', label: 'Organic' },
-      { id: 'local', label: 'Local' },
-      { id: 'seasonal', label: 'Seasonal' },
-      { id: 'sustainable', label: 'Sustainable' }
-    ]
-  }
-];
+import { filterCategories, defaultFilterValues, cuisineOptions } from '../config/filterConfig';
 
 type FilterSheetProps = {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
-  cuisineOptions: Array<{ value: string, label: string }>;
   onApplyFilters: () => void;
 };
 
 const FilterSheet: React.FC<FilterSheetProps> = ({
   priceFilter,
   setPriceFilter,
-  cuisineOptions,
   onApplyFilters,
 }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const isMobile = useIsMobile();
   const [selectedFilters, setSelectedFilters] = React.useState<Record<string, string[]>>({
     sources: mapFilters.sources || [],
     dietary: mapFilters.dietary || [],
@@ -92,14 +58,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
       nutrition: [],
     });
     setPriceFilter(null);
-    updateMapFilters({ 
-      cuisine: 'all', // Using 'all' instead of empty string
-      priceRange: null,
-      sources: [],
-      dietary: [],
-      nutrition: [],
-      excludeIngredients: [],
-    });
+    updateMapFilters(defaultFilterValues);
   };
 
   const Content = () => (
@@ -142,6 +101,8 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
       </Button>
     </div>
   );
+
+  const isMobile = useIsMobile();
 
   return isMobile ? (
     <DrawerContent>

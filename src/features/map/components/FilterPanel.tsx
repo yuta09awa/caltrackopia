@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
@@ -8,52 +9,11 @@ import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCate
 import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
 import IngredientSearch from '@/components/ingredients/IngredientSearch';
 import { LocationType } from '@/features/locations/types';
-
-type FilterCategory = {
-  id: string;
-  label: string;
-  options: { id: string; label: string }[];
-};
-
-// Reordered filter categories based on importance
-const filterCategories: FilterCategory[] = [
-  {
-    id: 'dietary',
-    label: 'Dietary Restrictions',
-    options: [
-      { id: 'vegan', label: 'Vegan' },
-      { id: 'vegetarian', label: 'Vegetarian' },
-      { id: 'gluten-free', label: 'Gluten Free' },
-      { id: 'dairy-free', label: 'Dairy Free' }
-    ]
-  },
-  {
-    id: 'nutrition',
-    label: 'Nutrition Focus',
-    options: [
-      { id: 'high-protein', label: 'High Protein' },
-      { id: 'low-carb', label: 'Low Carb' },
-      { id: 'low-fat', label: 'Low Fat' },
-      { id: 'keto', label: 'Keto Friendly' }
-    ]
-  },
-  {
-    id: 'sources',
-    label: 'Ingredient Sources',
-    options: [
-      { id: 'organic', label: 'Organic' },
-      { id: 'local', label: 'Local' },
-      { id: 'seasonal', label: 'Seasonal' },
-      { id: 'sustainable', label: 'Sustainable' }
-    ]
-  }
-];
+import { filterCategories, defaultFilterValues, cuisineOptions, groceryCategoryOptions } from '../config/filterConfig';
 
 type FilterPanelProps = {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
-  cuisineOptions: Array<{ value: string, label: string }>;
-  groceryCategoryOptions: Array<{ value: string, label: string }>;
   activeTab?: LocationType;
   onApplyFilters: () => void;
 };
@@ -61,8 +21,6 @@ type FilterPanelProps = {
 const FilterPanel: React.FC<FilterPanelProps> = ({
   priceFilter,
   setPriceFilter,
-  cuisineOptions,
-  groceryCategoryOptions,
   activeTab = 'all',
   onApplyFilters,
 }) => {
@@ -102,14 +60,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       nutrition: [],
     });
     setPriceFilter(null);
-    updateMapFilters({ 
-      cuisine: 'all',
-      groceryCategory: 'all',
-      priceRange: null,
-      sources: [],
-      dietary: [],
-      nutrition: [],
-    });
+    updateMapFilters(defaultFilterValues);
   };
 
   return (

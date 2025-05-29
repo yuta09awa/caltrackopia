@@ -8,8 +8,6 @@ interface MapSidebarProps {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
   activeTab?: LocationType;
-  cuisineOptions: Array<{ value: string; label: string }>;
-  groceryCategoryOptions: Array<{ value: string; label: string }>;
   onApplyFilters: () => void;
 }
 
@@ -17,8 +15,6 @@ const MapSidebar = ({
   priceFilter,
   setPriceFilter,
   activeTab = 'all',
-  cuisineOptions,
-  groceryCategoryOptions,
   onApplyFilters,
 }: MapSidebarProps) => {
   return (
@@ -33,8 +29,6 @@ const MapSidebar = ({
         <FilterPanel
           priceFilter={priceFilter}
           setPriceFilter={setPriceFilter}
-          cuisineOptions={cuisineOptions}
-          groceryCategoryOptions={groceryCategoryOptions}
           activeTab={activeTab}
           onApplyFilters={onApplyFilters}
         />
