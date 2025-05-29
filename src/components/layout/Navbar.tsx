@@ -13,7 +13,7 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isAuthenticated } = useAppStore();
+  const { isAuthenticated, itemCount } = useAppStore();
 
   const menuItems = [
     { name: "Map", path: "/map", icon: MapPin },
@@ -68,7 +68,7 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                className={`flex items-center justify-center w-10 h-10 rounded-full relative ${
                   location.pathname === item.path
                     ? "bg-primary/10 text-primary"
                     : "hover:bg-gray-100 text-gray-700"
@@ -76,6 +76,11 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
                 title={item.name}
               >
                 <item.icon className="w-5 h-5" />
+                {item.path === "/shopping" && itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount > 9 ? '9+' : itemCount}
+                  </span>
+                )}
               </Link>
             ))}
             <Button

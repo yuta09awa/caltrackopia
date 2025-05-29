@@ -9,6 +9,7 @@ import LocationDetailPage from '@/pages/LocationDetailPage';
 import MarketDetailPage from '@/pages/MarketDetailPage';
 import AuthPage from '@/pages/AuthPage';
 import ProfilePage from '@/pages/ProfilePage';
+import ShoppingPage from '@/pages/ShoppingPage';
 import { AppRoute } from './types';
 
 export const routes: AppRoute[] = [
@@ -35,6 +36,11 @@ export const routes: AppRoute[] = [
     navLabel: 'Nutrition',
     icon: <Flame className="w-4 h-4" />,
     showInNav: true,
+  },
+  {
+    path: '/shopping',
+    element: <ShoppingPage />,
+    title: 'Shopping Cart',
   },
   {
     path: '/location/:id',
