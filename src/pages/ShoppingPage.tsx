@@ -1,14 +1,14 @@
 
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/ui/Container";
-import { ShoppingCart, Trash2, AlertCircle } from "lucide-react";
+import { ShoppingCart, Trash2, AlertCircle, Undo2 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CartConflictDialog from "@/components/cart/CartConflictDialog";
 import CartItemDisplay from "@/components/cart/CartItemDisplay";
 import { useCartOperations } from "@/hooks/useCartOperations";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 
 const ShoppingPage = () => {
   const { 
@@ -25,7 +25,9 @@ const ShoppingPage = () => {
     formattedTotalWithFees,
     error,
     clearError,
-    handleClearCart
+    handleClearCart,
+    handleUndo,
+    canUndo
   } = useCartOperations();
 
   const handleConflictReplace = useCallback(() => {
@@ -39,6 +41,19 @@ const ShoppingPage = () => {
   const locationEntries = useMemo(() => {
     return Object.entries(groupedByLocation);
   }, [groupedByLocation]);
+
+  // Add keyboard shortcut for undo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo]);
 
   if (itemCount === 0) {
     return (
@@ -78,10 +93,21 @@ const ShoppingPage = () => {
                     {itemCount} item{itemCount !== 1 ? 's' : ''} in your cart
                   </p>
                 </div>
-                <Button variant="outline" onClick={handleClearCart} className="text-destructive">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clear Cart
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleUndo} 
+                    disabled={!canUndo}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    <Undo2 className="w-4 h-4 mr-2" />
+                    Undo
+                  </Button>
+                  <Button variant="outline" onClick={handleClearCart} className="text-destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Clear Cart
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -100,7 +126,7 @@ const ShoppingPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6" role="region" aria-label="Cart items">
                 {locationEntries.map(([locationId, locationItems]) => (
-                  <div key={locationId} className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+                  <div key={locationId} className="bg-white rounded-xl border border-border shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
                     <div className="px-6 py-4 border-b border-border bg-muted/20">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 bg-primary rounded-full" aria-hidden="true"></div>
@@ -113,7 +139,12 @@ const ShoppingPage = () => {
                     
                     <div className="divide-y divide-border">
                       {locationItems.map((item) => (
-                        <CartItemDisplay key={item.id} item={item} isCompact={false} />
+                        <CartItemDisplay 
+                          key={item.id} 
+                          item={item} 
+                          isCompact={false} 
+                          useQuickSelector={true}
+                        />
                       ))}
                     </div>
                   </div>

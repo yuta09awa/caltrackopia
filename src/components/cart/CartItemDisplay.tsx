@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, Loader2 } from "lucide-react";
 import { CartItem } from '@/types/cart';
 import { useAppStore } from '@/store/appStore';
+import { useCurrency } from '@/hooks/useCurrency';
 import { toast } from 'sonner';
+import QuantitySelector from './QuantitySelector';
 
 interface CartItemDisplayProps {
   item: CartItem;
   isCompact?: boolean;
+  useQuickSelector?: boolean;
 }
 
-const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplayProps) => {
+const CartItemDisplay = React.memo(({ item, isCompact = false, useQuickSelector = false }: CartItemDisplayProps) => {
   const { updateQuantity, removeItem } = useAppStore();
+  const { format } = useCurrency();
   const [optimisticQuantity, setOptimisticQuantity] = useState(item.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateTimeout, setUpdateTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -51,40 +55,24 @@ const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplay
     }
   }, [optimisticQuantity, debouncedUpdateQuantity]);
 
+  const handleQuantitySelect = useCallback((newQuantity: number) => {
+    debouncedUpdateQuantity(newQuantity);
+  }, [debouncedUpdateQuantity]);
+
   const handleRemove = useCallback(() => {
     removeItem(item.id);
-    toast.success(`${item.name} removed from cart`, {
-      action: {
-        label: "Undo",
-        onClick: () => {
-          // Note: This would require implementing an undo system in the store
-          toast.info("Undo functionality coming soon!");
-        },
-      },
-    });
-  }, [item.id, item.name, removeItem]);
+  }, [item.id, removeItem]);
 
   const itemTotal = useMemo(() => {
-    return (item.price * optimisticQuantity).toFixed(2);
+    return item.price * optimisticQuantity;
   }, [item.price, optimisticQuantity]);
 
-  const formattedPrice = useMemo(() => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(item.price);
-  }, [item.price]);
-
-  const formattedTotal = useMemo(() => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(parseFloat(itemTotal));
-  }, [itemTotal]);
+  const formattedPrice = useMemo(() => format(item.price), [item.price, format]);
+  const formattedTotal = useMemo(() => format(itemTotal), [itemTotal, format]);
 
   if (isCompact) {
     return (
-      <div className="flex items-center gap-3 p-3 border border-border rounded-lg">
+      <div className="flex items-center gap-3 p-3 border border-border rounded-lg transition-all duration-200 hover:shadow-sm">
         <img 
           src={item.image} 
           alt={item.name}
@@ -98,35 +86,45 @@ const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplay
         </div>
         
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-6 w-6"
-            onClick={handleDecrement}
-            disabled={isUpdating || optimisticQuantity <= 1}
-            aria-label={`Decrease quantity of ${item.name}`}
-          >
-            {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Minus className="w-3 h-3" />}
-          </Button>
-          <span className="w-6 text-center text-sm" aria-live="polite">
-            {optimisticQuantity}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-6 w-6"
-            onClick={handleIncrement}
-            disabled={isUpdating}
-            aria-label={`Increase quantity of ${item.name}`}
-          >
-            {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
-          </Button>
+          {useQuickSelector ? (
+            <QuantitySelector
+              quantity={optimisticQuantity}
+              onQuantityChange={handleQuantitySelect}
+              disabled={isUpdating}
+            />
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6"
+                onClick={handleDecrement}
+                disabled={isUpdating || optimisticQuantity <= 1}
+                aria-label={`Decrease quantity of ${item.name}`}
+              >
+                {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Minus className="w-3 h-3" />}
+              </Button>
+              <span className="w-6 text-center text-sm" aria-live="polite">
+                {optimisticQuantity}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-6 w-6"
+                onClick={handleIncrement}
+                disabled={isUpdating}
+                aria-label={`Increase quantity of ${item.name}`}
+              >
+                {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+              </Button>
+            </>
+          )}
         </div>
         
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 text-destructive"
+          className="h-6 w-6 text-destructive hover:bg-destructive/10"
           onClick={handleRemove}
           aria-label={`Remove ${item.name} from cart`}
         >
@@ -137,7 +135,7 @@ const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplay
   }
 
   return (
-    <div className="p-6 flex items-center gap-4">
+    <div className="p-6 flex items-center gap-4 transition-all duration-200 hover:bg-muted/20">
       <img 
         src={item.image} 
         alt={item.name}
@@ -160,29 +158,39 @@ const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplay
       
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            onClick={handleDecrement}
-            disabled={isUpdating || optimisticQuantity <= 1}
-            aria-label={`Decrease quantity of ${item.name}`}
-          >
-            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
-          </Button>
-          <span className="w-8 text-center font-medium" aria-live="polite">
-            {optimisticQuantity}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            onClick={handleIncrement}
-            disabled={isUpdating}
-            aria-label={`Increase quantity of ${item.name}`}
-          >
-            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-          </Button>
+          {useQuickSelector ? (
+            <QuantitySelector
+              quantity={optimisticQuantity}
+              onQuantityChange={handleQuantitySelect}
+              disabled={isUpdating}
+            />
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleDecrement}
+                disabled={isUpdating || optimisticQuantity <= 1}
+                aria-label={`Decrease quantity of ${item.name}`}
+              >
+                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
+              </Button>
+              <span className="w-8 text-center font-medium" aria-live="polite">
+                {optimisticQuantity}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleIncrement}
+                disabled={isUpdating}
+                aria-label={`Increase quantity of ${item.name}`}
+              >
+                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              </Button>
+            </>
+          )}
         </div>
         
         <div className="text-right">
@@ -193,7 +201,7 @@ const CartItemDisplay = React.memo(({ item, isCompact = false }: CartItemDisplay
         <Button
           variant="ghost"
           size="icon"
-          className="text-destructive"
+          className="text-destructive hover:bg-destructive/10"
           onClick={handleRemove}
           aria-label={`Remove ${item.name} from cart`}
         >

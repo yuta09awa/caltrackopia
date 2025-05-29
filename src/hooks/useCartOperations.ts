@@ -1,6 +1,8 @@
 
 import { useCallback, useMemo } from 'react';
 import { useAppStore } from '@/store/appStore';
+import { useUndoSystem } from './useUndoSystem';
+import { useCurrency } from './useCurrency';
 import { toast } from 'sonner';
 
 export const useCartOperations = () => {
@@ -15,12 +17,10 @@ export const useCartOperations = () => {
     clearError 
   } = useAppStore();
 
-  const formattedTotal = useMemo(() => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(total);
-  }, [total]);
+  const { format } = useCurrency();
+  const { performUndo, canUndo, recordRemoveAction, recordClearAction } = useUndoSystem();
+
+  const formattedTotal = useMemo(() => format(total), [total, format]);
 
   const totalWithFees = useMemo(() => {
     const deliveryFee = 3.99;
@@ -28,12 +28,7 @@ export const useCartOperations = () => {
     return total + deliveryFee + serviceFee;
   }, [total]);
 
-  const formattedTotalWithFees = useMemo(() => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(totalWithFees);
-  }, [totalWithFees]);
+  const formattedTotalWithFees = useMemo(() => format(totalWithFees), [totalWithFees, format]);
 
   const handleClearCart = useCallback(() => {
     const itemsCopy = [...items];
@@ -43,12 +38,13 @@ export const useCartOperations = () => {
       action: {
         label: "Undo",
         onClick: () => {
-          // Note: This would require implementing an undo system
-          toast.info("Undo functionality coming soon!");
+          if (performUndo()) {
+            toast.success('Cart restored');
+          }
         },
       },
     });
-  }, [items, clearCart]);
+  }, [items, clearCart, performUndo]);
 
   const announceCartUpdate = useCallback((message: string) => {
     // Create a live region announcement for screen readers
@@ -79,7 +75,26 @@ export const useCartOperations = () => {
 
     removeItem(itemId);
     announceCartUpdate(`${item.name} removed from cart`);
-  }, [items, removeItem, announceCartUpdate]);
+    
+    toast.success(`${item.name} removed from cart`, {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          if (performUndo()) {
+            toast.success(`${item.name} restored to cart`);
+          }
+        },
+      },
+    });
+  }, [items, removeItem, announceCartUpdate, performUndo]);
+
+  const handleUndo = useCallback(() => {
+    if (performUndo()) {
+      toast.success('Action undone');
+    } else {
+      toast.error('Nothing to undo');
+    }
+  }, [performUndo]);
 
   return {
     items,
@@ -93,6 +108,8 @@ export const useCartOperations = () => {
     handleQuantityUpdate,
     handleRemoveItem,
     handleClearCart,
-    announceCartUpdate
+    announceCartUpdate,
+    handleUndo,
+    canUndo
   };
 };

@@ -23,6 +23,15 @@ export interface PendingConflict {
   currentLocationName: string;
 }
 
+interface UndoAction {
+  type: 'remove' | 'clear' | 'quantity';
+  itemId?: string;
+  item?: CartItem;
+  previousQuantity?: number;
+  items?: CartItem[];
+  timestamp: number;
+}
+
 export interface CartState {
   items: CartItem[];
   groupedByLocation: Record<string, CartItem[]>;
@@ -33,6 +42,7 @@ export interface CartState {
   isLoading: boolean;
   error: string | null;
   pendingConflict: PendingConflict | null;
+  undoStack: UndoAction[];
 }
 
 export interface CartActions {
@@ -44,6 +54,10 @@ export interface CartActions {
   calculateTotals: () => void;
   resolveConflict: (action: 'replace' | 'cancel') => void;
   clearError: () => void;
+  addToUndoStack: (action: UndoAction) => void;
+  clearUndoStack: () => void;
 }
 
 export type CartSlice = CartState & CartActions;
+
+export type { UndoAction };

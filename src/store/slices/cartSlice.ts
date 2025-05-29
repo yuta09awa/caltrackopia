@@ -1,7 +1,16 @@
-
 import { StateCreator } from 'zustand';
 import { CartSlice, CartItem } from '@/types/cart';
 import { MenuItem, FeaturedItem } from '@/models/Location';
+
+// Add UndoAction type
+interface UndoAction {
+  type: 'remove' | 'clear' | 'quantity';
+  itemId?: string;
+  item?: CartItem;
+  previousQuantity?: number;
+  items?: CartItem[];
+  timestamp: number;
+}
 
 // Enhanced utility function to parse price strings with error handling
 const parsePrice = (priceString: string): number => {
@@ -59,6 +68,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
   isLoading: false,
   error: null,
   pendingConflict: null,
+  undoStack: [],
 
   addItem: (item, locationId, locationName, locationType) => {
     try {
@@ -116,6 +126,18 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
   removeItem: (itemId) => {
     try {
       const state = get();
+      const itemToRemove = state.items.find(item => item.id === itemId);
+      
+      if (itemToRemove) {
+        // Add to undo stack before removing
+        get().addToUndoStack({
+          type: 'remove',
+          itemId,
+          item: itemToRemove,
+          timestamp: Date.now()
+        });
+      }
+      
       const newItems = state.items.filter(item => item.id !== itemId);
       set({ items: newItems, error: null });
       get().calculateTotals();
@@ -140,6 +162,17 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
         return;
       }
       
+      const existingItem = state.items.find(item => item.id === itemId);
+      if (existingItem && existingItem.quantity !== quantity) {
+        // Add to undo stack for quantity changes
+        get().addToUndoStack({
+          type: 'quantity',
+          itemId,
+          previousQuantity: existingItem.quantity,
+          timestamp: Date.now()
+        });
+      }
+      
       const newItems = state.items.map(item =>
         item.id === itemId ? { ...item, quantity } : item
       );
@@ -153,6 +186,17 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
 
   clearCart: () => {
     try {
+      const state = get();
+      
+      if (state.items.length > 0) {
+        // Add to undo stack before clearing
+        get().addToUndoStack({
+          type: 'clear',
+          items: [...state.items],
+          timestamp: Date.now()
+        });
+      }
+      
       set({
         items: [],
         groupedByLocation: {},
@@ -227,6 +271,22 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
 
   clearError: () => {
     set({ error: null });
+  },
+  // New undo system methods
+  addToUndoStack: (action: UndoAction) => {
+    const state = get();
+    const newUndoStack = [...state.undoStack, action];
+    
+    // Keep only last 10 actions to prevent memory issues
+    if (newUndoStack.length > 10) {
+      newUndoStack.shift();
+    }
+    
+    set({ undoStack: newUndoStack });
+  },
+
+  clearUndoStack: () => {
+    set({ undoStack: [] });
   },
 });
 
