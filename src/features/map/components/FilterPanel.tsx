@@ -6,10 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
 import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
 import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
-import CategoryFilter from '@/features/map/components/filters/CategoryFilter';
-import IngredientSearch from '@/components/ingredients/IngredientSearch';
+import IngredientFilters from './IngredientFilters';
+import CategoryFilters from './CategoryFilters';
 import { LocationType } from '@/features/locations/types';
-import { filterCategories, defaultFilterValues, cuisineOptions, groceryCategoryOptions } from '../config/filterConfig';
+import { defaultFilterValues, cuisineOptions, groceryCategoryOptions } from '../config/filterConfig';
 
 type FilterPanelProps = {
   priceFilter: string | null;
@@ -39,7 +39,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     });
   }, [selectedFilters, updateMapFilters]);
 
-  const handleCheckboxChange = (categoryId: string, optionId: string) => {
+  const handleFilterChange = (categoryId: string, optionId: string) => {
     setSelectedFilters(prev => {
       const categoryFilters = prev[categoryId] || [];
       const updated = categoryFilters.includes(optionId)
@@ -66,17 +66,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 space-y-3 p-3 overflow-y-auto">
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Include Ingredients</label>
-            <IngredientSearch compact={true} placeholder="Search ingredients to include..." />
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-2 block">Exclude Ingredients</label>
-            <IngredientSearch compact={true} placeholder="Search ingredients to exclude..." />
-          </div>
-        </div>
+        <IngredientFilters />
 
         <PriceRangeFilter 
           priceFilter={priceFilter}
@@ -91,15 +81,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
         )}
 
-        {filterCategories.map((category) => (
-          <CategoryFilter
-            key={category.id}
-            label={category.label}
-            options={category.options}
-            selectedOptions={selectedFilters[category.id] || []}
-            onOptionChange={(optionId) => handleCheckboxChange(category.id, optionId)}
-          />
-        ))}
+        <CategoryFilters 
+          selectedFilters={selectedFilters}
+          onFilterChange={handleFilterChange}
+        />
 
         <Button
           variant="outline"
