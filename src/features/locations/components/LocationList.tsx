@@ -5,6 +5,7 @@ import { LocationErrorBoundary } from './LocationErrorBoundary';
 import LocationListHeader from './LocationListHeader';
 import LocationCard from './LocationCard';
 import LocationFilters from './LocationFilters';
+import FilterChips from '@/components/search/FilterChips';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
 
@@ -63,6 +64,7 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
             isOpenNow={isOpenNow}
             setIsOpenNow={setIsOpenNow}
           />
+          <FilterChips />
         </div>
         
         <div 
