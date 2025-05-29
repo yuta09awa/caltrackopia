@@ -15,6 +15,14 @@ export interface CartItem {
   originalItem: MenuItem | FeaturedItem;
 }
 
+export interface PendingConflict {
+  item: MenuItem | FeaturedItem;
+  locationId: string;
+  locationName: string;
+  locationType: 'Restaurant' | 'Grocery';
+  currentLocationName: string;
+}
+
 export interface CartState {
   items: CartItem[];
   groupedByLocation: Record<string, CartItem[]>;
@@ -22,6 +30,9 @@ export interface CartState {
   conflictMode: 'replace' | 'separate' | 'merge';
   total: number;
   itemCount: number;
+  isLoading: boolean;
+  error: string | null;
+  pendingConflict: PendingConflict | null;
 }
 
 export interface CartActions {
@@ -31,6 +42,8 @@ export interface CartActions {
   clearCart: () => void;
   clearLocation: (locationId: string) => void;
   calculateTotals: () => void;
+  resolveConflict: (action: 'replace' | 'cancel') => void;
+  clearError: () => void;
 }
 
 export type CartSlice = CartState & CartActions;
