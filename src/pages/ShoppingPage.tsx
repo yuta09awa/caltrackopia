@@ -1,14 +1,16 @@
-
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/ui/Container";
 import { ShoppingCart, Trash2, AlertCircle, Undo2 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import CartConflictDialog from "@/components/cart/CartConflictDialog";
 import CartItemDisplay from "@/components/cart/CartItemDisplay";
 import { useCartOperations } from "@/hooks/useCartOperations";
 import { useMemo, useCallback, useEffect } from "react";
+import CartErrorBoundary from "@/components/cart/CartErrorBoundary";
+import EnhancedCartConflictDialog from "@/components/cart/EnhancedCartConflictDialog";
+import { useInternationalization } from "@/hooks/useInternationalization";
+import { useCartAnalytics } from "@/hooks/useCartAnalytics";
 
 const ShoppingPage = () => {
   const { 
@@ -20,15 +22,15 @@ const ShoppingPage = () => {
   const {
     items,
     itemCount,
-    formattedTotal,
-    totalWithFees,
-    formattedTotalWithFees,
     error,
     clearError,
     handleClearCart,
     handleUndo,
     canUndo
   } = useCartOperations();
+
+  const { formatCurrency, calculateTax, getTipSuggestions } = useInternationalization();
+  const { trackEvent } = useCartAnalytics();
 
   const handleConflictReplace = useCallback(() => {
     resolveConflict('replace');
@@ -55,6 +57,13 @@ const ShoppingPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleUndo]);
 
+  const subtotal = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [items]);
+
+  const tax = useMemo(() => calculateTax(subtotal), [subtotal, calculateTax]);
+  const total = useMemo(() => subtotal + tax + 3.99 + 1.99, [subtotal, tax]);
+
   if (itemCount === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -79,7 +88,7 @@ const ShoppingPage = () => {
   }
 
   return (
-    <>
+    <CartErrorBoundary>
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         
@@ -158,28 +167,40 @@ const ShoppingPage = () => {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
                       <span>Subtotal ({itemCount} items)</span>
-                      <span aria-live="polite">{formattedTotal}</span>
+                      <span aria-live="polite">{formatCurrency(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Delivery fee</span>
-                      <span>$3.99</span>
+                      <span>{formatCurrency(3.99)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Service fee</span>
-                      <span>$1.99</span>
+                      <span>{formatCurrency(1.99)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>Tax</span>
+                      <span>{formatCurrency(tax)}</span>
                     </div>
                   </div>
                   
                   <div className="border-t border-border pt-4 mb-6">
                     <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
-                      <span aria-live="polite">{formattedTotalWithFees}</span>
+                      <span aria-live="polite">{formatCurrency(total)}</span>
                     </div>
                   </div>
                   
-                  <Button className="w-full" size="lg">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => trackEvent('checkout_started', { total, itemCount })}
+                  >
                     Proceed to Checkout
                   </Button>
+
+                  <div className="mt-4 text-xs text-muted-foreground">
+                    <p>Suggested tips: {getTipSuggestions().map(tip => `${(tip * 100).toFixed(0)}%`).join(', ')}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -187,15 +208,14 @@ const ShoppingPage = () => {
         </main>
       </div>
 
-      <CartConflictDialog
+      <EnhancedCartConflictDialog
         isOpen={!!pendingConflict}
-        onClose={handleConflictCancel}
-        onReplace={handleConflictReplace}
+        onClose={() => resolveConflict('cancel')}
         currentLocationName={pendingConflict?.currentLocationName || ''}
         newLocationName={pendingConflict?.locationName || ''}
         itemName={pendingConflict?.item.name || ''}
       />
-    </>
+    </CartErrorBoundary>
   );
 };
 

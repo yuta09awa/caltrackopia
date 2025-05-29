@@ -74,19 +74,45 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     try {
       const state = get();
       
-      // Check for location conflicts
+      // Check for location conflicts based on conflict mode
       if (state.items.length > 0 && state.activeLocationId && state.activeLocationId !== locationId) {
-        // Set pending conflict for UI to handle
-        set({
-          pendingConflict: {
-            item,
-            locationId,
-            locationName,
-            locationType,
-            currentLocationName: state.items[0]?.locationName || 'Unknown Location'
+        const storedPreference = localStorage.getItem('cart-conflict-preference');
+        let conflictMode = state.conflictMode;
+        
+        if (storedPreference) {
+          try {
+            const { mode } = JSON.parse(storedPreference);
+            conflictMode = mode;
+          } catch (error) {
+            console.warn('Failed to parse stored conflict preference:', error);
           }
-        });
-        return;
+        }
+
+        if (conflictMode === 'replace') {
+          // Auto-replace without dialog
+          get().clearCart();
+        } else if (conflictMode === 'merge') {
+          // Auto-merge items to new location
+          const existingItems = [...state.items];
+          get().clearCart();
+          
+          existingItems.forEach(existingItem => {
+            const cartItem = createCartItem(existingItem.originalItem, locationId, locationName, locationType);
+            set(state => ({ items: [...state.items, cartItem] }));
+          });
+        } else {
+          // Show conflict dialog for 'separate' mode or when no preference is stored
+          set({
+            pendingConflict: {
+              item,
+              locationId,
+              locationName,
+              locationType,
+              currentLocationName: state.items[0]?.locationName || 'Unknown Location'
+            }
+          });
+          return;
+        }
       }
       
       const existingItemIndex = state.items.findIndex(cartItem => cartItem.id === `${locationId}-${item.id}`);
@@ -94,14 +120,11 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
       let newItems: CartItem[];
       
       if (existingItemIndex >= 0) {
-        // Item already exists, increase quantity
         newItems = [...state.items];
         newItems[existingItemIndex].quantity += 1;
       } else {
-        // New item, add to cart
         const cartItem = createCartItem(item, locationId, locationName, locationType);
         
-        // Validate cart item was created successfully
         if (cartItem.price === 0 && item.price !== '0' && item.price !== '$0' && item.price !== '$0.00') {
           set({ error: `Unable to add ${item.name}: Invalid price format` });
           return;
@@ -260,13 +283,16 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     if (!state.pendingConflict) return;
     
     if (action === 'replace') {
-      // Clear cart and add the new item
       get().clearCart();
       const { item, locationId, locationName, locationType } = state.pendingConflict;
       get().addItem(item, locationId, locationName, locationType);
     }
     
     set({ pendingConflict: null });
+  },
+
+  setConflictMode: (mode: 'replace' | 'separate' | 'merge') => {
+    set({ conflictMode: mode });
   },
 
   clearError: () => {

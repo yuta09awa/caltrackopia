@@ -1,4 +1,3 @@
-
 import {
   Sheet,
   SheetContent,
@@ -12,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import CartConflictDialog from "./CartConflictDialog";
 import CartItemDisplay from "./CartItemDisplay";
 import { useCartOperations } from "@/hooks/useCartOperations";
 import { useMemo, useCallback } from "react";
+import CartErrorBoundary from "./CartErrorBoundary";
+import EnhancedCartConflictDialog from "./EnhancedCartConflictDialog";
+import { useInternationalization } from "@/hooks/useInternationalization";
 
 interface CartSheetProps {
   children: React.ReactNode;
@@ -31,25 +32,22 @@ const CartSheet = ({ children }: CartSheetProps) => {
   const {
     items,
     itemCount,
-    formattedTotal,
     error,
     clearError
   } = useCartOperations();
 
-  const handleConflictReplace = useCallback(() => {
-    resolveConflict('replace');
-  }, [resolveConflict]);
-
   const handleConflictCancel = useCallback(() => {
     resolveConflict('cancel');
   }, [resolveConflict]);
+  
+  const { formatCurrency } = useInternationalization();
 
   const locationEntries = useMemo(() => {
     return Object.entries(groupedByLocation);
   }, [groupedByLocation]);
 
   return (
-    <>
+    <CartErrorBoundary>
       <Sheet>
         <SheetTrigger asChild>
           {children}
@@ -110,7 +108,7 @@ const CartSheet = ({ children }: CartSheetProps) => {
             <div className="border-t border-border pt-4 mt-6" role="region" aria-label="Cart summary">
               <div className="flex justify-between items-center mb-4">
                 <span className="font-medium">Total:</span>
-                <span className="font-bold text-lg" aria-live="polite">{formattedTotal}</span>
+                <span className="font-bold text-lg" aria-live="polite">{formatCurrency(items.reduce((sum, item) => sum + (item.price * item.quantity), 0))}</span>
               </div>
               <div className="space-y-2">
                 <Button asChild className="w-full">
@@ -125,15 +123,14 @@ const CartSheet = ({ children }: CartSheetProps) => {
         </SheetContent>
       </Sheet>
 
-      <CartConflictDialog
+      <EnhancedCartConflictDialog
         isOpen={!!pendingConflict}
         onClose={handleConflictCancel}
-        onReplace={handleConflictReplace}
         currentLocationName={pendingConflict?.currentLocationName || ''}
         newLocationName={pendingConflict?.locationName || ''}
         itemName={pendingConflict?.item.name || ''}
       />
-    </>
+    </CartErrorBoundary>
   );
 };
 

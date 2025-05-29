@@ -53,6 +53,7 @@ export interface CartActions {
   clearLocation: (locationId: string) => void;
   calculateTotals: () => void;
   resolveConflict: (action: 'replace' | 'cancel') => void;
+  setConflictMode: (mode: 'replace' | 'separate' | 'merge') => void;
   clearError: () => void;
   addToUndoStack: (action: UndoAction) => void;
   clearUndoStack: () => void;
