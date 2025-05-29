@@ -1,8 +1,10 @@
+
 import { useState, useCallback, useRef } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Ingredient } from "@/hooks/useIngredientSearch";
+import { Location } from "@/models/Location";
 import MapControls from "./MapControls";
 import MapMarkers from "./MapMarkers";
 import MapHeader from "./MapHeader";
@@ -57,12 +59,14 @@ const MapView = ({ selectedIngredient, onLocationSelect }: MapViewProps) => {
       if (location) {
         setSelectedMarkerId(markerId);
         
-        // Calculate position for info card
-        if (event && mapContainer.current) {
+        // Calculate position for info card using domEvent for pixel coordinates
+        if (event?.domEvent && mapContainer.current) {
           const rect = mapContainer.current.getBoundingClientRect();
+          const clientX = (event.domEvent as MouseEvent).clientX;
+          const clientY = (event.domEvent as MouseEvent).clientY;
           setInfoCardPosition({
-            x: event.pixel.x - 140, // Center the card on the marker
-            y: event.pixel.y - 180  // Position above the marker
+            x: clientX - rect.left - 140, // Center the card on the marker
+            y: clientY - rect.top - 180   // Position above the marker
           });
         }
         
@@ -83,10 +87,25 @@ const MapView = ({ selectedIngredient, onLocationSelect }: MapViewProps) => {
     if (selectedMarkerId && selectedIngredient?.locations) {
       const location = selectedIngredient.locations.find(loc => loc.id === selectedMarkerId);
       if (location) {
+        // Create a full Location object with default values for missing properties
+        const fullLocation: Location = {
+          id: location.id,
+          name: location.name,
+          type: "Restaurant", // Default type
+          rating: 4.0, // Default rating
+          distance: typeof location.distance === 'number' ? `${location.distance}mi` : location.distance || "0.5mi",
+          address: location.address,
+          openNow: true, // Default to open
+          hours: [],
+          price: (location.price as "$" | "$$" | "$$$" | "$$$$") || "$$",
+          dietaryOptions: [],
+          cuisine: "Various",
+          images: [],
+          coordinates: { lat: location.lat, lng: location.lng }
+        };
+
         // Determine the correct route based on location type
-        if (location.type.toLowerCase() === "grocery" && 
-            location.subType && 
-            ["farmers market", "food festival", "convenience store"].includes(location.subType.toLowerCase())) {
+        if (fullLocation.type.toLowerCase() === "grocery") {
           navigate(`/markets/${location.id}`);
         } else {
           navigate(`/location/${location.id}`);
@@ -117,8 +136,29 @@ const MapView = ({ selectedIngredient, onLocationSelect }: MapViewProps) => {
     return <MapErrorState />;
   }
 
+  // Create a full Location object for the selected location to pass to MapMarkerInfoCard
   const selectedLocation = selectedMarkerId && selectedIngredient?.locations 
-    ? selectedIngredient.locations.find(loc => loc.id === selectedMarkerId)
+    ? (() => {
+        const location = selectedIngredient.locations.find(loc => loc.id === selectedMarkerId);
+        if (!location) return null;
+        
+        // Convert to full Location interface with defaults
+        return {
+          id: location.id,
+          name: location.name,
+          type: "Restaurant" as const,
+          rating: 4.0,
+          distance: typeof location.distance === 'number' ? `${location.distance}mi` : location.distance || "0.5mi",
+          address: location.address,
+          openNow: true,
+          hours: [],
+          price: (location.price as "$" | "$$" | "$$$" | "$$$$") || "$$",
+          dietaryOptions: [],
+          cuisine: "Various",
+          images: [],
+          coordinates: { lat: location.lat, lng: location.lng }
+        } as Location;
+      })()
     : null;
 
   return (
