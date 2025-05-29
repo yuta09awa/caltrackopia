@@ -60,8 +60,8 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
                   <circle cx="16" cy="16" r="14" fill="${isSelected ? '#1976d2' : isHovered ? '#1976d280' : 'white'}" 
                           stroke="${isSelected || isHovered ? '#ffffff' : '#1976d2'}" stroke-width="2"/>
                   <g transform="translate(12, 12)">
-                    ${type === 'restaurant' ? '<path d="M12 2l3.09 6.26L22 9l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.87 2 9l6.91-.74L12 2z" fill="currentColor"/>' : 
-                      type === 'grocery' ? '<path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1z" fill="currentColor"/>' :
+                    ${marker.type === 'restaurant' ? '<path d="M12 2l3.09 6.26L22 9l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.87 2 9l6.91-.74L12 2z" fill="currentColor"/>' : 
+                      marker.type === 'grocery' ? '<path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1z" fill="currentColor"/>' :
                       '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>'}
                   </g>
                 </svg>

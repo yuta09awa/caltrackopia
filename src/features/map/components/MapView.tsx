@@ -46,7 +46,7 @@ const MapView: React.FC<MapViewProps> = ({
 
   return (
     <GoogleMap
-      ref={handleMapLoad}
+      onLoad={handleMapLoad}
       zoom={zoom}
       center={center}
       onCenterChanged={onCameraChanged}

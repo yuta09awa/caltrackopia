@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLoadScript } from '@react-google-maps/api';
+import { useLoadScript, GoogleMap } from '@react-google-maps/api';
 import { useMapState } from '../hooks/useMapState';
 import MapMarkers from './MapMarkers';
 import { MarkerData } from '../types';
@@ -138,7 +138,7 @@ const MapView: React.FC<MapViewProps> = ({
     }
   }, [updateCenter, updateZoom]);
 
-  const handleMapLoad = React.useCallback((map: google.maps.Map) => {
+  const onLoad = React.useCallback((map: google.maps.Map) => {
     mapRef.current = map;
   }, []);
 
@@ -153,7 +153,7 @@ const MapView: React.FC<MapViewProps> = ({
 
   return (
     <GoogleMap
-      ref={handleMapLoad}
+      onLoad={onLoad}
       zoom={zoom}
       center={center}
       onCenterChanged={onCameraChanged}

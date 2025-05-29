@@ -1,11 +1,12 @@
 
-import { LatLng } from '@react-google-maps/api';
+// Define our own LatLng interface since @react-google-maps/api doesn't export it directly
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
 
 export interface MarkerData {
   position: LatLng;
   locationId: string;
   type: string;
 }
-
-// Re-export AdvancedMarker from @react-google-maps/api
-export { AdvancedMarker } from '@react-google-maps/api';
