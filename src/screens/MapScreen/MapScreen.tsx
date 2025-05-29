@@ -40,14 +40,16 @@ const MapScreen = () => {
     const mockLocation: Location = {
       id: locationId,
       name: "Sample Location",
-      type: "restaurant",
+      type: "Restaurant", // Fixed: changed from "restaurant" to "Restaurant"
       rating: 4.5,
       price: "$$",
       distance: "0.3 mi",
       openNow: true,
       images: [],
       address: "123 Main St",
-      phone: "(555) 123-4567"
+      phone: "(555) 123-4567",
+      dietaryOptions: [],
+      cuisine: "American"
     };
     
     setSelectedLocation(mockLocation);

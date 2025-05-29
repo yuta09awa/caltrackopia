@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
-import { APIProvider, Map } from '@vis.gl/react-google-maps';
+import { useLoadScript } from '@react-google-maps/api';
 import { useMapState } from '../hooks/useMapState';
-import { MapMarkers } from './MapMarkers';
+import MapMarkers from './MapMarkers';
 import { MarkerData } from '../types';
 import { Ingredient } from '@/hooks/useIngredientSearch';
 
@@ -46,103 +47,133 @@ const MapContainer: React.FC<MapContainerProps> = ({
     fetchApiKey();
   }, []);
 
-  interface MapViewProps {
-    center: google.maps.LatLngLiteral;
-    zoom: number;
-    markers: MarkerData[];
-    selectedLocationId?: string | null;
-    onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
-    onLocationSelect?: (locationId: string) => void;
-  }
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: apiKey || '',
+    libraries: ['marker'],
+  });
 
-  const MapView: React.FC<MapViewProps> = ({ 
-    center, 
-    zoom, 
-    markers,
-    selectedLocationId,
-    onMarkerClick,
-    onLocationSelect
-  }) => {
-    const mapRef = React.useRef<google.maps.Map | null>(null);
-    const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
-
-    const onCameraChanged = React.useCallback(() => {
-      if (!mapRef.current) return;
-      updateCenter({
-        lat: mapRef.current.center?.lat() || 0,
-        lng: mapRef.current.center?.lng() || 0,
-      });
-      updateZoom(mapRef.current.zoom || 0);
-    }, [updateCenter, updateZoom]);
-
-    const handleMapLoad = React.useCallback((map: google.maps.Map) => {
-      mapRef.current = map;
-    }, []);
-
-    const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
-      if (onMarkerClick) {
-        onMarkerClick(locationId, position);
-      }
-      if (onLocationSelect) {
-        onLocationSelect(locationId);
-      }
-    };
-
+  if (loading) {
     return (
-      <Map
-        ref={mapRef}
-        zoom={zoom}
-        center={center}
-        onCameraChanged={onCameraChanged}
-        mapId="bf51a910020fa25a"
-        className="w-full h-full"
-        onClick={() => {
-          // Clear selection when clicking on empty map area
-          if (onLocationSelect) {
-            onLocationSelect('');
-          }
-        }}
-      >
-        <MapMarkers 
-          markers={markers}
-          selectedLocationId={selectedLocationId}
-          hoveredLocationId={hoveredLocationId}
-          onMarkerClick={handleMarkerClick}
-          onMarkerHover={setHoveredLocationId}
-        />
-      </Map>
-    );
-  };
-
-  return (
-    <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
-      {error && (
-        <div className="absolute top-0 left-0 w-full bg-red-500 text-white p-4 z-50">
-          Error: {error}
-        </div>
-      )}
-
-      {loading ? (
+      <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">
           Loading map...
         </div>
-      ) : apiKey ? (
-        <APIProvider apiKey={apiKey} libraries={['marker']}>
-          <MapView
-            center={mapState.center}
-            zoom={mapState.zoom}
-            markers={mapState.markers}
-            selectedLocationId={selectedLocationId}
-            onMarkerClick={onMarkerClick}
-            onLocationSelect={onLocationSelect}
-          />
-        </APIProvider>
-      ) : (
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
+        <div className="absolute top-0 left-0 w-full bg-red-500 text-white p-4 z-50">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoaded || !apiKey) {
+    return (
+      <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">
           Failed to load map. Please check your API key.
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
+      <MapView
+        center={mapState.center}
+        zoom={mapState.zoom}
+        markers={mapState.markers}
+        selectedLocationId={selectedLocationId}
+        onMarkerClick={onMarkerClick}
+        onLocationSelect={onLocationSelect}
+        updateCenter={updateCenter}
+        updateZoom={updateZoom}
+      />
     </div>
+  );
+};
+
+interface MapViewProps {
+  center: google.maps.LatLngLiteral;
+  zoom: number;
+  markers: MarkerData[];
+  selectedLocationId?: string | null;
+  onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
+  onLocationSelect?: (locationId: string) => void;
+  updateCenter: (center: any) => void;
+  updateZoom: (zoom: number) => void;
+}
+
+const MapView: React.FC<MapViewProps> = ({ 
+  center, 
+  zoom, 
+  markers,
+  selectedLocationId,
+  onMarkerClick,
+  onLocationSelect,
+  updateCenter,
+  updateZoom
+}) => {
+  const mapRef = React.useRef<google.maps.Map | null>(null);
+  const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
+
+  const onCameraChanged = React.useCallback(() => {
+    if (!mapRef.current) return;
+    const newCenter = mapRef.current.getCenter();
+    const newZoom = mapRef.current.getZoom();
+    
+    if (newCenter) {
+      updateCenter({
+        lat: newCenter.lat(),
+        lng: newCenter.lng(),
+      });
+    }
+    if (newZoom) {
+      updateZoom(newZoom);
+    }
+  }, [updateCenter, updateZoom]);
+
+  const handleMapLoad = React.useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
+    if (onMarkerClick) {
+      onMarkerClick(locationId, position);
+    }
+    if (onLocationSelect) {
+      onLocationSelect(locationId);
+    }
+  };
+
+  return (
+    <GoogleMap
+      ref={handleMapLoad}
+      zoom={zoom}
+      center={center}
+      onCenterChanged={onCameraChanged}
+      onZoomChanged={onCameraChanged}
+      mapContainerClassName="w-full h-full"
+      onClick={() => {
+        // Clear selection when clicking on empty map area
+        if (onLocationSelect) {
+          onLocationSelect('');
+        }
+      }}
+    >
+      <MapMarkers 
+        markers={markers}
+        selectedLocationId={selectedLocationId}
+        hoveredLocationId={hoveredLocationId}
+        onMarkerClick={handleMarkerClick}
+        onMarkerHover={setHoveredLocationId}
+      />
+    </GoogleMap>
   );
 };
 

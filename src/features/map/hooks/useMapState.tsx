@@ -1,5 +1,10 @@
+
 import { useState } from 'react';
-import { LatLng } from '@/components/map/types';
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
 
 export interface MarkerData {
   position: LatLng;

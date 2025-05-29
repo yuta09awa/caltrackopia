@@ -1,11 +1,11 @@
+
 import React, { useState, useRef, useCallback } from 'react';
-import { GoogleMap, Marker, LatLng } from '@react-google-maps/api';
-import { Map } from "@react-google-maps/api";
+import { GoogleMap } from '@react-google-maps/api';
 import { MarkerData } from '../hooks/useMapState';
 import MapMarkers from './MapMarkers';
 
 interface MapViewProps {
-  center: LatLng;
+  center: google.maps.LatLngLiteral;
   zoom: number;
   markers: MarkerData[];
   selectedLocationId?: string | null;
@@ -45,13 +45,13 @@ const MapView: React.FC<MapViewProps> = ({
   };
 
   return (
-    <Map
-      ref={mapRef}
+    <GoogleMap
+      ref={handleMapLoad}
       zoom={zoom}
       center={center}
-      onCameraChanged={onCameraChanged}
-      mapId="bf51a910020fa25a"
-      className="w-full h-full"
+      onCenterChanged={onCameraChanged}
+      onZoomChanged={onCameraChanged}
+      mapContainerClassName="w-full h-full"
       onClick={() => {
         // Clear selection when clicking on empty map area
         if (onLocationSelect) {
@@ -66,7 +66,7 @@ const MapView: React.FC<MapViewProps> = ({
         onMarkerClick={handleMarkerClick}
         onMarkerHover={setHoveredLocationId}
       />
-    </Map>
+    </GoogleMap>
   );
 };
 
