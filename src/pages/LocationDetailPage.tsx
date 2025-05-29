@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, 
@@ -29,8 +28,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { locationService } from "@/services/locationService";
+import { Location } from "@/models/Location";
 
-// Define types for our location data
+// Define types for our location data - extending base Location interface
 interface MenuCategory {
   category: string;
   items: MenuItem[];
@@ -75,78 +76,34 @@ interface Section {
   popular: string[];
 }
 
-interface BaseLocation {
-  id: string;
-  name: string;
-  type: string;
-  rating: number;
-  distance: string;
-  address: string;
-  phone: string;
-  website: string;
-  openNow: boolean;
-  hours: { day: string; hours: string }[];
-  price: string;
-  dietaryOptions: string[];
-  cuisine: string;
-  description: string;
-  images: string[];
-}
-
-interface RestaurantLocation extends BaseLocation {
-  menu: MenuCategory[];
-  nutrition: {
+interface RestaurantLocation extends Location {
+  menu?: MenuCategory[];
+  nutrition?: {
     show: boolean;
     items: NutritionItem[];
   };
 }
 
-interface GroceryLocation extends BaseLocation {
-  sections: Section[];
-  featuredItems: FeaturedItem[];
+interface GroceryLocation extends Location {
+  sections?: Section[];
+  featuredItems?: FeaturedItem[];
 }
 
-type Location = RestaurantLocation | GroceryLocation;
+type ExtendedLocation = RestaurantLocation | GroceryLocation;
 
 // Function to check if location is a restaurant
-function isRestaurant(location: Location): location is RestaurantLocation {
+function isRestaurant(location: ExtendedLocation): location is RestaurantLocation {
   return location.type === "Restaurant";
 }
 
 // Function to check if location is a grocery
-function isGrocery(location: Location): location is GroceryLocation {
+function isGrocery(location: ExtendedLocation): location is GroceryLocation {
   return location.type === "Grocery";
 }
 
-// Mock data for locations
-const mockLocations: Record<string, Location> = {
+// Mock extended data for locations that need additional details
+const extendedLocationData: Record<string, Partial<ExtendedLocation>> = {
   "1": {
-    id: "1",
-    name: "Healthy Greens Cafe",
-    type: "Restaurant",
-    rating: 4.8,
-    distance: "0.3 mi",
-    address: "123 Nutrition St, San Francisco, CA",
-    phone: "(415) 555-1234",
-    website: "https://healthygreens.example.com",
-    openNow: true,
-    hours: [
-      { day: "Monday", hours: "8:00 AM - 8:00 PM" },
-      { day: "Tuesday", hours: "8:00 AM - 8:00 PM" },
-      { day: "Wednesday", hours: "8:00 AM - 8:00 PM" },
-      { day: "Thursday", hours: "8:00 AM - 8:00 PM" },
-      { day: "Friday", hours: "8:00 AM - 10:00 PM" },
-      { day: "Saturday", hours: "9:00 AM - 10:00 PM" },
-      { day: "Sunday", hours: "9:00 AM - 7:00 PM" }
-    ],
-    price: "$",
-    dietaryOptions: ["High Protein", "Low Fat", "Vegetarian", "Gluten-Free"],
-    cuisine: "American",
-    description: "A cozy café offering nutritious meals made with locally-sourced ingredients. Our menu features a variety of healthy options to fuel your day.",
-    images: [
-      "/placeholder.svg",
-      "/placeholder.svg",
-    ],
     menu: [
       {
         category: "Breakfast",
@@ -161,71 +118,6 @@ const mockLocations: Record<string, Location> = {
             rating: 4.7,
             thumbsUp: 24,
             thumbsDown: 2
-          },
-          {
-            id: "b2",
-            name: "Avocado Toast",
-            description: "Whole grain toast topped with mashed avocado, poached eggs, and microgreens",
-            price: "$10.99",
-            image: "/placeholder.svg",
-            dietaryTags: ["High Fiber", "Vegetarian"],
-            rating: 4.9,
-            thumbsUp: 32,
-            thumbsDown: 1
-          }
-        ]
-      },
-      {
-        category: "Lunch",
-        items: [
-          {
-            id: "l1",
-            name: "Quinoa Bowl",
-            description: "Protein-packed quinoa with roasted vegetables, chickpeas, and tahini dressing",
-            price: "$14.99",
-            image: "/placeholder.svg",
-            dietaryTags: ["Vegan", "Gluten-Free"],
-            rating: 4.6,
-            thumbsUp: 19,
-            thumbsDown: 3
-          },
-          {
-            id: "l2",
-            name: "Grilled Chicken Salad",
-            description: "Mixed greens with grilled chicken breast, avocado, cherry tomatoes, and balsamic vinaigrette",
-            price: "$15.99",
-            image: "/placeholder.svg",
-            dietaryTags: ["High Protein", "Low Fat"],
-            rating: 4.8,
-            thumbsUp: 27,
-            thumbsDown: 2
-          }
-        ]
-      },
-      {
-        category: "Dinner",
-        items: [
-          {
-            id: "d1",
-            name: "Salmon Plate",
-            description: "Grilled wild salmon with quinoa, steamed broccoli, and lemon-dill sauce",
-            price: "$19.99",
-            image: "/placeholder.svg",
-            dietaryTags: ["High Protein", "Omega-3"],
-            rating: 4.9,
-            thumbsUp: 35,
-            thumbsDown: 1
-          },
-          {
-            id: "d2",
-            name: "Vegetable Stir-Fry",
-            description: "Seasonal vegetables stir-fried with tofu in a light ginger sauce, served with brown rice",
-            price: "$16.99",
-            image: "/placeholder.svg",
-            dietaryTags: ["Vegan", "Low Fat"],
-            rating: 4.7,
-            thumbsUp: 22,
-            thumbsDown: 3
           }
         ]
       }
@@ -240,90 +132,63 @@ const mockLocations: Record<string, Location> = {
           carbs: 45,
           fat: 12,
           fiber: 6
-        },
-        {
-          name: "Avocado Toast",
-          calories: 350,
-          protein: 15,
-          carbs: 30,
-          fat: 20,
-          fiber: 8
         }
       ]
     }
   },
   "2": {
-    id: "2",
-    name: "Fresh Market Grocery",
-    type: "Grocery",
-    rating: 4.6,
-    distance: "0.5 mi",
-    address: "456 Organic Ave, San Francisco, CA",
-    phone: "(415) 555-5678",
-    website: "https://freshmarket.example.com",
-    openNow: true,
-    hours: [
-      { day: "Monday", hours: "7:00 AM - 10:00 PM" },
-      { day: "Tuesday", hours: "7:00 AM - 10:00 PM" },
-      { day: "Wednesday", hours: "7:00 AM - 10:00 PM" },
-      { day: "Thursday", hours: "7:00 AM - 10:00 PM" },
-      { day: "Friday", hours: "7:00 AM - 11:00 PM" },
-      { day: "Saturday", hours: "7:00 AM - 11:00 PM" },
-      { day: "Sunday", hours: "8:00 AM - 9:00 PM" }
-    ],
-    price: "$$",
-    dietaryOptions: ["Organic", "Vegan", "Gluten-Free", "Local"],
-    cuisine: "Various",
-    description: "A neighborhood grocery store specializing in organic, locally-sourced produce and health foods. We offer a wide selection of nutritious options for every diet.",
-    images: [
-      "/placeholder.svg",
-      "/placeholder.svg",
-    ],
-    sections: [
+    // Greens Restaurant - this should be a restaurant, not grocery
+    menu: [
       {
-        name: "Produce",
-        description: "Fresh, organic fruits and vegetables sourced from local farms",
-        popular: ["Organic Kale", "Heirloom Tomatoes", "Avocados"]
+        category: "Appetizers",
+        items: [
+          {
+            id: "a1",
+            name: "Seasonal Vegetable Terrine",
+            description: "Layers of roasted vegetables with herb oil and microgreens",
+            price: "$18.00",
+            image: "/placeholder.svg",
+            dietaryTags: ["Vegetarian", "Vegan"],
+            rating: 4.8,
+            thumbsUp: 32,
+            thumbsDown: 1
+          }
+        ]
       },
       {
-        name: "Protein",
-        description: "High-quality, sustainably-sourced meats, seafood, and plant-based proteins",
-        popular: ["Wild Salmon", "Grass-Fed Beef", "Organic Tofu"]
-      },
-      {
-        name: "Bulk Foods",
-        description: "Package-free grains, nuts, seeds, and dried fruits",
-        popular: ["Organic Quinoa", "Raw Almonds", "Chia Seeds"]
+        category: "Main Courses",
+        items: [
+          {
+            id: "m1",
+            name: "Wild Mushroom Risotto",
+            description: "Creamy arborio rice with seasonal wild mushrooms and truffle oil",
+            price: "$28.00",
+            image: "/placeholder.svg",
+            dietaryTags: ["Vegetarian", "Gluten-Free"],
+            rating: 4.9,
+            thumbsUp: 45,
+            thumbsDown: 2
+          }
+        ]
       }
     ],
-    featuredItems: [
-      {
-        id: "f1",
-        name: "Organic Meal Prep Box",
-        description: "A curated box of seasonal produce and proteins for healthy meal prep",
-        price: "$39.99",
-        image: "/placeholder.svg",
-        dietaryTags: ["Organic", "Seasonal"],
-        rating: 4.8,
-        thumbsUp: 42,
-        thumbsDown: 3
-      },
-      {
-        id: "f2",
-        name: "Local Honey",
-        description: "Raw, unfiltered honey produced by local beekeepers",
-        price: "$8.99",
-        image: "/placeholder.svg",
-        dietaryTags: ["Natural", "Local"],
-        rating: 4.9,
-        thumbsUp: 56,
-        thumbsDown: 1
-      }
-    ]
+    nutrition: {
+      show: true,
+      items: [
+        {
+          name: "Wild Mushroom Risotto",
+          calories: 520,
+          protein: 12,
+          carbs: 68,
+          fat: 18,
+          fiber: 4
+        }
+      ]
+    }
   }
 };
 
-// Mock menu items for "More locations like this"
+// Mock similar locations for reviews tab
 const similarLocations = [
   {
     id: "3",
@@ -343,11 +208,43 @@ const similarLocations = [
 
 const LocationDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const [location, setLocation] = useState<ExtendedLocation | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeThumbsUp, setActiveThumbsUp] = useState<Set<string>>(new Set());
   const [activeThumbsDown, setActiveThumbsDown] = useState<Set<string>>(new Set());
   
-  // Get location data based on ID
-  const location = id ? mockLocations[id as keyof typeof mockLocations] : null;
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const baseLocation = await locationService.getLocationById(id);
+        if (baseLocation) {
+          // Merge with extended data if available
+          const extendedData = extendedLocationData[id] || {};
+          const mergedLocation = { ...baseLocation, ...extendedData } as ExtendedLocation;
+          setLocation(mergedLocation);
+        }
+      } catch (error) {
+        console.error('Error fetching location:', error);
+        toast.error("Failed to load location details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLocation();
+  }, [id]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="mt-2 text-muted-foreground">Loading location details...</p>
+      </div>
+    );
+  }
   
   if (!location) {
     return (
@@ -585,7 +482,7 @@ const LocationDetailPage = () => {
                   </Accordion>
                 )}
 
-                {isGrocery(location) && (
+                {isGrocery(location) && location.featuredItems && (
                   <>
                     <h3 className="text-lg font-medium mb-3">Featured Items</h3>
                     <div className="space-y-4">
@@ -647,28 +544,38 @@ const LocationDetailPage = () => {
                       ))}
                     </div>
 
-                    <h3 className="text-lg font-medium mt-6 mb-3">Departments</h3>
-                    <Accordion type="single" collapsible className="w-full">
-                      {location.sections.map((section) => (
-                        <AccordionItem key={section.name} value={section.name}>
-                          <AccordionTrigger className="hover:no-underline">
-                            <span>{section.name}</span>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {section.description}
-                            </p>
-                            <h4 className="text-sm font-medium mt-2">Popular Items</h4>
-                            <ul className="list-disc pl-4 text-sm text-muted-foreground">
-                              {section.popular.map((item) => (
-                                <li key={item}>{item}</li>
-                              ))}
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
+                    {location.sections && (
+                      <>
+                        <h3 className="text-lg font-medium mt-6 mb-3">Departments</h3>
+                        <Accordion type="single" collapsible className="w-full">
+                          {location.sections.map((section) => (
+                            <AccordionItem key={section.name} value={section.name}>
+                              <AccordionTrigger className="hover:no-underline">
+                                <span>{section.name}</span>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {section.description}
+                                </p>
+                                <h4 className="text-sm font-medium mt-2">Popular Items</h4>
+                                <ul className="list-disc pl-4 text-sm text-muted-foreground">
+                                  {section.popular.map((item) => (
+                                    <li key={item}>{item}</li>
+                                  ))}
+                                </ul>
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </>
+                    )}
                   </>
+                )}
+
+                {!isRestaurant(location) && !isGrocery(location) && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Menu information coming soon!</p>
+                  </div>
                 )}
               </TabsContent>
               
@@ -680,35 +587,41 @@ const LocationDetailPage = () => {
                     <p className="text-sm text-muted-foreground">{location.address}</p>
                   </div>
                   
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Contact</h3>
-                    <p className="text-sm text-muted-foreground">{location.phone}</p>
-                    <a 
-                      href={location.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      {location.website.replace('https://', '')}
-                    </a>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Hours</h3>
-                    <div className="text-sm">
-                      {location.hours.map((hour) => (
-                        <div 
-                          key={hour.day} 
-                          className="flex justify-between py-1 border-b border-gray-100 last:border-0"
+                  {location.phone && (
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Contact</h3>
+                      <p className="text-sm text-muted-foreground">{location.phone}</p>
+                      {location.website && (
+                        <a 
+                          href={location.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline"
                         >
-                          <span className={hour.day === "Sunday" ? "font-medium" : ""}>
-                            {hour.day}
-                          </span>
-                          <span className="text-muted-foreground">{hour.hours}</span>
-                        </div>
-                      ))}
+                          {location.website.replace('https://', '')}
+                        </a>
+                      )}
                     </div>
-                  </div>
+                  )}
+                  
+                  {location.hours && (
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Hours</h3>
+                      <div className="text-sm">
+                        {location.hours.map((hour) => (
+                          <div 
+                            key={hour.day} 
+                            className="flex justify-between py-1 border-b border-gray-100 last:border-0"
+                          >
+                            <span className={hour.day === "Sunday" ? "font-medium" : ""}>
+                              {hour.day}
+                            </span>
+                            <span className="text-muted-foreground">{hour.hours}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
               
@@ -785,4 +698,3 @@ const LocationDetailPage = () => {
 };
 
 export default LocationDetailPage;
-

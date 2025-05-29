@@ -17,11 +17,15 @@ interface LocationCardProps {
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
-  // Determine the correct route based on location type
+  // Determine the correct route based on location type and subType
   const getDetailLink = () => {
-    if (location.type.toLowerCase() === "grocery") {
+    // Only route to markets page for specific grocery subtypes that have market-specific features
+    if (location.type.toLowerCase() === "grocery" && 
+        location.subType && 
+        ["farmers market", "food festival", "convenience store"].includes(location.subType.toLowerCase())) {
       return `/markets/${location.id}`;
     } else {
+      // All restaurants and other location types go to location detail page
       return `/location/${location.id}`;
     }
   };

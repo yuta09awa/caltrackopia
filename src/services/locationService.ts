@@ -1,6 +1,7 @@
 
 import { Location } from "@/models/Location";
 import { apiService } from "./api/apiService";
+import { mockLocations } from "@/features/locations/data/mockLocations";
 
 export class LocationService {
   /**
@@ -50,44 +51,24 @@ export class LocationService {
   }
 
   /**
-   * Mock data for development/fallback
+   * Get a single location by ID
+   */
+  async getLocationById(id: string): Promise<Location | null> {
+    try {
+      return await apiService.get<Location>(`/locations/${id}`);
+    } catch (error) {
+      console.error('Error fetching location by ID:', error);
+      // Return mock data as fallback
+      const mockLocations = this.getMockLocations();
+      return mockLocations.find(location => location.id === id) || null;
+    }
+  }
+
+  /**
+   * Mock data for development/fallback - now uses consolidated data
    */
   private getMockLocations(): Location[] {
-    return [
-      {
-        id: "1",
-        name: "Green Valley Market",
-        type: "Grocery",
-        subType: "Health Food Store",
-        rating: 4.5,
-        distance: "0.3 miles",
-        address: "123 Main St, San Francisco, CA",
-        openNow: true,
-        hours: [
-          { day: "Monday", hours: "8:00 AM - 9:00 PM" },
-          { day: "Tuesday", hours: "8:00 AM - 9:00 PM" }
-        ],
-        price: "$$",
-        dietaryOptions: ["Organic", "Vegan", "Gluten-Free"],
-        cuisine: "Health Food",
-        images: ["/placeholder.svg"],
-        coordinates: { lat: 37.7749, lng: -122.4194 }
-      },
-      {
-        id: "2",
-        name: "Farm Fresh Bistro",
-        type: "Restaurant",
-        rating: 4.8,
-        distance: "0.5 miles",
-        address: "456 Oak Ave, San Francisco, CA",
-        openNow: true,
-        price: "$$$",
-        dietaryOptions: ["Farm-to-Table", "Vegetarian"],
-        cuisine: "American",
-        images: ["/placeholder.svg"],
-        coordinates: { lat: 37.7849, lng: -122.4094 }
-      }
-    ];
+    return mockLocations;
   }
 }
 
