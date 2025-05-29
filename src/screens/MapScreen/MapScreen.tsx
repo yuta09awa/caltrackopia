@@ -5,10 +5,15 @@ import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
+import { Location } from "@/features/locations/types";
+import MapInfoCard from "@/features/map/components/MapInfoCard";
 
 const MapScreen = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [showInfoCard, setShowInfoCard] = useState(false);
+  const [infoCardPosition, setInfoCardPosition] = useState({ x: 0, y: 0 });
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [mapHeight, setMapHeight] = useState("40vh");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
@@ -25,11 +30,42 @@ const MapScreen = () => {
 
   const handleLocationSelect = (locationId: string) => {
     setSelectedLocationId(locationId);
-    
-    // Scroll to the corresponding location card in the list
-    // This would require additional implementation in LocationList component
-    // to accept selectedLocationId and scroll to that item
     console.log('Selected location from map:', locationId);
+  };
+
+  const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
+    // Find the location data (you'd need access to locations data here)
+    // For now, we'll create a mock location - in real implementation, 
+    // this should come from your locations data
+    const mockLocation: Location = {
+      id: locationId,
+      name: "Sample Location",
+      type: "restaurant",
+      rating: 4.5,
+      price: "$$",
+      distance: "0.3 mi",
+      openNow: true,
+      images: [],
+      address: "123 Main St",
+      phone: "(555) 123-4567"
+    };
+    
+    setSelectedLocation(mockLocation);
+    setSelectedLocationId(locationId);
+    setInfoCardPosition(position);
+    setShowInfoCard(true);
+  };
+
+  const handleInfoCardClose = () => {
+    setShowInfoCard(false);
+    setSelectedLocationId(null);
+    setSelectedLocation(null);
+  };
+
+  const handleViewDetails = (locationId: string) => {
+    // Navigate to location details
+    console.log('Navigate to location details:', locationId);
+    handleInfoCardClose();
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -62,11 +98,25 @@ const MapScreen = () => {
       
       <main className="flex-1 flex flex-col relative w-full">
         {/* Map Container */}
-        <MapContainer
-          height={mapHeight}
-          selectedIngredient={selectedIngredient}
-          onLocationSelect={handleLocationSelect}
-        />
+        <div className="relative">
+          <MapContainer
+            height={mapHeight}
+            selectedIngredient={selectedIngredient}
+            onLocationSelect={handleLocationSelect}
+            selectedLocationId={selectedLocationId}
+            onMarkerClick={handleMarkerClick}
+          />
+          
+          {/* Map Info Card */}
+          {showInfoCard && selectedLocation && (
+            <MapInfoCard
+              location={selectedLocation}
+              position={infoCardPosition}
+              onClose={handleInfoCardClose}
+              onViewDetails={handleViewDetails}
+            />
+          )}
+        </div>
 
         {/* Scrollable Location List */}
         <div 
