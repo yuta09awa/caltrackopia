@@ -1,9 +1,8 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+
+import React, { useRef, useCallback, useEffect, useMemo } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
-import { MarkerData } from '../types';
 import MapMarkers from './MapMarkers';
-import { usePlacesApi } from '../hooks/usePlacesApi';
-import { MapState } from '@/features/map/hooks/useMapState';
+import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapViewProps {
   mapState: MapState;
@@ -12,6 +11,7 @@ interface MapViewProps {
   onLocationSelect?: (locationId: string) => void;
   searchQuery?: string;
   onMapLoaded?: (map: google.maps.Map) => void;
+  onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
 const MapView: React.FC<MapViewProps> = ({ 
@@ -20,39 +20,44 @@ const MapView: React.FC<MapViewProps> = ({
   onMarkerClick,
   onLocationSelect,
   searchQuery,
-  onMapLoaded
+  onMapLoaded,
+  onMapIdle
 }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
-  const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
-  const [placesMarkers, setPlacesMarkers] = useState<MarkerData[]>([]);
-  
-  const { searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Debounced camera change handler - waits 300ms after user stops interacting
   const onCameraChanged = useCallback(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !onMapIdle) return;
     
-    const newCenter = mapRef.current.getCenter();
-    const newZoom = mapRef.current.getZoom();
-    
-    if (newCenter && newZoom !== undefined) {
-      const centerLat = Number(newCenter.lat().toFixed(6));
-      const centerLng = Number(newCenter.lng().toFixed(6));
-      const roundedZoom = Math.round(newZoom * 100) / 100;
-      
-      // Only update if values have actually changed significantly
-      const centerChanged = Math.abs(centerLat - mapState.center.lat) > 0.000001 || 
-                           Math.abs(centerLng - mapState.center.lng) > 0.000001;
-      const zoomChanged = Math.abs(roundedZoom - mapState.zoom) > 0.01;
-      
-      if (centerChanged) {
-        // updateCenter({ lat: centerLat, lng: centerLng });
-      }
-      
-      if (zoomChanged) {
-        // updateZoom(roundedZoom);
-      }
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
-  }, [mapState.center, mapState.zoom]);
+    
+    // Set new timeout for debounced update
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (!mapRef.current) return;
+      
+      const newCenter = mapRef.current.getCenter();
+      const newZoom = mapRef.current.getZoom();
+      
+      if (newCenter && newZoom !== undefined) {
+        const centerLat = Number(newCenter.lat().toFixed(6));
+        const centerLng = Number(newCenter.lng().toFixed(6));
+        const roundedZoom = Math.round(newZoom * 100) / 100;
+        
+        // Only update if values have changed significantly
+        const centerChanged = Math.abs(centerLat - mapState.center.lat) > 0.000001 || 
+                             Math.abs(centerLng - mapState.center.lng) > 0.000001;
+        const zoomChanged = Math.abs(roundedZoom - mapState.zoom) > 0.01;
+        
+        if (centerChanged || zoomChanged) {
+          onMapIdle({ lat: centerLat, lng: centerLng }, roundedZoom);
+        }
+      }
+    }, 300); // 300ms debounce
+  }, [mapState.center, mapState.zoom, onMapIdle]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
@@ -62,46 +67,26 @@ const MapView: React.FC<MapViewProps> = ({
     }
   }, [onMapLoaded]);
 
-  const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
+  const handleMarkerClick = useCallback((locationId: string, position: { x: number; y: number }) => {
     if (onMarkerClick) {
       onMarkerClick(locationId, position);
     }
     if (onLocationSelect) {
       onLocationSelect(locationId);
     }
-  };
+  }, [onMarkerClick, onLocationSelect]);
 
-  // Load nearby places only when there's no active search
-  const loadNearbyPlaces = useCallback(async () => {
-    if (!mapRef.current || searchQuery) return;
-    
-    try {
-      console.log('Loading nearby places (no search query)');
-      const places = await searchNearbyPlaces(mapRef.current, mapState.center);
-      setPlacesMarkers(places);
-    } catch (error) {
-      console.error('Failed to load nearby places:', error);
-    }
-  }, [searchNearbyPlaces, mapState.center, searchQuery]);
-
-  // Load nearby places when map loads and there's no search
+  // Cleanup timeout on unmount
   useEffect(() => {
-    if (mapRef.current && !searchQuery) {
-      loadNearbyPlaces();
-    } else if (searchQuery) {
-      // Clear nearby places when there's a search query
-      setPlacesMarkers([]);
-    }
-  }, [loadNearbyPlaces, searchQuery]);
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
-  // Determine which markers to show
-  // Priority: search results from ingredients/places > default nearby places
-  const allMarkers = mapState.markers.length > 0 
-    ? mapState.markers  // Show search results first
-    : placesMarkers;    // Fall back to nearby places when no search
-
-  // Map style to hide POI and keep only food-related locations
-  const mapStyles = [
+  // Memoize map styles to prevent recreation on every render
+  const mapStyles = useMemo(() => [
     {
       featureType: "poi",
       elementType: "labels",
@@ -139,10 +124,10 @@ const MapView: React.FC<MapViewProps> = ({
       featureType: "poi.sports_complex",
       stylers: [{ visibility: "off" }]
     }
-  ];
+  ], []);
 
-  // Google Maps options with POI disabled and proper interaction settings
-  const mapOptions: google.maps.MapOptions = {
+  // Memoize Google Maps options to prevent recreation on every render
+  const mapOptions: google.maps.MapOptions = useMemo(() => ({
     zoomControl: true,
     streetViewControl: false,
     mapTypeControl: false,
@@ -153,7 +138,10 @@ const MapView: React.FC<MapViewProps> = ({
     disableDoubleClickZoom: false,
     clickableIcons: false,
     styles: mapStyles,
-  };
+  }), [mapStyles]);
+
+  // Memoize markers to prevent unnecessary re-renders
+  const memoizedMarkers = useMemo(() => mapState.markers, [mapState.markers]);
 
   return (
     <GoogleMap
@@ -172,18 +160,15 @@ const MapView: React.FC<MapViewProps> = ({
       }}
     >
       <MapMarkers 
-        markers={allMarkers}
+        markers={memoizedMarkers}
         selectedLocationId={selectedLocationId}
-        hoveredLocationId={hoveredLocationId}
+        hoveredLocationId={mapState.hoveredLocationId}
         onMarkerClick={handleMarkerClick}
-        onMarkerHover={setHoveredLocationId}
+        onMarkerHover={(locationId) => {
+          // Handle marker hover if needed in future
+          console.log('Marker hover:', locationId);
+        }}
       />
-      
-      {placesLoading && !searchQuery && (
-        <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md text-sm">
-          Loading nearby restaurants...
-        </div>
-      )}
     </GoogleMap>
   );
 };

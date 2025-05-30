@@ -5,7 +5,7 @@ import { useApiKeyLoader } from './ApiKeyLoader';
 import MapLoadingState from './MapLoadingState';
 import MapView from './MapView';
 import { Ingredient } from '@/hooks/useIngredientSearch';
-import { MapState } from '@/features/map/hooks/useMapState';
+import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapContainerProps {
   height: string;
@@ -16,6 +16,7 @@ interface MapContainerProps {
   mapState: MapState;
   searchQuery?: string;
   onMapLoaded?: (map: google.maps.Map) => void;
+  onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
 // Define libraries array outside component to prevent re-renders - now includes places
@@ -29,7 +30,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onMarkerClick,
   mapState,
   searchQuery,
-  onMapLoaded
+  onMapLoaded,
+  onMapIdle
 }) => {
   const { apiKey, error, loading } = useApiKeyLoader();
 
@@ -79,6 +81,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         height={height}
         searchQuery={searchQuery}
         onMapLoaded={onMapLoaded}
+        onMapIdle={onMapIdle}
       />
     </div>
   );
@@ -94,6 +97,7 @@ const MapWithScript: React.FC<{
   height: string;
   searchQuery?: string;
   onMapLoaded?: (map: google.maps.Map) => void;
+  onMapIdle?: (center: LatLng, zoom: number) => void;
 }> = ({ 
   apiKey, 
   mapState,
@@ -102,7 +106,8 @@ const MapWithScript: React.FC<{
   onLocationSelect, 
   height,
   searchQuery,
-  onMapLoaded
+  onMapLoaded,
+  onMapIdle
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -156,6 +161,7 @@ const MapWithScript: React.FC<{
       onLocationSelect={onLocationSelect}
       searchQuery={searchQuery}
       onMapLoaded={onMapLoaded}
+      onMapIdle={onMapIdle}
     />
   );
 };
