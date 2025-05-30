@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { useMapState } from '../hooks/useMapState';
@@ -15,8 +14,8 @@ interface MapContainerProps {
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
 }
 
-// Define libraries array outside component to prevent re-renders
-const libraries: ("marker")[] = ['marker'];
+// Define libraries array outside component to prevent re-renders - now includes places
+const libraries: ("marker" | "places")[] = ['marker', 'places'];
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
   height, 

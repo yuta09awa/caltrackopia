@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
 import { MarkerData } from '../types';
 import MapMarkers from './MapMarkers';
+import { usePlacesApi } from '../hooks/usePlacesApi';
 
 interface MapViewProps {
   center: google.maps.LatLngLiteral;
@@ -26,8 +27,11 @@ const MapView: React.FC<MapViewProps> = ({
 }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
+  const [placesMarkers, setPlacesMarkers] = useState<MarkerData[]>([]);
   const lastCenter = useRef<google.maps.LatLngLiteral>(center);
   const lastZoom = useRef<number>(zoom);
+  
+  const { searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
 
   const onCameraChanged = useCallback(() => {
     if (!mapRef.current) return;
@@ -76,6 +80,28 @@ const MapView: React.FC<MapViewProps> = ({
     lastCenter.current = center;
     lastZoom.current = zoom;
   }, [center, zoom]);
+
+  // Load nearby places when map loads or center changes significantly
+  const loadNearbyPlaces = useCallback(async () => {
+    if (!mapRef.current) return;
+    
+    try {
+      const places = await searchNearbyPlaces(mapRef.current, center);
+      setPlacesMarkers(places);
+    } catch (error) {
+      console.error('Failed to load nearby places:', error);
+    }
+  }, [searchNearbyPlaces, center]);
+
+  // Load places when map is ready
+  useEffect(() => {
+    if (mapRef.current) {
+      loadNearbyPlaces();
+    }
+  }, [loadNearbyPlaces]);
+
+  // Combine custom markers with places markers
+  const allMarkers = [...markers, ...placesMarkers];
 
   // Map style to hide POI and keep only food-related locations
   const mapStyles = [
@@ -134,7 +160,11 @@ const MapView: React.FC<MapViewProps> = ({
 
   return (
     <GoogleMap
-      onLoad={onLoad}
+      onLoad={(map) => {
+        mapRef.current = map;
+        // Load places after map is loaded
+        loadNearbyPlaces();
+      }}
       zoom={zoom}
       center={center}
       onCenterChanged={onCameraChanged}
@@ -149,12 +179,18 @@ const MapView: React.FC<MapViewProps> = ({
       }}
     >
       <MapMarkers 
-        markers={markers}
+        markers={allMarkers}
         selectedLocationId={selectedLocationId}
         hoveredLocationId={hoveredLocationId}
         onMarkerClick={handleMarkerClick}
         onMarkerHover={setHoveredLocationId}
       />
+      
+      {placesLoading && (
+        <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md text-sm">
+          Loading nearby restaurants...
+        </div>
+      )}
     </GoogleMap>
   );
 };
