@@ -14,6 +14,7 @@ interface MapContainerProps {
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   mapState: MapState;
+  searchQuery?: string;
 }
 
 // Define libraries array outside component to prevent re-renders - now includes places
@@ -25,7 +26,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onLocationSelect,
   selectedLocationId,
   onMarkerClick,
-  mapState
+  mapState,
+  searchQuery
 }) => {
   const { apiKey, error, loading } = useApiKeyLoader();
 
@@ -36,6 +38,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
+    searchQuery,
     currentUrl: window.location.href
   });
 
@@ -72,6 +75,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         onMarkerClick={onMarkerClick}
         onLocationSelect={onLocationSelect}
         height={height}
+        searchQuery={searchQuery}
       />
     </div>
   );
@@ -85,13 +89,15 @@ const MapWithScript: React.FC<{
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
   height: string;
+  searchQuery?: string;
 }> = ({ 
   apiKey, 
   mapState,
   selectedLocationId, 
   onMarkerClick, 
   onLocationSelect, 
-  height 
+  height,
+  searchQuery
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -106,6 +112,7 @@ const MapWithScript: React.FC<{
     loadError: loadError?.message,
     loadErrorStack: loadError?.stack,
     markersCount: mapState.markers.length,
+    searchQuery,
     googleMapsAvailable: typeof window !== 'undefined' && 'google' in window
   });
 
@@ -142,6 +149,7 @@ const MapWithScript: React.FC<{
       selectedLocationId={selectedLocationId}
       onMarkerClick={onMarkerClick}
       onLocationSelect={onLocationSelect}
+      searchQuery={searchQuery}
     />
   );
 };

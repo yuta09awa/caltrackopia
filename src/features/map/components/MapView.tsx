@@ -10,19 +10,21 @@ interface MapViewProps {
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
+  searchQuery?: string;
 }
 
 const MapView: React.FC<MapViewProps> = ({ 
   mapState,
   selectedLocationId,
   onMarkerClick,
-  onLocationSelect
+  onLocationSelect,
+  searchQuery
 }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
   const [placesMarkers, setPlacesMarkers] = useState<MarkerData[]>([]);
   
-  const { searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
+  const { searchPlacesByText, searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
 
   const onCameraChanged = useCallback(() => {
     if (!mapRef.current) return;
@@ -63,28 +65,38 @@ const MapView: React.FC<MapViewProps> = ({
     }
   };
 
-  // Load nearby places when map loads or center changes significantly
-  const loadNearbyPlaces = useCallback(async () => {
+  // Search for places based on search query
+  const searchPlaces = useCallback(async () => {
     if (!mapRef.current) return;
     
     try {
-      const places = await searchNearbyPlaces(mapRef.current, mapState.center);
-      setPlacesMarkers(places);
+      if (searchQuery && searchQuery.trim()) {
+        console.log('Searching for places with query:', searchQuery);
+        const places = await searchPlacesByText(mapRef.current, searchQuery, mapState.center);
+        setPlacesMarkers(places);
+      } else {
+        // Only load nearby places if there's no active search
+        console.log('Loading nearby places (no search query)');
+        const places = await searchNearbyPlaces(mapRef.current, mapState.center);
+        setPlacesMarkers(places);
+      }
     } catch (error) {
-      console.error('Failed to load nearby places:', error);
+      console.error('Failed to search places:', error);
     }
-  }, [searchNearbyPlaces, mapState.center]);
+  }, [searchPlacesByText, searchNearbyPlaces, mapState.center, searchQuery]);
 
-  // Load places when map is ready
+  // Update places when search query changes or map loads
   useEffect(() => {
     if (mapRef.current) {
-      loadNearbyPlaces();
+      searchPlaces();
     }
-  }, [loadNearbyPlaces]);
+  }, [searchPlaces]);
 
-  // Combine search result markers with places markers
-  // Priority: search results > places markers
-  const allMarkers = mapState.markers.length > 0 ? mapState.markers : [...placesMarkers];
+  // Determine which markers to show
+  // Priority: search results from ingredients > places search results > default nearby places
+  const allMarkers = mapState.markers.length > 0 
+    ? mapState.markers  // Show ingredient location search results first
+    : placesMarkers;    // Fall back to places API results
 
   // Map style to hide POI and keep only food-related locations
   const mapStyles = [
@@ -133,20 +145,20 @@ const MapView: React.FC<MapViewProps> = ({
     streetViewControl: false,
     mapTypeControl: false,
     fullscreenControl: false,
-    gestureHandling: 'greedy', // Enable drag and zoom without requiring ctrl/cmd
+    gestureHandling: 'greedy',
     draggable: true,
     scrollwheel: true,
     disableDoubleClickZoom: false,
-    clickableIcons: false, // This disables clicking on POI icons
-    styles: mapStyles, // Apply custom styles to hide POI
+    clickableIcons: false,
+    styles: mapStyles,
   };
 
   return (
     <GoogleMap
       onLoad={(map) => {
         mapRef.current = map;
-        // Load places after map is loaded
-        loadNearbyPlaces();
+        // Search places after map is loaded
+        searchPlaces();
       }}
       zoom={mapState.zoom}
       center={mapState.center}
@@ -171,7 +183,7 @@ const MapView: React.FC<MapViewProps> = ({
       
       {placesLoading && (
         <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md text-sm">
-          Loading nearby restaurants...
+          {searchQuery ? `Searching for ${searchQuery}...` : 'Loading nearby restaurants...'}
         </div>
       )}
     </GoogleMap>

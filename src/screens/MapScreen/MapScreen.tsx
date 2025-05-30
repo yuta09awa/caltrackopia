@@ -18,6 +18,7 @@ const MapScreen = () => {
   const [infoCardPosition, setInfoCardPosition] = useState({ x: 0, y: 0 });
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [mapHeight, setMapHeight] = useState("40vh");
+  const [currentSearchQuery, setCurrentSearchQuery] = useState<string>("");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
   
@@ -29,6 +30,7 @@ const MapScreen = () => {
   
   const handleSelectIngredient = (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
+    setCurrentSearchQuery(ingredient.name); // Track search query for map
     
     if (ingredient.locations && ingredient.locations.length > 0) {
       // Convert ingredient locations to map markers
@@ -45,7 +47,7 @@ const MapScreen = () => {
     } else {
       // Clear markers if no locations
       updateMarkers([]);
-      toast.info(`Selected: ${ingredient.name}`);
+      toast.info(`Searching for: ${ingredient.name}`);
     }
   };
 
@@ -99,6 +101,14 @@ const MapScreen = () => {
     lastScrollY.current = currentScrollY;
   };
 
+  // Clear search when no ingredient is selected
+  useEffect(() => {
+    if (!selectedIngredient) {
+      setCurrentSearchQuery("");
+      updateMarkers([]); // Clear ingredient-based markers
+    }
+  }, [selectedIngredient, updateMarkers]);
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
       <Navbar>
@@ -121,6 +131,7 @@ const MapScreen = () => {
             selectedLocationId={selectedLocationId}
             onMarkerClick={handleMarkerClick}
             mapState={mapState}
+            searchQuery={currentSearchQuery}
           />
           
           {/* Map Info Card - only show for restaurant locations */}
