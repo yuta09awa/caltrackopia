@@ -32,44 +32,48 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      const service = new google.maps.places.PlacesService(map);
+      // Use the new Places API (Place class) instead of deprecated PlacesService
+      const { Place, SearchNearbyRankPreference } = google.maps.places;
       
-      // Use text search for more specific results
-      const request: google.maps.places.TextSearchRequest = {
-        query: `${query} restaurants near me`,
-        location: new google.maps.LatLng(center.lat, center.lng),
-        radius: radius,
+      const request = {
+        textQuery: `${query} restaurants`,
+        fields: ['id', 'displayName', 'location', 'types', 'rating', 'priceLevel'],
+        locationBias: {
+          center: { lat: center.lat, lng: center.lng },
+          radius: radius
+        },
+        maxResultCount: 8, // Limit results to reduce latency
+        language: 'en',
+        region: 'US'
       };
 
-      return new Promise((resolve, reject) => {
-        service.textSearch(request, (results, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const markers: MarkerData[] = results
-              .filter(place => place.geometry?.location && place.place_id)
-              .slice(0, 10) // Limit to 10 results to avoid overwhelming the map
-              .map(place => ({
-                position: {
-                  lat: place.geometry!.location!.lat(),
-                  lng: place.geometry!.location!.lng()
-                },
-                locationId: place.place_id!,
-                type: 'restaurant'
-              }));
-            
-            console.log(`Found ${markers.length} places for query: ${query}`);
-            resolve(markers);
-          } else {
-            console.log('Places text search returned no results for:', query);
-            resolve([]);
-          }
-          setLoading(false);
-        });
-      });
+      const { places } = await Place.searchByText(request);
+      
+      if (places && places.length > 0) {
+        const markers: MarkerData[] = places
+          .filter(place => place.location && place.id)
+          .map(place => ({
+            position: {
+              lat: place.location!.lat(),
+              lng: place.location!.lng()
+            },
+            locationId: place.id!,
+            type: 'restaurant'
+          }));
+        
+        console.log(`Found ${markers.length} places for query: ${query} using new Places API`);
+        setLoading(false);
+        return markers;
+      } else {
+        console.log('Places search returned no results for:', query);
+        setLoading(false);
+        return [];
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search places';
       setError(errorMessage);
       setLoading(false);
-      console.error('Error searching places:', err);
+      console.error('Error searching places with new API:', err);
       return [];
     }
   }, []);
@@ -88,43 +92,49 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      const service = new google.maps.places.PlacesService(map);
+      // Use the new Places API for nearby search
+      const { Place, SearchNearbyRankPreference } = google.maps.places;
       
-      const request: google.maps.places.PlaceSearchRequest = {
-        location: new google.maps.LatLng(center.lat, center.lng),
-        radius: radius,
-        type: 'restaurant',
+      const request = {
+        fields: ['id', 'displayName', 'location', 'types'],
+        locationRestriction: {
+          center: { lat: center.lat, lng: center.lng },
+          radius: radius
+        },
+        includedTypes: ['restaurant', 'meal_takeaway', 'food'],
+        maxResultCount: 6, // Reduced for better performance
+        rankPreference: SearchNearbyRankPreference.DISTANCE,
+        language: 'en',
+        region: 'US'
       };
 
-      return new Promise((resolve, reject) => {
-        service.nearbySearch(request, (results, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const markers: MarkerData[] = results
-              .filter(place => place.geometry?.location && place.place_id)
-              .slice(0, 8) // Limit to 8 results for cleaner map
-              .map(place => ({
-                position: {
-                  lat: place.geometry!.location!.lat(),
-                  lng: place.geometry!.location!.lng()
-                },
-                locationId: place.place_id!,
-                type: 'restaurant'
-              }));
-            
-            console.log(`Found ${markers.length} nearby places`);
-            resolve(markers);
-          } else {
-            console.error('Places search failed:', status);
-            resolve([]);
-          }
-          setLoading(false);
-        });
-      });
+      const { places } = await Place.searchNearby(request);
+      
+      if (places && places.length > 0) {
+        const markers: MarkerData[] = places
+          .filter(place => place.location && place.id)
+          .map(place => ({
+            position: {
+              lat: place.location!.lat(),
+              lng: place.location!.lng()
+            },
+            locationId: place.id!,
+            type: 'restaurant'
+          }));
+        
+        console.log(`Found ${markers.length} nearby places using new Places API`);
+        setLoading(false);
+        return markers;
+      } else {
+        console.log('No nearby places found');
+        setLoading(false);
+        return [];
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search places';
       setError(errorMessage);
       setLoading(false);
-      console.error('Error searching places:', err);
+      console.error('Error searching nearby places with new API:', err);
       return [];
     }
   }, []);
@@ -132,29 +142,30 @@ export const usePlacesApi = () => {
   const getPlaceDetails = useCallback(async (
     map: google.maps.Map,
     placeId: string
-  ): Promise<google.maps.places.PlaceResult | null> => {
+  ): Promise<google.maps.places.Place | null> => {
     if (!map || !window.google?.maps?.places) {
       console.error('Google Maps Places API not loaded');
       return null;
     }
 
-    const service = new google.maps.places.PlacesService(map);
-    
-    const request: google.maps.places.PlaceDetailsRequest = {
-      placeId: placeId,
-      fields: ['name', 'formatted_address', 'geometry', 'rating', 'photos', 'price_level', 'types', 'opening_hours']
-    };
-
-    return new Promise((resolve, reject) => {
-      service.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-          resolve(place);
-        } else {
-          console.error('Place details request failed:', status);
-          reject(new Error(`Place details failed: ${status}`));
-        }
+    try {
+      // Use the new Places API for place details
+      const { Place } = google.maps.places;
+      
+      const place = new Place({
+        id: placeId,
+        requestedLanguage: 'en',
       });
-    });
+
+      await place.fetchFields({
+        fields: ['id', 'displayName', 'formattedAddress', 'location', 'rating', 'photos', 'priceLevel', 'types', 'regularOpeningHours']
+      });
+
+      return place;
+    } catch (err) {
+      console.error('Place details request failed:', err);
+      return null;
+    }
   }, []);
 
   return {
