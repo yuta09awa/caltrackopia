@@ -20,6 +20,7 @@ const MapScreen = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [mapHeight, setMapHeight] = useState("40vh");
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>("");
+  const [displayedSearchQuery, setDisplayedSearchQuery] = useState<string>("");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -36,6 +37,7 @@ const MapScreen = () => {
   const handleSelectIngredient = async (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
     setCurrentSearchQuery(ingredient.name);
+    setDisplayedSearchQuery(ingredient.name);
     
     // If it's an ingredient with known locations, use those
     if (ingredient.locations && ingredient.locations.length > 0) {
@@ -152,10 +154,18 @@ const MapScreen = () => {
     lastScrollY.current = currentScrollY;
   };
 
+  const handleSearchReset = () => {
+    setSelectedIngredient(null);
+    setCurrentSearchQuery("");
+    setDisplayedSearchQuery("");
+    updateMarkers([]);
+  };
+
   // Clear search when no ingredient is selected
   useEffect(() => {
     if (!selectedIngredient) {
       setCurrentSearchQuery("");
+      setDisplayedSearchQuery("");
       updateMarkers([]); // Clear ingredient-based markers
     }
   }, [selectedIngredient, updateMarkers]);
@@ -166,6 +176,8 @@ const MapScreen = () => {
         <div className="flex-1 max-w-2xl mx-4">
           <GlobalSearch 
             onSelectIngredient={handleSelectIngredient}
+            onSearchReset={handleSearchReset}
+            displayValue={displayedSearchQuery}
             className="w-full" 
             compact={true}
           />

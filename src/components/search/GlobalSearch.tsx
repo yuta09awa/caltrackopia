@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, MapPin, Utensils, ShoppingCart } from 'lucide-react';
+import { Search, Clock, MapPin, Utensils, ShoppingCart, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIngredientSearch } from '@/hooks/useIngredientSearch';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
@@ -9,6 +9,8 @@ import { useSearchHistory } from '@/hooks/useSearchHistory';
 interface GlobalSearchProps {
   className?: string;
   onSelectIngredient?: (ingredient: any) => void;
+  onSearchReset?: () => void;
+  displayValue?: string;
   compact?: boolean;
 }
 
@@ -25,12 +27,23 @@ const getCategoryIcon = (category?: string) => {
   return <Search className="h-3 w-3" />;
 };
 
-const GlobalSearch = ({ className, onSelectIngredient, compact = false }: GlobalSearchProps) => {
+const GlobalSearch = ({ 
+  className, 
+  onSelectIngredient, 
+  onSearchReset,
+  displayValue = "",
+  compact = false 
+}: GlobalSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { results, loading, searchIngredients } = useIngredientSearch();
   const { searchHistory, addToHistory } = useSearchHistory();
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Update internal state when displayValue changes
+  useEffect(() => {
+    setSearchTerm(displayValue);
+  }, [displayValue]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -42,6 +55,23 @@ const GlobalSearch = ({ className, onSelectIngredient, compact = false }: Global
     }
   };
 
+  const handleFocus = () => {
+    // If there's a displayed value (active search), clear it to start new search
+    if (displayValue && onSearchReset) {
+      onSearchReset();
+      setSearchTerm('');
+    }
+    setIsOpen(true);
+  };
+
+  const handleClearSearch = () => {
+    if (onSearchReset) {
+      onSearchReset();
+    }
+    setSearchTerm('');
+    setIsOpen(false);
+  };
+
   const handleSelectIngredient = (ingredient: any) => {
     // Add to search history
     addToHistory({
@@ -50,8 +80,7 @@ const GlobalSearch = ({ className, onSelectIngredient, compact = false }: Global
       category: ingredient.category
     });
     
-    // Clear search and close dropdown
-    setSearchTerm('');
+    // Close dropdown
     setIsOpen(false);
     
     // Notify parent
@@ -61,7 +90,6 @@ const GlobalSearch = ({ className, onSelectIngredient, compact = false }: Global
   };
 
   const handleSelectHistoryItem = (historyItem: any) => {
-    setSearchTerm(historyItem.name);
     setIsOpen(false);
     
     // Create a mock ingredient object for compatibility
@@ -99,14 +127,26 @@ const GlobalSearch = ({ className, onSelectIngredient, compact = false }: Global
           type="search"
           placeholder="Search ingredients, restaurants, dishes..."
           className={cn(
-            "w-full pl-9 pr-4",
+            "w-full pl-9",
+            displayValue ? "pr-10" : "pr-4",
             compact ? "h-9 text-sm" : "h-10"
           )}
           value={searchTerm}
           onChange={handleSearch}
-          onFocus={() => setIsOpen(true)}
+          onFocus={handleFocus}
         />
-        {loading && (
+        
+        {/* Clear button when there's a displayed value */}
+        {displayValue && (
+          <button
+            onClick={handleClearSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        
+        {loading && !displayValue && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

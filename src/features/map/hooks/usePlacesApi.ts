@@ -22,7 +22,7 @@ export const usePlacesApi = () => {
     map: google.maps.Map,
     query: string,
     center: google.maps.LatLngLiteral,
-    radius: number = 5000
+    radius: number = 20000 // Increased to 20km for more results
   ): Promise<MarkerData[]> => {
     if (!map || !window.google?.maps?.places || !query.trim()) {
       return [];
@@ -33,19 +33,21 @@ export const usePlacesApi = () => {
 
     try {
       // Use the new Places API (Place class) instead of deprecated PlacesService
-      const { Place, SearchNearbyRankPreference } = google.maps.places;
+      const { Place } = google.maps.places;
       
       const request = {
-        textQuery: `${query} restaurants`,
+        textQuery: query, // Search for exact query instead of adding "restaurants"
         fields: ['id', 'displayName', 'location', 'types', 'rating', 'priceLevel'],
         locationBias: {
           center: { lat: center.lat, lng: center.lng },
           radius: radius
         },
-        maxResultCount: 8, // Limit results to reduce latency
+        maxResultCount: 20, // Increased to get more results
         language: 'en',
         region: 'US'
       };
+
+      console.log('Searching places with query:', query, 'radius:', radius);
 
       const { places } = await Place.searchByText(request);
       
