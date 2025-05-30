@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLoadScript, GoogleMap } from '@react-google-maps/api';
 import { useMapState } from '../hooks/useMapState';
@@ -141,20 +142,35 @@ const MapView: React.FC<MapViewProps> = ({
 }) => {
   const mapRef = React.useRef<google.maps.Map | null>(null);
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
+  const lastCenter = React.useRef<google.maps.LatLngLiteral>(center);
+  const lastZoom = React.useRef<number>(zoom);
 
   const onCameraChanged = React.useCallback(() => {
     if (!mapRef.current) return;
+    
     const newCenter = mapRef.current.getCenter();
     const newZoom = mapRef.current.getZoom();
     
-    if (newCenter) {
-      updateCenter({
-        lat: newCenter.lat(),
-        lng: newCenter.lng(),
-      });
-    }
-    if (newZoom) {
-      updateZoom(newZoom);
+    if (newCenter && newZoom !== undefined) {
+      const centerLat = Number(newCenter.lat().toFixed(6));
+      const centerLng = Number(newCenter.lng().toFixed(6));
+      const roundedZoom = Math.round(newZoom * 100) / 100;
+      
+      // Only update if values have actually changed significantly
+      const centerChanged = Math.abs(centerLat - lastCenter.current.lat) > 0.000001 || 
+                           Math.abs(centerLng - lastCenter.current.lng) > 0.000001;
+      const zoomChanged = Math.abs(roundedZoom - lastZoom.current) > 0.01;
+      
+      if (centerChanged) {
+        const newCenterObj = { lat: centerLat, lng: centerLng };
+        lastCenter.current = newCenterObj;
+        updateCenter(newCenterObj);
+      }
+      
+      if (zoomChanged) {
+        lastZoom.current = roundedZoom;
+        updateZoom(roundedZoom);
+      }
     }
   }, [updateCenter, updateZoom]);
 
@@ -170,6 +186,12 @@ const MapView: React.FC<MapViewProps> = ({
       onLocationSelect(locationId);
     }
   };
+
+  // Update refs when props change
+  React.useEffect(() => {
+    lastCenter.current = center;
+    lastZoom.current = zoom;
+  }, [center, zoom]);
 
   return (
     <GoogleMap
