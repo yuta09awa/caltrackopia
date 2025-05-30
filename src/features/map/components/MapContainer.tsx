@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLoadScript, GoogleMap } from '@react-google-maps/api';
 import { useMapState } from '../hooks/useMapState';
 import MapMarkers from './MapMarkers';
 import { MarkerData } from '../types';
 import { Ingredient } from '@/hooks/useIngredientSearch';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MapContainerProps {
   height: string;
@@ -32,31 +32,27 @@ const MapContainer: React.FC<MapContainerProps> = ({
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
-        const response = await fetch('/api/get-google-maps-api-key');
+        console.log('Fetching Google Maps API key from Edge Function...');
         
-        // Check if the response is actually JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          // If it's not JSON, it means the API endpoint doesn't exist
-          setError('Google Maps API key not configured. Please set up the API endpoint.');
+        const { data, error } = await supabase.functions.invoke('get-google-maps-api-key');
+
+        if (error) {
+          console.error('Error calling Edge Function:', error);
+          setError('Failed to load Google Maps API key');
           setLoading(false);
           return;
         }
 
-        const data = await response.json();
-
         if (data && data.apiKey) {
+          console.log('Successfully retrieved API key');
           setApiKey(data.apiKey);
         } else {
+          console.error('No API key in response:', data);
           setError('Google Maps API key not found in response');
         }
       } catch (e: any) {
-        // Handle both network errors and JSON parsing errors
-        if (e.message.includes('Unexpected token')) {
-          setError('Google Maps API endpoint not configured properly');
-        } else {
-          setError(`Failed to load API key: ${e.message}`);
-        }
+        console.error('Exception when fetching API key:', e);
+        setError(`Failed to load API key: ${e.message}`);
       } finally {
         setLoading(false);
       }
@@ -84,12 +80,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
     return (
       <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
         <div className="absolute top-0 left-0 w-full bg-red-500 text-white p-4 z-50">
-          <div className="text-sm font-medium mb-2">Map Configuration Required</div>
+          <div className="text-sm font-medium mb-2">Map Configuration Error</div>
           <div className="text-xs">
             {error || loadError?.message || 'Failed to load Google Maps'}
           </div>
           <div className="text-xs mt-2 opacity-90">
-            To use maps, please set up a Google Maps API key endpoint.
+            Please check that your Google Maps API key is properly configured.
           </div>
         </div>
       </div>
