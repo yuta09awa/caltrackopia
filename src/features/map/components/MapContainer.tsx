@@ -28,12 +28,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const { mapState, updateCenter, updateZoom } = useMapState();
   const { apiKey, error, loading } = useApiKeyLoader();
 
-  // Only load script after we have the API key to prevent multiple loads
+  // Only initialize useLoadScript when we have a valid API key
+  const shouldLoadScript = !loading && !error && apiKey;
+  
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
     libraries,
-    id: 'google-map-script', // Add unique ID to prevent multiple loads
-  });
+    id: 'google-map-script',
+    preventGoogleFontsLoading: true,
+  }, shouldLoadScript);
 
   if (loading) {
     return <MapLoadingState height={height} type="loading" />;
