@@ -3,7 +3,7 @@ export interface Location {
   id: string;
   name: string;
   type: "Restaurant" | "Grocery";
-  subType?: "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market";
+  subType?: "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market";
   rating: number;
   distance: string;
   address: string;
