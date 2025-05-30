@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Phone, Clock, X } from 'lucide-react';
@@ -18,13 +18,53 @@ const MapInfoCard: React.FC<MapInfoCardProps> = ({
   onViewDetails,
   position 
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      const card = cardRef.current;
+      const cardRect = card.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      let { x, y } = position;
+      
+      // Adjust horizontal position if card would exceed right edge
+      if (x + cardRect.width / 2 > viewportWidth - 20) {
+        x = viewportWidth - cardRect.width / 2 - 20;
+      }
+      
+      // Adjust horizontal position if card would exceed left edge
+      if (x - cardRect.width / 2 < 20) {
+        x = cardRect.width / 2 + 20;
+      }
+      
+      // Adjust vertical position if card would exceed top edge
+      if (y - cardRect.height - 20 < 20) {
+        // Position below the marker instead of above
+        y = y + 40;
+      }
+      
+      // Adjust vertical position if card would exceed bottom edge
+      if (y > viewportHeight - 20) {
+        y = viewportHeight - 20;
+      }
+      
+      setAdjustedPosition({ x, y });
+    }
+  }, [position]);
+
   return (
     <div 
+      ref={cardRef}
       className="absolute z-50 w-80 pointer-events-auto"
       style={{ 
-        left: `${position.x}px`, 
-        top: `${position.y}px`,
-        transform: 'translate(-50%, -100%)'
+        left: `${adjustedPosition.x}px`, 
+        top: `${adjustedPosition.y}px`,
+        transform: adjustedPosition.y === position.y + 40 
+          ? 'translate(-50%, 0)' // Below marker
+          : 'translate(-50%, -100%)' // Above marker
       }}
     >
       <Card className="shadow-lg border-2 border-primary/20 bg-white">
