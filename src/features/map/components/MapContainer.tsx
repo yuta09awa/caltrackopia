@@ -41,7 +41,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
     error, 
     apiKey: apiKey ? 'present' : 'missing', 
     isLoaded, 
-    loadError: loadError?.message 
+    loadError: loadError?.message,
+    markersCount: mapState.markers.length,
+    center: mapState.center,
+    zoom: mapState.zoom
   });
 
   if (loading) {
@@ -49,6 +52,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   }
 
   if (error || loadError) {
+    console.error('Map error details:', { error, loadError: loadError?.message });
     return (
       <MapLoadingState 
         height={height} 
@@ -60,8 +64,11 @@ const MapContainer: React.FC<MapContainerProps> = ({
 
   // Don't render until we have both API key and script loaded
   if (!apiKey || !isLoaded) {
+    console.log('Waiting for API key and script load:', { apiKey: !!apiKey, isLoaded });
     return <MapLoadingState height={height} type="initializing" />;
   }
+
+  console.log('Rendering MapView with markers:', mapState.markers);
 
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>

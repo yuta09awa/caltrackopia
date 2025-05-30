@@ -18,11 +18,30 @@ export interface MapState {
   markers: MarkerData[];
 }
 
+// Sample test markers for NYC area
+const TEST_MARKERS: MarkerData[] = [
+  {
+    position: { lat: 40.7589, lng: -73.9851 }, // Times Square
+    locationId: 'test-restaurant-1',
+    type: 'restaurant'
+  },
+  {
+    position: { lat: 40.7505, lng: -73.9934 }, // Herald Square
+    locationId: 'test-grocery-1',
+    type: 'grocery'
+  },
+  {
+    position: { lat: 40.7614, lng: -73.9776 }, // Central Park South
+    locationId: 'test-market-1',
+    type: 'farmersmarket'
+  }
+];
+
 export const useMapState = () => {
   const [mapState, setMapState] = useState<MapState>({
     center: { lat: 40.7589, lng: -73.9851 }, // NYC coordinates
     zoom: 12,
-    markers: []
+    markers: TEST_MARKERS // Add test markers by default
   });
   
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
