@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
 import { MarkerData } from '../types';
@@ -78,7 +77,48 @@ const MapView: React.FC<MapViewProps> = ({
     lastZoom.current = zoom;
   }, [center, zoom]);
 
-  // Google Maps options with proper interaction settings
+  // Map style to hide POI and keep only food-related locations
+  const mapStyles = [
+    {
+      featureType: "poi",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.attraction",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.business",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.government",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.medical",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.park",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.place_of_worship",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.school",
+      stylers: [{ visibility: "off" }]
+    },
+    {
+      featureType: "poi.sports_complex",
+      stylers: [{ visibility: "off" }]
+    }
+  ];
+
+  // Google Maps options with POI disabled and proper interaction settings
   const mapOptions: google.maps.MapOptions = {
     zoomControl: true,
     streetViewControl: false,
@@ -88,6 +128,8 @@ const MapView: React.FC<MapViewProps> = ({
     draggable: true,
     scrollwheel: true,
     disableDoubleClickZoom: false,
+    clickableIcons: false, // This disables clicking on POI icons
+    styles: mapStyles, // Apply custom styles to hide POI
   };
 
   return (
