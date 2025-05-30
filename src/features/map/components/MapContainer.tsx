@@ -34,6 +34,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     libraries,
     id: 'google-map-script',
     preventGoogleFontsLoading: true,
+    // Don't load the script until we have an API key
+    loadScriptOptions: apiKey ? undefined : { defer: true }
   });
 
   console.log('MapContainer render state:', { 
@@ -47,10 +49,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
     zoom: mapState.zoom
   });
 
+  // Show loading while fetching API key
   if (loading) {
     return <MapLoadingState height={height} type="loading" />;
   }
 
+  // Show error if API key fetch failed or Google Maps failed to load
   if (error || loadError) {
     console.error('Map error details:', { error, loadError: loadError?.message });
     return (
