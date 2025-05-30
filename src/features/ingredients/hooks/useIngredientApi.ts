@@ -1,6 +1,5 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { apiService } from '@/services/api/apiService';
 import { Ingredient } from '@/hooks/useIngredientSearch';
 
 interface UseIngredientApiOptions {
@@ -14,53 +13,83 @@ interface SearchOptions {
   filters?: Record<string, any>;
 }
 
+// Mock data for demo purposes
+const mockIngredients: Ingredient[] = [
+  {
+    id: '1',
+    name: 'Organic Kale',
+    description: 'Fresh locally grown kale',
+    category: 'Vegetables',
+    locations: [
+      { id: 'loc1', name: 'Farmers Market', address: '123 Market St', lat: 40.7589, lng: -73.9851 },
+      { id: 'loc2', name: 'Green Grocery', address: '456 Organic Ave', lat: 40.7505, lng: -73.9934 }
+    ]
+  },
+  {
+    id: '2',
+    name: 'Grass-fed Beef',
+    description: 'Sustainably raised beef',
+    category: 'Meat',
+    locations: [
+      { id: 'loc3', name: 'Butcher Shop', address: '789 Meat St', lat: 40.7580, lng: -73.9840 }
+    ]
+  },
+  {
+    id: '3',
+    name: 'Avocado',
+    description: 'Ripe Hass avocados',
+    category: 'Fruits',
+    locations: [
+      { id: 'loc4', name: 'Grocery Store', address: '101 Fresh Blvd', lat: 40.7600, lng: -73.9800 },
+      { id: 'loc5', name: 'Farmers Market', address: '123 Market St', lat: 40.7589, lng: -73.9851 }
+    ]
+  },
+  {
+    id: '4',
+    name: 'Whole Foods',
+    description: 'Whole Foods Market - organic groceries',
+    category: 'Grocery Store',
+    locations: [
+      { id: 'loc6', name: 'Whole Foods Union Square', address: '4 Union Square S, New York, NY', lat: 40.7359, lng: -73.9911 },
+      { id: 'loc7', name: 'Whole Foods Tribeca', address: '270 Greenwich St, New York, NY', lat: 40.7205, lng: -74.0134 }
+    ]
+  },
+  {
+    id: '5',
+    name: 'Quinoa',
+    description: 'Organic quinoa grain',
+    category: 'Grains',
+    locations: [
+      { id: 'loc8', name: 'Health Food Store', address: '789 Wellness Ave', lat: 40.7550, lng: -73.9900 }
+    ]
+  },
+  {
+    id: '6',
+    name: 'Salmon',
+    description: 'Fresh Atlantic salmon',
+    category: 'Seafood',
+    locations: [
+      { id: 'loc9', name: 'Fish Market', address: '456 Harbor St', lat: 40.7520, lng: -73.9950 }
+    ]
+  }
+];
+
 export function useIngredientSearch(
   searchOptions: SearchOptions,
   options: UseIngredientApiOptions = {}
 ) {
-  // Mock implementation that would be replaced with actual API calls
+  // Mock implementation that filters local data instead of making API calls
   const mockSearchIngredients = async (term: string): Promise<Ingredient[]> => {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Mock data for demo
-    const mockResults: Ingredient[] = [
-      {
-        id: '1',
-        name: 'Organic Kale',
-        description: 'Fresh locally grown kale',
-        category: 'Vegetables',
-        locations: [
-          { id: 'loc1', name: 'Farmers Market', address: '123 Market St', lat: 37.7749, lng: -122.4194 },
-          { id: 'loc2', name: 'Green Grocery', address: '456 Organic Ave', lat: 37.7833, lng: -122.4167 }
-        ]
-      },
-      {
-        id: '2',
-        name: 'Grass-fed Beef',
-        description: 'Sustainably raised beef',
-        category: 'Meat',
-        locations: [
-          { id: 'loc3', name: 'Butcher Shop', address: '789 Meat St', lat: 37.7700, lng: -122.4200 }
-        ]
-      },
-      {
-        id: '3',
-        name: 'Avocado',
-        description: 'Ripe Hass avocados',
-        category: 'Fruits',
-        locations: [
-          { id: 'loc4', name: 'Grocery Store', address: '101 Fresh Blvd', lat: 37.7800, lng: -122.4100 },
-          { id: 'loc5', name: 'Farmers Market', address: '123 Market St', lat: 37.7749, lng: -122.4194 }
-        ]
-      }
-    ];
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     // Filter by search term
     if (!term) return [];
     
-    return mockResults.filter(
-      item => item.name.toLowerCase().includes(term.toLowerCase())
+    return mockIngredients.filter(
+      item => item.name.toLowerCase().includes(term.toLowerCase()) ||
+              item.description.toLowerCase().includes(term.toLowerCase()) ||
+              item.category?.toLowerCase().includes(term.toLowerCase())
     );
   };
 
