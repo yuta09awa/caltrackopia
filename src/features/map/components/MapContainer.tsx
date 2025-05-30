@@ -34,7 +34,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     apiKey: apiKey ? 'present' : 'missing', 
     markersCount: mapState.markers.length,
     center: mapState.center,
-    zoom: mapState.zoom
+    zoom: mapState.zoom,
+    currentUrl: window.location.href
   });
 
   // Show loading while fetching API key
@@ -111,20 +112,29 @@ const MapWithScript: React.FC<{
   });
 
   console.log('MapWithScript state:', { 
-    apiKey: 'present',
+    apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
     isLoaded, 
     loadError: loadError?.message,
-    markersCount: markers.length
+    loadErrorStack: loadError?.stack,
+    markersCount: markers.length,
+    googleMapsAvailable: typeof window !== 'undefined' && 'google' in window
   });
 
   // Show error if Google Maps failed to load
   if (loadError) {
-    console.error('Google Maps load error:', loadError.message);
+    console.error('Google Maps load error details:', {
+      message: loadError.message,
+      stack: loadError.stack,
+      apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
+      currentDomain: window.location.hostname,
+      fullUrl: window.location.href
+    });
+    
     return (
       <MapLoadingState 
         height={height} 
         type="error" 
-        errorMessage={loadError.message} 
+        errorMessage={`Google Maps Error: ${loadError.message}. Check console for details.`} 
       />
     );
   }
@@ -135,7 +145,7 @@ const MapWithScript: React.FC<{
     return <MapLoadingState height={height} type="initializing" />;
   }
 
-  console.log('Rendering MapView with markers:', markers);
+  console.log('Google Maps successfully loaded, rendering MapView with markers:', markers);
 
   return (
     <MapView
