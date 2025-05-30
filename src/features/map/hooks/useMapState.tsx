@@ -18,22 +18,22 @@ export interface MapState {
   markers: MarkerData[];
 }
 
-// Sample test markers for NYC area
+// Sample test markers that correspond to actual location IDs from mockLocations
 const TEST_MARKERS: MarkerData[] = [
   {
-    position: { lat: 40.7589, lng: -73.9851 }, // Times Square
-    locationId: 'test-restaurant-1',
+    position: { lat: 40.7589, lng: -73.9851 }, // Times Square area
+    locationId: 'loc-1', // This should match an actual location ID
     type: 'restaurant'
   },
   {
-    position: { lat: 40.7505, lng: -73.9934 }, // Herald Square
-    locationId: 'test-grocery-1',
-    type: 'grocery'
+    position: { lat: 40.7505, lng: -73.9934 }, // Herald Square area  
+    locationId: 'loc-2', // This should match an actual location ID
+    type: 'restaurant'
   },
   {
-    position: { lat: 40.7614, lng: -73.9776 }, // Central Park South
-    locationId: 'test-market-1',
-    type: 'farmersmarket'
+    position: { lat: 40.7614, lng: -73.9776 }, // Central Park area
+    locationId: 'loc-3', // This should match an actual location ID
+    type: 'grocery'
   }
 ];
 
@@ -41,7 +41,7 @@ export const useMapState = () => {
   const [mapState, setMapState] = useState<MapState>({
     center: { lat: 40.7589, lng: -73.9851 }, // NYC coordinates
     zoom: 12,
-    markers: TEST_MARKERS // Add test markers by default
+    markers: TEST_MARKERS
   });
   
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);

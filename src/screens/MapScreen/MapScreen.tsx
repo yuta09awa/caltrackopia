@@ -7,6 +7,7 @@ import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
 import { Location } from "@/features/locations/types";
 import MapInfoCard from "@/features/map/components/MapInfoCard";
+import { useLocations } from "@/features/locations/hooks/useLocations";
 
 const MapScreen = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
@@ -17,6 +18,9 @@ const MapScreen = () => {
   const [mapHeight, setMapHeight] = useState("40vh");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
+  
+  // Get real location data
+  const { locations } = useLocations();
   
   const handleSelectIngredient = (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
@@ -34,28 +38,17 @@ const MapScreen = () => {
   };
 
   const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
-    // Find the location data (you'd need access to locations data here)
-    // For now, we'll create a mock location - in real implementation, 
-    // this should come from your locations data
-    const mockLocation: Location = {
-      id: locationId,
-      name: "Sample Location",
-      type: "Restaurant", // Fixed: changed from "restaurant" to "Restaurant"
-      rating: 4.5,
-      price: "$$",
-      distance: "0.3 mi",
-      openNow: true,
-      images: [],
-      address: "123 Main St",
-      phone: "(555) 123-4567",
-      dietaryOptions: [],
-      cuisine: "American"
-    };
+    // Find the actual location data from our locations
+    const location = locations.find(loc => loc.id === locationId);
     
-    setSelectedLocation(mockLocation);
-    setSelectedLocationId(locationId);
-    setInfoCardPosition(position);
-    setShowInfoCard(true);
+    if (location) {
+      setSelectedLocation(location);
+      setSelectedLocationId(locationId);
+      setInfoCardPosition(position);
+      setShowInfoCard(true);
+    } else {
+      console.warn('Location not found for ID:', locationId);
+    }
   };
 
   const handleInfoCardClose = () => {

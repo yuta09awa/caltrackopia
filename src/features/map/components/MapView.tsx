@@ -78,6 +78,18 @@ const MapView: React.FC<MapViewProps> = ({
     lastZoom.current = zoom;
   }, [center, zoom]);
 
+  // Google Maps options with proper interaction settings
+  const mapOptions: google.maps.MapOptions = {
+    zoomControl: true,
+    streetViewControl: false,
+    mapTypeControl: false,
+    fullscreenControl: false,
+    gestureHandling: 'greedy', // Enable drag and zoom without requiring ctrl/cmd
+    draggable: true,
+    scrollwheel: true,
+    disableDoubleClickZoom: false,
+  };
+
   return (
     <GoogleMap
       onLoad={onLoad}
@@ -86,6 +98,7 @@ const MapView: React.FC<MapViewProps> = ({
       onCenterChanged={onCameraChanged}
       onZoomChanged={onCameraChanged}
       mapContainerClassName="w-full h-full"
+      options={mapOptions}
       onClick={() => {
         // Clear selection when clicking on empty map area
         if (onLocationSelect) {
