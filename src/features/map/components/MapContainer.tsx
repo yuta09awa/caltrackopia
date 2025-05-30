@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
@@ -19,8 +18,8 @@ interface MapContainerProps {
   onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
-// Define libraries array outside component to prevent re-renders - now includes places
-const libraries: ("marker" | "places")[] = ['marker', 'places'];
+// Define libraries array outside component to prevent re-renders - only include marker for now
+const libraries: ("marker")[] = ['marker'];
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
   height, 
