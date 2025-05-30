@@ -28,20 +28,21 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const { mapState, updateCenter, updateZoom } = useMapState();
   const { apiKey, error, loading } = useApiKeyLoader();
 
-  // Only initialize useLoadScript when we have a valid API key
+  // Conditionally use useLoadScript - only when we have an API key
+  const shouldLoadScript = Boolean(apiKey && !loading && !error);
+  
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
     libraries,
     id: 'google-map-script',
     preventGoogleFontsLoading: true,
-    // Skip loading until we have an API key
-    skip: !apiKey
   });
 
   console.log('MapContainer render state:', { 
     loading, 
     error, 
     apiKey: apiKey ? 'present' : 'missing', 
+    shouldLoadScript,
     isLoaded, 
     loadError: loadError?.message,
     markersCount: mapState.markers.length,
