@@ -36,6 +36,14 @@ const MapContainer: React.FC<MapContainerProps> = ({
     preventGoogleFontsLoading: true,
   });
 
+  console.log('MapContainer render state:', { 
+    loading, 
+    error, 
+    apiKey: apiKey ? 'present' : 'missing', 
+    isLoaded, 
+    loadError: loadError?.message 
+  });
+
   if (loading) {
     return <MapLoadingState height={height} type="loading" />;
   }
