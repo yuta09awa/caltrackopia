@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -28,8 +29,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { locationService } from "@/services/locationService";
+import { useHybridLocation } from "@/hooks/useHybridLocation";
 import { Location } from "@/models/Location";
+import RestaurantDetails from "@/components/restaurants/RestaurantDetails";
 
 // Define types for our location data - extending base Location interface
 interface MenuCategory {
@@ -136,112 +138,103 @@ const extendedLocationData: Record<string, Partial<ExtendedLocation>> = {
       ]
     }
   },
-  "2": {
-    // Greens Restaurant - this should be a restaurant, not grocery
-    menu: [
+  "target1": {
+    // Target store - grocery location
+    sections: [
       {
-        category: "Appetizers",
-        items: [
-          {
-            id: "a1",
-            name: "Seasonal Vegetable Terrine",
-            description: "Layers of roasted vegetables with herb oil and microgreens",
-            price: "$18.00",
-            image: "/placeholder.svg",
-            dietaryTags: ["Vegetarian", "Vegan"],
-            rating: 4.8,
-            thumbsUp: 32,
-            thumbsDown: 1
-          }
-        ]
+        name: "Produce",
+        description: "Fresh fruits and vegetables sourced from local farms",
+        popular: ["Organic bananas", "Avocados", "Baby spinach", "Strawberries"]
       },
       {
-        category: "Main Courses",
-        items: [
-          {
-            id: "m1",
-            name: "Wild Mushroom Risotto",
-            description: "Creamy arborio rice with seasonal wild mushrooms and truffle oil",
-            price: "$28.00",
-            image: "/placeholder.svg",
-            dietaryTags: ["Vegetarian", "Gluten-Free"],
-            rating: 4.9,
-            thumbsUp: 45,
-            thumbsDown: 2
-          }
-        ]
+        name: "Dairy",
+        description: "Fresh dairy products and alternatives",
+        popular: ["Organic milk", "Greek yogurt", "Cheese selection", "Plant-based milk"]
+      },
+      {
+        name: "Meat & Seafood",
+        description: "Quality meats and fresh seafood",
+        popular: ["Chicken breast", "Salmon fillets", "Ground beef", "Shrimp"]
       }
     ],
-    nutrition: {
-      show: true,
-      items: [
-        {
-          name: "Wild Mushroom Risotto",
-          calories: 520,
-          protein: 12,
-          carbs: 68,
-          fat: 18,
-          fiber: 4
-        }
-      ]
-    }
+    featuredItems: [
+      {
+        id: "f1",
+        name: "Organic Blueberries",
+        description: "Fresh organic blueberries, perfect for smoothies and snacking",
+        price: "$4.99",
+        image: "/placeholder.svg",
+        dietaryTags: ["Organic", "Antioxidant Rich"],
+        rating: 4.8,
+        thumbsUp: 15,
+        thumbsDown: 1
+      },
+      {
+        id: "f2",
+        name: "Grass-Fed Ground Beef",
+        description: "Premium grass-fed ground beef, 85% lean",
+        price: "$8.99/lb",
+        image: "/placeholder.svg",
+        dietaryTags: ["Grass-Fed", "High Protein"],
+        rating: 4.6,
+        thumbsUp: 12,
+        thumbsDown: 0
+      }
+    ]
   }
 };
 
 // Mock similar locations for reviews tab
 const similarLocations = [
   {
-    id: "3",
-    name: "Protein Power Bar",
-    type: "Restaurant",
-    distance: "0.8 mi",
+    id: "wf1",
+    name: "Whole Foods Market",
+    type: "Grocery",
+    distance: "0.5 mi",
     image: "/placeholder.svg"
   },
   {
-    id: "5",
-    name: "Green Leaf Deli",
-    type: "Restaurant",
-    distance: "1.5 mi",
+    id: "cvs1",
+    name: "CVS Pharmacy",
+    type: "Grocery",
+    distance: "1.2 mi",
     image: "/placeholder.svg"
   }
 ];
 
 const LocationDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { location: hybridLocation, loading, error } = useHybridLocation(id || null);
   const [location, setLocation] = useState<ExtendedLocation | null>(null);
-  const [loading, setLoading] = useState(true);
   const [activeThumbsUp, setActiveThumbsUp] = useState<Set<string>>(new Set());
   const [activeThumbsDown, setActiveThumbsDown] = useState<Set<string>>(new Set());
   
   useEffect(() => {
-    const fetchLocation = async () => {
-      if (!id) return;
-      
-      setLoading(true);
-      try {
-        const baseLocation = await locationService.getLocationById(id);
-        if (baseLocation) {
-          // Merge with extended data if available
-          const extendedData = extendedLocationData[id] || {};
-          const mergedLocation = { ...baseLocation, ...extendedData } as ExtendedLocation;
-          setLocation(mergedLocation);
-        }
-      } catch (error) {
-        console.error('Error fetching location:', error);
-        toast.error("Failed to load location details");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (hybridLocation && id) {
+      // Merge with extended data if available
+      const extendedData = extendedLocationData[id] || {};
+      const mergedLocation = { ...hybridLocation, ...extendedData } as ExtendedLocation;
+      setLocation(mergedLocation);
+    }
+  }, [hybridLocation, id]);
 
-    fetchLocation();
-  }, [id]);
-  
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <p className="mt-2 text-muted-foreground">Loading location details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <h1 className="text-2xl font-bold mb-4 text-destructive">Error loading location</h1>
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Link to="/map" className="text-primary hover:underline">
+          Return to map
+        </Link>
       </div>
     );
   }
@@ -253,6 +246,27 @@ const LocationDetailPage = () => {
         <Link to="/map" className="text-primary hover:underline">
           Return to map
         </Link>
+      </div>
+    );
+  }
+
+  // If this is a restaurant with custom data, show the detailed restaurant view
+  if (location.type === "Restaurant" && location.customData) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background pb-16">
+        <Navbar />
+        <main className="flex-1 pt-16">
+          <div className="px-4 py-4">
+            <Link 
+              to="/map" 
+              className="inline-flex items-center gap-2 mb-4 text-primary hover:underline"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to map
+            </Link>
+            <RestaurantDetails location={location} />
+          </div>
+        </main>
       </div>
     );
   }
@@ -410,78 +424,6 @@ const LocationDetailPage = () => {
               
               {/* Menu Tab */}
               <TabsContent value="menu" className="mt-4">
-                {isRestaurant(location) && location.menu && (
-                  <Accordion type="single" collapsible className="w-full">
-                    {location.menu.map((category) => (
-                      <AccordionItem key={category.category} value={category.category}>
-                        <AccordionTrigger className="hover:no-underline">
-                          <span>{category.category}</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-4">
-                            {category.items.map((item) => (
-                              <div key={item.id} className="flex gap-3">
-                                <div className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                                  <img 
-                                    src={item.image} 
-                                    alt={item.name} 
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex justify-between">
-                                    <h3 className="font-medium text-base">{item.name}</h3>
-                                    <span className="font-medium">{item.price}</span>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground mt-0.5">
-                                    {item.description}
-                                  </p>
-                                  <div className="flex justify-between items-center mt-2">
-                                    <div className="flex gap-1">
-                                      {item.dietaryTags.map((tag) => (
-                                        <span 
-                                          key={tag} 
-                                          className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full"
-                                        >
-                                          {tag}
-                                        </span>
-                                      ))}
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                      <button 
-                                        onClick={() => handleThumbsUp(item.id)}
-                                        className={`flex items-center gap-1 ${
-                                          activeThumbsUp.has(item.id) 
-                                            ? "text-primary" 
-                                            : "text-muted-foreground"
-                                        }`}
-                                      >
-                                        <ThumbsUp className="w-3.5 h-3.5" />
-                                        <span className="text-xs">{item.thumbsUp + (activeThumbsUp.has(item.id) ? 1 : 0)}</span>
-                                      </button>
-                                      <button 
-                                        onClick={() => handleThumbsDown(item.id)}
-                                        className={`flex items-center gap-1 ${
-                                          activeThumbsDown.has(item.id) 
-                                            ? "text-destructive" 
-                                            : "text-muted-foreground"
-                                        }`}
-                                      >
-                                        <ThumbsDown className="w-3.5 h-3.5" />
-                                        <span className="text-xs">{item.thumbsDown + (activeThumbsDown.has(item.id) ? 1 : 0)}</span>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                )}
-
                 {isGrocery(location) && location.featuredItems && (
                   <>
                     <h3 className="text-lg font-medium mb-3">Featured Items</h3>
@@ -572,7 +514,7 @@ const LocationDetailPage = () => {
                   </>
                 )}
 
-                {!isRestaurant(location) && !isGrocery(location) && (
+                {!isGrocery(location) && (
                   <div className="text-center py-8 text-muted-foreground">
                     <p>Menu information coming soon!</p>
                   </div>
@@ -628,39 +570,6 @@ const LocationDetailPage = () => {
               {/* Reviews Tab */}
               <TabsContent value="reviews" className="mt-4">
                 <div className="space-y-4">
-                  <div className="py-2 px-4 bg-muted/50 rounded-md">
-                    <h3 className="font-medium">Nutritional Information</h3>
-                    {isRestaurant(location) && location.nutrition && location.nutrition.show && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Item</TableHead>
-                            <TableHead className="text-right">Calories</TableHead>
-                            <TableHead className="text-right">Protein</TableHead>
-                            <TableHead className="text-right">Carbs</TableHead>
-                            <TableHead className="text-right">Fat</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {location.nutrition.items.map((item) => (
-                            <TableRow key={item.name}>
-                              <TableCell>{item.name}</TableCell>
-                              <TableCell className="text-right">{item.calories}</TableCell>
-                              <TableCell className="text-right">{item.protein}g</TableCell>
-                              <TableCell className="text-right">{item.carbs}g</TableCell>
-                              <TableCell className="text-right">{item.fat}g</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                    {(!isRestaurant(location) || (isRestaurant(location) && (!location.nutrition || !location.nutrition.show))) && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Detailed nutritional information is being added soon.
-                      </p>
-                    )}
-                  </div>
-
                   <div>
                     <h3 className="text-lg font-medium mb-3">More like this</h3>
                     <div className="grid grid-cols-2 gap-3">
