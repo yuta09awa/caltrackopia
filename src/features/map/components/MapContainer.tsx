@@ -15,6 +15,7 @@ interface MapContainerProps {
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   mapState: MapState;
   searchQuery?: string;
+  onMapLoaded?: (map: google.maps.Map) => void;
 }
 
 // Define libraries array outside component to prevent re-renders - now includes places
@@ -27,7 +28,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   selectedLocationId,
   onMarkerClick,
   mapState,
-  searchQuery
+  searchQuery,
+  onMapLoaded
 }) => {
   const { apiKey, error, loading } = useApiKeyLoader();
 
@@ -76,6 +78,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         onLocationSelect={onLocationSelect}
         height={height}
         searchQuery={searchQuery}
+        onMapLoaded={onMapLoaded}
       />
     </div>
   );
@@ -90,6 +93,7 @@ const MapWithScript: React.FC<{
   onLocationSelect?: (locationId: string) => void;
   height: string;
   searchQuery?: string;
+  onMapLoaded?: (map: google.maps.Map) => void;
 }> = ({ 
   apiKey, 
   mapState,
@@ -97,7 +101,8 @@ const MapWithScript: React.FC<{
   onMarkerClick, 
   onLocationSelect, 
   height,
-  searchQuery
+  searchQuery,
+  onMapLoaded
 }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -150,6 +155,7 @@ const MapWithScript: React.FC<{
       onMarkerClick={onMarkerClick}
       onLocationSelect={onLocationSelect}
       searchQuery={searchQuery}
+      onMapLoaded={onMapLoaded}
     />
   );
 };

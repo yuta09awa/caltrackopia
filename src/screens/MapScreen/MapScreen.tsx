@@ -10,6 +10,7 @@ import { Location } from "@/features/locations/types";
 import MapInfoCard from "@/features/map/components/MapInfoCard";
 import { useLocations } from "@/features/locations/hooks/useLocations";
 import { useMapState } from "@/features/map/hooks/useMapState";
+import { usePlacesApi } from "@/features/map/hooks/usePlacesApi";
 
 const MapScreen = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
@@ -21,6 +22,7 @@ const MapScreen = () => {
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>("");
   const listRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
+  const mapRef = useRef<google.maps.Map | null>(null);
   
   // Get real location data
   const { locations } = useLocations();
@@ -28,26 +30,75 @@ const MapScreen = () => {
   // Get map state management
   const { mapState, updateMarkers } = useMapState();
   
-  const handleSelectIngredient = (ingredient: Ingredient) => {
+  // Get Places API functionality
+  const { searchPlacesByText } = usePlacesApi();
+  
+  const handleSelectIngredient = async (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
-    setCurrentSearchQuery(ingredient.name); // Track search query for map
+    setCurrentSearchQuery(ingredient.name);
     
+    // If it's an ingredient with known locations, use those
     if (ingredient.locations && ingredient.locations.length > 0) {
-      // Convert ingredient locations to map markers
       const searchMarkers = ingredient.locations.map(location => ({
         position: { lat: location.lat, lng: location.lng },
         locationId: location.id,
         type: 'search-result'
       }));
       
-      // Update map markers with search results
       updateMarkers(searchMarkers);
-      
       toast.success(`Found ${ingredient.locations.length} locations for ${ingredient.name}`);
     } else {
-      // Clear markers if no locations
-      updateMarkers([]);
-      toast.info(`Searching for: ${ingredient.name}`);
+      // If no ingredient locations found, search using Places API
+      if (mapRef.current) {
+        try {
+          const placesResults = await searchPlacesByText(
+            mapRef.current, 
+            ingredient.name, 
+            mapState.center,
+            10000 // 10km radius
+          );
+          
+          if (placesResults.length > 0) {
+            updateMarkers(placesResults);
+            toast.success(`Found ${placesResults.length} places for ${ingredient.name}`);
+          } else {
+            updateMarkers([]);
+            toast.info(`No locations found for ${ingredient.name}`);
+          }
+        } catch (error) {
+          console.error('Places search failed:', error);
+          updateMarkers([]);
+          toast.error(`Search failed for ${ingredient.name}`);
+        }
+      } else {
+        // Store the search query for when map loads
+        updateMarkers([]);
+        toast.info(`Searching for: ${ingredient.name}`);
+      }
+    }
+  };
+
+  // Handle when map is loaded and we have a pending search
+  const handleMapLoaded = async (map: google.maps.Map) => {
+    mapRef.current = map;
+    
+    // If we have a search query but no markers, search using Places API
+    if (currentSearchQuery && mapState.markers.length === 0) {
+      try {
+        const placesResults = await searchPlacesByText(
+          map, 
+          currentSearchQuery, 
+          mapState.center,
+          10000
+        );
+        
+        if (placesResults.length > 0) {
+          updateMarkers(placesResults);
+          toast.success(`Found ${placesResults.length} places for ${currentSearchQuery}`);
+        }
+      } catch (error) {
+        console.error('Places search failed on map load:', error);
+      }
     }
   };
 
@@ -132,6 +183,7 @@ const MapScreen = () => {
             onMarkerClick={handleMarkerClick}
             mapState={mapState}
             searchQuery={currentSearchQuery}
+            onMapLoaded={handleMapLoaded}
           />
           
           {/* Map Info Card - only show for restaurant locations */}

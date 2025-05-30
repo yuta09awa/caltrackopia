@@ -11,6 +11,7 @@ interface MapViewProps {
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
   searchQuery?: string;
+  onMapLoaded?: (map: google.maps.Map) => void;
 }
 
 const MapView: React.FC<MapViewProps> = ({ 
@@ -18,13 +19,14 @@ const MapView: React.FC<MapViewProps> = ({
   selectedLocationId,
   onMarkerClick,
   onLocationSelect,
-  searchQuery
+  searchQuery,
+  onMapLoaded
 }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
   const [placesMarkers, setPlacesMarkers] = useState<MarkerData[]>([]);
   
-  const { searchPlacesByText, searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
+  const { searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
 
   const onCameraChanged = useCallback(() => {
     if (!mapRef.current) return;
@@ -54,7 +56,11 @@ const MapView: React.FC<MapViewProps> = ({
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-  }, []);
+    // Notify parent that map is loaded
+    if (onMapLoaded) {
+      onMapLoaded(map);
+    }
+  }, [onMapLoaded]);
 
   const handleMarkerClick = (locationId: string, position: { x: number; y: number }) => {
     if (onMarkerClick) {
@@ -65,38 +71,34 @@ const MapView: React.FC<MapViewProps> = ({
     }
   };
 
-  // Search for places based on search query
-  const searchPlaces = useCallback(async () => {
-    if (!mapRef.current) return;
+  // Load nearby places only when there's no active search
+  const loadNearbyPlaces = useCallback(async () => {
+    if (!mapRef.current || searchQuery) return;
     
     try {
-      if (searchQuery && searchQuery.trim()) {
-        console.log('Searching for places with query:', searchQuery);
-        const places = await searchPlacesByText(mapRef.current, searchQuery, mapState.center);
-        setPlacesMarkers(places);
-      } else {
-        // Only load nearby places if there's no active search
-        console.log('Loading nearby places (no search query)');
-        const places = await searchNearbyPlaces(mapRef.current, mapState.center);
-        setPlacesMarkers(places);
-      }
+      console.log('Loading nearby places (no search query)');
+      const places = await searchNearbyPlaces(mapRef.current, mapState.center);
+      setPlacesMarkers(places);
     } catch (error) {
-      console.error('Failed to search places:', error);
+      console.error('Failed to load nearby places:', error);
     }
-  }, [searchPlacesByText, searchNearbyPlaces, mapState.center, searchQuery]);
+  }, [searchNearbyPlaces, mapState.center, searchQuery]);
 
-  // Update places when search query changes or map loads
+  // Load nearby places when map loads and there's no search
   useEffect(() => {
-    if (mapRef.current) {
-      searchPlaces();
+    if (mapRef.current && !searchQuery) {
+      loadNearbyPlaces();
+    } else if (searchQuery) {
+      // Clear nearby places when there's a search query
+      setPlacesMarkers([]);
     }
-  }, [searchPlaces]);
+  }, [loadNearbyPlaces, searchQuery]);
 
   // Determine which markers to show
-  // Priority: search results from ingredients > places search results > default nearby places
+  // Priority: search results from ingredients/places > default nearby places
   const allMarkers = mapState.markers.length > 0 
-    ? mapState.markers  // Show ingredient location search results first
-    : placesMarkers;    // Fall back to places API results
+    ? mapState.markers  // Show search results first
+    : placesMarkers;    // Fall back to nearby places when no search
 
   // Map style to hide POI and keep only food-related locations
   const mapStyles = [
@@ -155,11 +157,7 @@ const MapView: React.FC<MapViewProps> = ({
 
   return (
     <GoogleMap
-      onLoad={(map) => {
-        mapRef.current = map;
-        // Search places after map is loaded
-        searchPlaces();
-      }}
+      onLoad={onLoad}
       zoom={mapState.zoom}
       center={mapState.center}
       onCenterChanged={onCameraChanged}
@@ -181,9 +179,9 @@ const MapView: React.FC<MapViewProps> = ({
         onMarkerHover={setHoveredLocationId}
       />
       
-      {placesLoading && (
+      {placesLoading && !searchQuery && (
         <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md text-sm">
-          {searchQuery ? `Searching for ${searchQuery}...` : 'Loading nearby restaurants...'}
+          Loading nearby restaurants...
         </div>
       )}
     </GoogleMap>
