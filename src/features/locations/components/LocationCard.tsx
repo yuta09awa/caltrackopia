@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
@@ -73,10 +74,17 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
     );
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on carousel controls
+    const target = e.target as HTMLElement;
+    if (target.closest('button[aria-label*="slide"]') || target.closest('.carousel-navigation')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   return (
-    <Link 
-      key={location.id}
-      to={getDetailLink()}
+    <div 
       className={`block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5 ${
         isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
       }`}
@@ -86,7 +94,12 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10" />
       )}
       
-      <div className="flex">
+      <Link 
+        key={location.id}
+        to={getDetailLink()}
+        className="flex"
+        onClick={handleCardClick}
+      >
         {/* Image Carousel with floating controls - maximized with less spacing */}
         <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden">
           <Carousel className="w-full h-full">
@@ -103,9 +116,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* Floating overlay navigation buttons */}
-            <CarouselPrevious className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
-            <CarouselNext className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-10" />
+            {/* Floating overlay navigation buttons with carousel-navigation class for identification */}
+            <CarouselPrevious className="carousel-navigation absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-20" />
+            <CarouselNext className="carousel-navigation absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-20" />
           </Carousel>
         </div>
         
@@ -148,8 +161,8 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
             ))}
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
 
