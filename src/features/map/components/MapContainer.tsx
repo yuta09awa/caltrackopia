@@ -34,8 +34,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     libraries,
     id: 'google-map-script',
     preventGoogleFontsLoading: true,
-    // Don't load the script until we have an API key
-    loadScriptOptions: apiKey ? undefined : { defer: true }
+    // Skip loading until we have an API key
+    skip: !apiKey
   });
 
   console.log('MapContainer render state:', { 
