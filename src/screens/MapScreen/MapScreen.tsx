@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import MapContainer from "@/features/map/components/MapContainer";
@@ -41,11 +42,14 @@ const MapScreen = () => {
     // Find the actual location data from our locations
     const location = locations.find(loc => loc.id === locationId);
     
-    if (location) {
+    // Only show popup for restaurant locations (food locations)
+    if (location && location.type === "Restaurant") {
       setSelectedLocation(location);
       setSelectedLocationId(locationId);
       setInfoCardPosition(position);
       setShowInfoCard(true);
+    } else if (location) {
+      console.log('Location found but not a restaurant, skipping popup:', location.type);
     } else {
       console.warn('Location not found for ID:', locationId);
     }
@@ -102,8 +106,8 @@ const MapScreen = () => {
             onMarkerClick={handleMarkerClick}
           />
           
-          {/* Map Info Card */}
-          {showInfoCard && selectedLocation && (
+          {/* Map Info Card - only show for restaurant locations */}
+          {showInfoCard && selectedLocation && selectedLocation.type === "Restaurant" && (
             <MapInfoCard
               location={selectedLocation}
               position={infoCardPosition}

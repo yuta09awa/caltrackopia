@@ -18,7 +18,7 @@ export interface MapState {
   markers: MarkerData[];
 }
 
-// Sample test markers that correspond to actual location IDs from mockLocations
+// Sample test markers - only restaurants to limit popups to food locations
 const TEST_MARKERS: MarkerData[] = [
   {
     position: { lat: 40.7589, lng: -73.9851 }, // Times Square area
@@ -29,12 +29,8 @@ const TEST_MARKERS: MarkerData[] = [
     position: { lat: 40.7505, lng: -73.9934 }, // Herald Square area  
     locationId: 'loc-2', // This should match an actual location ID
     type: 'restaurant'
-  },
-  {
-    position: { lat: 40.7614, lng: -73.9776 }, // Central Park area
-    locationId: 'loc-3', // This should match an actual location ID
-    type: 'grocery'
   }
+  // Removed Central Park grocery marker to limit to restaurants only
 ];
 
 export const useMapState = () => {
