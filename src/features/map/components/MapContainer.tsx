@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { useLoadScript } from '@react-google-maps/api';
-import { useMapState } from '../hooks/useMapState';
 import { useApiKeyLoader } from './ApiKeyLoader';
 import MapLoadingState from './MapLoadingState';
 import MapView from './MapView';
 import { Ingredient } from '@/hooks/useIngredientSearch';
+import { MapState } from '@/features/map/hooks/useMapState';
 
 interface MapContainerProps {
   height: string;
@@ -12,6 +13,7 @@ interface MapContainerProps {
   onLocationSelect?: (locationId: string) => void;
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
+  mapState: MapState;
 }
 
 // Define libraries array outside component to prevent re-renders - now includes places
@@ -22,9 +24,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
   selectedIngredient, 
   onLocationSelect,
   selectedLocationId,
-  onMarkerClick
+  onMarkerClick,
+  mapState
 }) => {
-  const { mapState, updateCenter, updateZoom } = useMapState();
   const { apiKey, error, loading } = useApiKeyLoader();
 
   console.log('MapContainer render state:', { 
@@ -65,14 +67,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
       <MapWithScript
         apiKey={apiKey}
-        center={mapState.center}
-        zoom={mapState.zoom}
-        markers={mapState.markers}
+        mapState={mapState}
         selectedLocationId={selectedLocationId}
         onMarkerClick={onMarkerClick}
         onLocationSelect={onLocationSelect}
-        updateCenter={updateCenter}
-        updateZoom={updateZoom}
         height={height}
       />
     </div>
@@ -82,25 +80,17 @@ const MapContainer: React.FC<MapContainerProps> = ({
 // Separate component that handles the Google Maps script loading
 const MapWithScript: React.FC<{
   apiKey: string;
-  center: { lat: number; lng: number };
-  zoom: number;
-  markers: any[];
+  mapState: MapState;
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
-  updateCenter: (center: { lat: number; lng: number }) => void;
-  updateZoom: (zoom: number) => void;
   height: string;
 }> = ({ 
   apiKey, 
-  center, 
-  zoom, 
-  markers, 
+  mapState,
   selectedLocationId, 
   onMarkerClick, 
   onLocationSelect, 
-  updateCenter, 
-  updateZoom,
   height 
 }) => {
   const { isLoaded, loadError } = useLoadScript({
@@ -115,7 +105,7 @@ const MapWithScript: React.FC<{
     isLoaded, 
     loadError: loadError?.message,
     loadErrorStack: loadError?.stack,
-    markersCount: markers.length,
+    markersCount: mapState.markers.length,
     googleMapsAvailable: typeof window !== 'undefined' && 'google' in window
   });
 
@@ -144,18 +134,14 @@ const MapWithScript: React.FC<{
     return <MapLoadingState height={height} type="initializing" />;
   }
 
-  console.log('Google Maps successfully loaded, rendering MapView with markers:', markers);
+  console.log('Google Maps successfully loaded, rendering MapView with markers:', mapState.markers);
 
   return (
     <MapView
-      center={center}
-      zoom={zoom}
-      markers={markers}
+      mapState={mapState}
       selectedLocationId={selectedLocationId}
       onMarkerClick={onMarkerClick}
       onLocationSelect={onLocationSelect}
-      updateCenter={updateCenter}
-      updateZoom={updateZoom}
     />
   );
 };

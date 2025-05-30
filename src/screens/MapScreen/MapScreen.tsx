@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Location } from "@/features/locations/types";
 import MapInfoCard from "@/features/map/components/MapInfoCard";
 import { useLocations } from "@/features/locations/hooks/useLocations";
+import { useMapState } from "@/features/map/hooks/useMapState";
 
 const MapScreen = () => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
@@ -23,12 +24,27 @@ const MapScreen = () => {
   // Get real location data
   const { locations } = useLocations();
   
+  // Get map state management
+  const { mapState, updateMarkers } = useMapState();
+  
   const handleSelectIngredient = (ingredient: Ingredient) => {
     setSelectedIngredient(ingredient);
     
     if (ingredient.locations && ingredient.locations.length > 0) {
+      // Convert ingredient locations to map markers
+      const searchMarkers = ingredient.locations.map(location => ({
+        position: { lat: location.lat, lng: location.lng },
+        locationId: location.id,
+        type: 'search-result'
+      }));
+      
+      // Update map markers with search results
+      updateMarkers(searchMarkers);
+      
       toast.success(`Found ${ingredient.locations.length} locations for ${ingredient.name}`);
     } else {
+      // Clear markers if no locations
+      updateMarkers([]);
       toast.info(`Selected: ${ingredient.name}`);
     }
   };
@@ -104,6 +120,7 @@ const MapScreen = () => {
             onLocationSelect={handleLocationSelect}
             selectedLocationId={selectedLocationId}
             onMarkerClick={handleMarkerClick}
+            mapState={mapState}
           />
           
           {/* Map Info Card - only show for restaurant locations */}

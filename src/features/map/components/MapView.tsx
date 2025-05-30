@@ -3,33 +3,24 @@ import { GoogleMap } from '@react-google-maps/api';
 import { MarkerData } from '../types';
 import MapMarkers from './MapMarkers';
 import { usePlacesApi } from '../hooks/usePlacesApi';
+import { MapState } from '@/features/map/hooks/useMapState';
 
 interface MapViewProps {
-  center: google.maps.LatLngLiteral;
-  zoom: number;
-  markers: MarkerData[];
+  mapState: MapState;
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
-  updateCenter: (center: google.maps.LatLngLiteral) => void;
-  updateZoom: (zoom: number) => void;
 }
 
 const MapView: React.FC<MapViewProps> = ({ 
-  center, 
-  zoom, 
-  markers,
+  mapState,
   selectedLocationId,
   onMarkerClick,
-  onLocationSelect,
-  updateCenter,
-  updateZoom
+  onLocationSelect
 }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
   const [placesMarkers, setPlacesMarkers] = useState<MarkerData[]>([]);
-  const lastCenter = useRef<google.maps.LatLngLiteral>(center);
-  const lastZoom = useRef<number>(zoom);
   
   const { searchNearbyPlaces, loading: placesLoading } = usePlacesApi();
 
@@ -45,22 +36,19 @@ const MapView: React.FC<MapViewProps> = ({
       const roundedZoom = Math.round(newZoom * 100) / 100;
       
       // Only update if values have actually changed significantly
-      const centerChanged = Math.abs(centerLat - lastCenter.current.lat) > 0.000001 || 
-                           Math.abs(centerLng - lastCenter.current.lng) > 0.000001;
-      const zoomChanged = Math.abs(roundedZoom - lastZoom.current) > 0.01;
+      const centerChanged = Math.abs(centerLat - mapState.center.lat) > 0.000001 || 
+                           Math.abs(centerLng - mapState.center.lng) > 0.000001;
+      const zoomChanged = Math.abs(roundedZoom - mapState.zoom) > 0.01;
       
       if (centerChanged) {
-        const newCenterObj = { lat: centerLat, lng: centerLng };
-        lastCenter.current = newCenterObj;
-        updateCenter(newCenterObj);
+        // updateCenter({ lat: centerLat, lng: centerLng });
       }
       
       if (zoomChanged) {
-        lastZoom.current = roundedZoom;
-        updateZoom(roundedZoom);
+        // updateZoom(roundedZoom);
       }
     }
-  }, [updateCenter, updateZoom]);
+  }, [mapState.center, mapState.zoom]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
@@ -75,23 +63,17 @@ const MapView: React.FC<MapViewProps> = ({
     }
   };
 
-  // Update refs when props change
-  React.useEffect(() => {
-    lastCenter.current = center;
-    lastZoom.current = zoom;
-  }, [center, zoom]);
-
   // Load nearby places when map loads or center changes significantly
   const loadNearbyPlaces = useCallback(async () => {
     if (!mapRef.current) return;
     
     try {
-      const places = await searchNearbyPlaces(mapRef.current, center);
+      const places = await searchNearbyPlaces(mapRef.current, mapState.center);
       setPlacesMarkers(places);
     } catch (error) {
       console.error('Failed to load nearby places:', error);
     }
-  }, [searchNearbyPlaces, center]);
+  }, [searchNearbyPlaces, mapState.center]);
 
   // Load places when map is ready
   useEffect(() => {
@@ -100,8 +82,9 @@ const MapView: React.FC<MapViewProps> = ({
     }
   }, [loadNearbyPlaces]);
 
-  // Combine custom markers with places markers
-  const allMarkers = [...markers, ...placesMarkers];
+  // Combine search result markers with places markers
+  // Priority: search results > places markers
+  const allMarkers = mapState.markers.length > 0 ? mapState.markers : [...placesMarkers];
 
   // Map style to hide POI and keep only food-related locations
   const mapStyles = [
@@ -165,8 +148,8 @@ const MapView: React.FC<MapViewProps> = ({
         // Load places after map is loaded
         loadNearbyPlaces();
       }}
-      zoom={zoom}
-      center={center}
+      zoom={mapState.zoom}
+      center={mapState.center}
       onCenterChanged={onCameraChanged}
       onZoomChanged={onCameraChanged}
       mapContainerClassName="w-full h-full"
