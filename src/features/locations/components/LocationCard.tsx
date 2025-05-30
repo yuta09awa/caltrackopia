@@ -1,4 +1,5 @@
 
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
@@ -75,11 +76,14 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on carousel controls
+    // Prevent navigation if clicking on carousel controls or buttons
     const target = e.target as HTMLElement;
-    if (target.closest('button[aria-label*="slide"]') || target.closest('.carousel-navigation')) {
+    const button = target.closest('button');
+    
+    if (button) {
       e.preventDefault();
       e.stopPropagation();
+      return false;
     }
   };
 
@@ -116,9 +120,21 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* Floating overlay navigation buttons with carousel-navigation class for identification */}
-            <CarouselPrevious className="carousel-navigation absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-20" />
-            <CarouselNext className="carousel-navigation absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-20" />
+            {/* Floating overlay navigation buttons with higher z-index and event prevention */}
+            <CarouselPrevious 
+              className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            />
+            <CarouselNext 
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            />
           </Carousel>
         </div>
         
@@ -167,3 +183,4 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
 };
 
 export default LocationCard;
+
