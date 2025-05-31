@@ -50,7 +50,7 @@ export const useCachedPlacesApi = () => {
         throw new Error(functionError.message);
       }
 
-      if (data.success) {
+      if (data && data.success) {
         console.log(`Cache ${data.source}: Found ${data.count} places`);
         
         // Update cache hit rate for UI feedback
@@ -61,7 +61,8 @@ export const useCachedPlacesApi = () => {
         }
 
         // Convert cached results to MarkerData format
-        const markers: MarkerData[] = data.results.map((place: CachedPlaceResult) => ({
+        const results = data.results || [];
+        const markers: MarkerData[] = results.map((place: any) => ({
           position: {
             lat: Number(place.latitude),
             lng: Number(place.longitude)
@@ -94,7 +95,7 @@ export const useCachedPlacesApi = () => {
     try {
       console.log(`Searching nearby cached places at ${center.lat},${center.lng}`);
 
-      // Use the enhanced database service for nearby search
+      // Use the database service for nearby search
       const results = await databaseService.findPlacesWithIngredients(
         center.lat,
         center.lng,
@@ -109,13 +110,16 @@ export const useCachedPlacesApi = () => {
         console.log(`Found ${results.length} nearby cached places`);
         
         // Update cache statistics
-        await supabase.rpc('update_cache_stats', { 
-          hits: 1, 
-          misses: 0, 
-          saved: 1,
-          new_places: 0,
-          updated_places: 0
-        });
+        try {
+          await supabase.rpc('update_cache_stats', { 
+            hits: 1, 
+            misses: 0, 
+            saved: 1
+          });
+        } catch (rpcError) {
+          console.warn('Failed to update cache stats:', rpcError);
+        }
+        
         setCacheHitRate(prev => prev ? (prev + 1) / 2 : 1);
 
         const markers: MarkerData[] = results.map((place: any) => ({

@@ -21,8 +21,8 @@ const mockIngredients: Ingredient[] = [
     description: 'Fresh locally grown kale',
     category: 'Vegetables',
     locations: [
-      { id: 'loc1', name: 'Farmers Market', address: '123 Market St', lat: 40.7589, lng: -73.9851 },
-      { id: 'loc2', name: 'Green Grocery', address: '456 Organic Ave', lat: 40.7505, lng: -73.9934 }
+      { id: 'loc1', name: 'Farmers Market', lat: 40.7589, lng: -73.9851 },
+      { id: 'loc2', name: 'Green Grocery', lat: 40.7505, lng: -73.9934 }
     ]
   },
   {
@@ -31,7 +31,7 @@ const mockIngredients: Ingredient[] = [
     description: 'Sustainably raised beef',
     category: 'Meat',
     locations: [
-      { id: 'loc3', name: 'Butcher Shop', address: '789 Meat St', lat: 40.7580, lng: -73.9840 }
+      { id: 'loc3', name: 'Butcher Shop', lat: 40.7580, lng: -73.9840 }
     ]
   },
   {
@@ -40,8 +40,8 @@ const mockIngredients: Ingredient[] = [
     description: 'Ripe Hass avocados',
     category: 'Fruits',
     locations: [
-      { id: 'loc4', name: 'Grocery Store', address: '101 Fresh Blvd', lat: 40.7600, lng: -73.9800 },
-      { id: 'loc5', name: 'Farmers Market', address: '123 Market St', lat: 40.7589, lng: -73.9851 }
+      { id: 'loc4', name: 'Grocery Store', lat: 40.7600, lng: -73.9800 },
+      { id: 'loc5', name: 'Farmers Market', lat: 40.7589, lng: -73.9851 }
     ]
   },
   {
@@ -50,8 +50,8 @@ const mockIngredients: Ingredient[] = [
     description: 'Whole Foods Market - organic groceries',
     category: 'Grocery Store',
     locations: [
-      { id: 'loc6', name: 'Whole Foods Union Square', address: '4 Union Square S, New York, NY', lat: 40.7359, lng: -73.9911 },
-      { id: 'loc7', name: 'Whole Foods Tribeca', address: '270 Greenwich St, New York, NY', lat: 40.7205, lng: -74.0134 }
+      { id: 'loc6', name: 'Whole Foods Union Square', lat: 40.7359, lng: -73.9911 },
+      { id: 'loc7', name: 'Whole Foods Tribeca', lat: 40.7205, lng: -74.0134 }
     ]
   },
   {
@@ -60,7 +60,7 @@ const mockIngredients: Ingredient[] = [
     description: 'Organic quinoa grain',
     category: 'Grains',
     locations: [
-      { id: 'loc8', name: 'Health Food Store', address: '789 Wellness Ave', lat: 40.7550, lng: -73.9900 }
+      { id: 'loc8', name: 'Health Food Store', lat: 40.7550, lng: -73.9900 }
     ]
   },
   {
@@ -69,7 +69,7 @@ const mockIngredients: Ingredient[] = [
     description: 'Fresh Atlantic salmon',
     category: 'Seafood',
     locations: [
-      { id: 'loc9', name: 'Fish Market', address: '456 Harbor St', lat: 40.7520, lng: -73.9950 }
+      { id: 'loc9', name: 'Fish Market', lat: 40.7520, lng: -73.9950 }
     ]
   }
 ];
