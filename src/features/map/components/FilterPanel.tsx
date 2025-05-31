@@ -53,6 +53,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 space-y-3 p-3 overflow-y-auto">
+        {/* Enhanced Ingredient Filters */}
         <IngredientFilters />
 
         <PriceRangeFilter 
