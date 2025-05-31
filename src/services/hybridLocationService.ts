@@ -1,5 +1,22 @@
+
 import { Location, RestaurantCustomData } from "@/models/Location";
 import { locationService } from "./locationService";
+import { databaseService } from "./databaseService";
+import { mockLocations } from "@/features/locations/data/mockLocations";
+
+// Define MarketCustomData interface since it's missing from Location.ts
+export interface MarketCustomData {
+  id: string;
+  description: string;
+  hours: Array<{ day: string; isOpen: boolean; openTime?: string; closeTime?: string; specialNotes?: string }>;
+  features: string[];
+  vendors: Array<{ id: string; name: string; type: string; description: string; popular: string[]; images: string[] }>;
+  events: Array<{ id: string; name: string; date: string; time: string; description: string }>;
+  sections: Array<{ name: string; description: string; popular: string[] }>;
+  highlights: Array<{ id: string; name: string; type: string; description: string; vendor?: string }>;
+  isVerified: boolean;
+  lastUpdated: string;
+}
 
 export class HybridLocationService {
   
@@ -162,7 +179,7 @@ export class HybridLocationService {
       const enrichedLocations = await Promise.all(
         baseLocations.map(async (location) => {
           if (location.type === "Restaurant") {
-            const customData = await this.getCustomRestaurantData(location.id);
+            const customData = await this.getCustomRestaurantData(location.id, null);
             if (customData) {
               location.customData = customData;
             }
@@ -205,7 +222,7 @@ export class HybridLocationService {
         allLocations
           .filter(loc => loc.type === "Restaurant")
           .map(async (location) => {
-            const customData = await this.getCustomRestaurantData(location.id);
+            const customData = await this.getCustomRestaurantData(location.id, null);
             if (customData?.ingredients.some(ing => 
               ing.name.toLowerCase().includes(ingredientName.toLowerCase())
             )) {
