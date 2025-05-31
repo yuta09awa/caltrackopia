@@ -156,7 +156,16 @@ export class NutritionService {
 
   async getDietaryRestrictions(): Promise<DietaryRestriction[]> {
     try {
-      return await databaseService.getAllDietaryRestrictions();
+      const dbRestrictions = await databaseService.getAllDietaryRestrictions();
+      
+      // Transform database DietaryRestriction to model DietaryRestriction
+      return dbRestrictions.map(dbRestriction => ({
+        id: dbRestriction.id,
+        name: dbRestriction.name,
+        description: dbRestriction.description || '',
+        excludedIngredients: dbRestriction.excluded_ingredients || [],
+        excludedAllergens: dbRestriction.excluded_allergens || []
+      }));
     } catch (error) {
       console.error('Error fetching dietary restrictions:', error);
       return [];
