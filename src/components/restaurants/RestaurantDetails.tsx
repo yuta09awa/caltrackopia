@@ -5,14 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, MapPin, Star, Truck, Award, Leaf } from 'lucide-react';
+import { isRestaurantCustomData } from '@/utils/typeGuards';
 
 interface RestaurantDetailsProps {
   location: Location;
-}
-
-// Type guard to check if customData is RestaurantCustomData
-function isRestaurantCustomData(customData: any): customData is RestaurantCustomData {
-  return customData && 'menuItems' in customData && 'specialFeatures' in customData;
 }
 
 const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ location }) => {

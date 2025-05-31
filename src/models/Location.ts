@@ -1,3 +1,4 @@
+
 export interface Location {
   id: string;
   name: string;
@@ -25,16 +26,17 @@ export interface Location {
   customData?: RestaurantCustomData | MarketCustomData; // Support both types of custom data
 }
 
-// Add MarketCustomData interface to the models file
+// Enhanced MarketCustomData interface with featuredItems added
 export interface MarketCustomData {
   id: string;
   description: string;
-  hours: Array<{ day: string; isOpen: boolean; openTime?: string; closeTime?: string; specialNotes?: string }>;
+  hours: Array<{ day: string; isOpen: boolean; openTime?: string; closeTime?: string; specialNotes?: string; hours?: string }>;
   features: string[];
   vendors: Array<{ id: string; name: string; type: string; description: string; popular: string[]; images: string[] }>;
   events: Array<{ id: string; name: string; date: string; time: string; description: string }>;
   sections: Array<{ name: string; description: string; popular: string[] }>;
   highlights: Array<{ id: string; name: string; type: string; description: string; vendor?: string }>;
+  featuredItems?: FeaturedItem[]; // Added for consistency with RestaurantCustomData
   isVerified: boolean;
   lastUpdated: string;
 }
@@ -85,6 +87,7 @@ export interface CustomBusinessHours {
   openTime?: string;
   closeTime?: string;
   specialNotes?: string;
+  hours?: string; // For simplified display compatibility
 }
 
 export interface MenuItem {
@@ -121,6 +124,38 @@ export interface FeaturedItem {
   category?: string;
   isSpecialOffer: boolean;
   validUntil?: string;
+}
+
+// Market-specific types consolidated from features/markets/types.ts
+export interface Vendor {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  popular: string[];
+  images: string[];
+}
+
+export interface Event {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  description: string;
+}
+
+export interface Section {
+  name: string;
+  description: string;
+  popular: string[];
+}
+
+export interface HighlightItem {
+  id: string;
+  name: string;
+  type: "new" | "popular" | "seasonal";
+  description: string;
+  vendor?: string;
 }
 
 export type LocationType = 'all' | 'restaurant' | 'grocery' | 'farmers-market' | 'convenience-store' | 'food-festival';
