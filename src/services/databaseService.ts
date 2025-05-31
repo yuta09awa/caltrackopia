@@ -354,15 +354,114 @@ class DatabaseService {
     return [];
   }
 
-  // Dietary restrictions queries
+  // Enhanced dietary restrictions queries with fallback data
   async getAllDietaryRestrictions(): Promise<DietaryRestriction[]> {
-    console.warn('Dietary restrictions table not available yet, returning mock data');
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('dietary_restrictions')
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.warn('Dietary restrictions table not available, using mock data:', error);
+        return this.getMockDietaryRestrictions();
+      }
+
+      return data || this.getMockDietaryRestrictions();
+    } catch (error) {
+      console.warn('Error fetching dietary restrictions, using mock data:', error);
+      return this.getMockDietaryRestrictions();
+    }
   }
 
   async getDietaryRestrictionByName(name: string): Promise<DietaryRestriction | null> {
-    console.warn('Dietary restrictions table not available yet, returning null');
-    return null;
+    try {
+      const { data, error } = await supabase
+        .from('dietary_restrictions')
+        .select('*')
+        .eq('name', name)
+        .single();
+
+      if (error) {
+        console.warn('Dietary restrictions table not available, using mock data');
+        return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
+      }
+
+      return data;
+    } catch (error) {
+      console.warn('Error fetching dietary restriction by name, using mock data:', error);
+      return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
+    }
+  }
+
+  // Mock dietary restrictions for fallback
+  private getMockDietaryRestrictions(): DietaryRestriction[] {
+    return [
+      {
+        id: '1',
+        name: 'Vegan',
+        description: 'No animal products',
+        excluded_ingredients: ['meat', 'dairy', 'eggs', 'honey'],
+        excluded_allergens: ['dairy', 'eggs'],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '2',
+        name: 'Vegetarian',
+        description: 'No meat or fish',
+        excluded_ingredients: ['meat', 'fish', 'poultry'],
+        excluded_allergens: [],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '3',
+        name: 'Gluten Free',
+        description: 'No gluten-containing grains',
+        excluded_ingredients: ['wheat', 'barley', 'rye', 'oats'],
+        excluded_allergens: ['gluten'],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '4',
+        name: 'Dairy Free',
+        description: 'No dairy products',
+        excluded_ingredients: ['milk', 'cheese', 'butter', 'cream'],
+        excluded_allergens: ['dairy'],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '5',
+        name: 'Nut Free',
+        description: 'No tree nuts or peanuts',
+        excluded_ingredients: ['almonds', 'walnuts', 'peanuts', 'cashews'],
+        excluded_allergens: ['nuts', 'peanuts'],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '6',
+        name: 'Kosher',
+        description: 'Follows Jewish dietary laws',
+        excluded_ingredients: ['pork', 'shellfish', 'non-kosher meat'],
+        excluded_allergens: [],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '7',
+        name: 'Halal',
+        description: 'Follows Islamic dietary laws',
+        excluded_ingredients: ['pork', 'alcohol', 'non-halal meat'],
+        excluded_allergens: [],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: '8',
+        name: 'Paleo',
+        description: 'Paleolithic diet - no processed foods',
+        excluded_ingredients: ['grains', 'legumes', 'dairy', 'processed_sugar'],
+        excluded_allergens: ['gluten', 'dairy'],
+        created_at: new Date().toISOString()
+      }
+    ];
   }
 
   // Cache statistics

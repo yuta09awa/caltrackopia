@@ -7,9 +7,12 @@ import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter
 import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
 import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
 import IngredientFilters from './IngredientFilters';
-import CategoryFilters from './CategoryFilters';
+import CategoryFilter from './filters/CategoryFilter';
 import { LocationType } from '@/features/locations/types';
 import { defaultFilterValues, cuisineOptions, groceryCategoryOptions } from '../config/filterConfig';
+import { useDietaryRestrictions } from '../hooks/filters/useDietaryRestrictions';
+import { useIngredientSources } from '../hooks/filters/useIngredientSources';
+import { useNutritionGoals } from '../hooks/filters/useNutritionGoals';
 
 type FilterPanelProps = {
   priceFilter: string | null;
@@ -25,40 +28,24 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onApplyFilters,
 }) => {
   const { mapFilters, updateMapFilters } = useAppStore();
-  const [selectedFilters, setSelectedFilters] = React.useState<Record<string, string[]>>({
-    sources: mapFilters.sources || [],
-    dietary: mapFilters.dietary || [],
-    nutrition: mapFilters.nutrition || [],
-  });
-
-  React.useEffect(() => {
-    updateMapFilters({
-      sources: selectedFilters.sources,
-      dietary: selectedFilters.dietary,
-      nutrition: selectedFilters.nutrition,
-    });
-  }, [selectedFilters, updateMapFilters]);
+  
+  // Fetch dynamic filter data
+  const { data: dietaryOptions = [], isLoading: dietaryLoading } = useDietaryRestrictions();
+  const { data: sourceOptions = [] } = useIngredientSources();
+  const { data: nutritionOptions = [] } = useNutritionGoals();
 
   const handleFilterChange = (categoryId: string, optionId: string) => {
-    setSelectedFilters(prev => {
-      const categoryFilters = prev[categoryId] || [];
-      const updated = categoryFilters.includes(optionId)
-        ? categoryFilters.filter(id => id !== optionId)
-        : [...categoryFilters, optionId];
-      
-      return {
-        ...prev,
-        [categoryId]: updated
-      };
+    const currentFilters = mapFilters[categoryId as keyof typeof mapFilters] as string[] || [];
+    const updated = currentFilters.includes(optionId)
+      ? currentFilters.filter(id => id !== optionId)
+      : [...currentFilters, optionId];
+    
+    updateMapFilters({
+      [categoryId]: updated
     });
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({
-      sources: [],
-      dietary: [],
-      nutrition: [],
-    });
     setPriceFilter(null);
     updateMapFilters(defaultFilterValues);
   };
@@ -81,9 +68,29 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           <GroceryCategoryFilter categoryOptions={groceryCategoryOptions} />
         )}
 
-        <CategoryFilters 
-          selectedFilters={selectedFilters}
-          onFilterChange={handleFilterChange}
+        {/* Dynamic Dietary Restrictions Filter */}
+        <CategoryFilter
+          label="Dietary Restrictions"
+          options={dietaryOptions}
+          selectedOptions={mapFilters.dietary || []}
+          onOptionChange={(optionId) => handleFilterChange('dietary', optionId)}
+          isLoading={dietaryLoading}
+        />
+
+        {/* Dynamic Nutrition Focus Filter */}
+        <CategoryFilter
+          label="Nutrition Focus"
+          options={nutritionOptions}
+          selectedOptions={mapFilters.nutrition || []}
+          onOptionChange={(optionId) => handleFilterChange('nutrition', optionId)}
+        />
+
+        {/* Ingredient Sources Filter */}
+        <CategoryFilter
+          label="Ingredient Sources"
+          options={sourceOptions}
+          selectedOptions={mapFilters.sources || []}
+          onOptionChange={(optionId) => handleFilterChange('sources', optionId)}
         />
 
         <Button

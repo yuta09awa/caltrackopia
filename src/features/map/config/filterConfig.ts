@@ -12,26 +12,17 @@ export interface FilterCategory {
   options: FilterOption[];
 }
 
-export const filterCategories: FilterCategory[] = [
+// Dynamic filter categories that will be populated from database
+export const dynamicFilterCategories: FilterCategory[] = [
   {
     id: 'dietary',
     label: 'Dietary Restrictions',
-    options: [
-      { id: 'vegan', label: 'Vegan' },
-      { id: 'vegetarian', label: 'Vegetarian' },
-      { id: 'gluten-free', label: 'Gluten Free' },
-      { id: 'dairy-free', label: 'Dairy Free' }
-    ]
+    options: [], // Will be populated dynamically
   },
   {
     id: 'nutrition',
     label: 'Nutrition Focus',
-    options: [
-      { id: 'high-protein', label: 'High Protein' },
-      { id: 'low-carb', label: 'Low Carb' },
-      { id: 'low-fat', label: 'Low Fat' },
-      { id: 'keto', label: 'Keto Friendly' }
-    ]
+    options: [], // Will be populated dynamically
   },
   {
     id: 'sources',
@@ -45,6 +36,16 @@ export const filterCategories: FilterCategory[] = [
   }
 ];
 
+// Static filter options for components that don't need dynamic loading yet
+export const staticFilterOptions = {
+  nutritionFocus: [
+    { id: 'high-protein', label: 'High Protein' },
+    { id: 'low-carb', label: 'Low Carb' },
+    { id: 'low-fat', label: 'Low Fat' },
+    { id: 'keto', label: 'Keto Friendly' }
+  ]
+};
+
 export const defaultFilterValues = {
   dietary: [],
   nutrition: [],
@@ -52,18 +53,27 @@ export const defaultFilterValues = {
   priceRange: null,
   cuisine: 'all',
   groceryCategory: 'all',
-  excludeIngredients: []
+  excludeIngredients: [],
+  includeIngredients: [], // Added for explicit inclusion filtering
 };
 
-// Cuisine options configuration
+// Enhanced cuisine options
 export const cuisineOptions = [
   { value: "american", label: "American" },
   { value: "mediterranean", label: "Mediterranean" },
   { value: "asian", label: "Asian" },
   { value: "italian", label: "Italian" },
+  { value: "mexican", label: "Mexican" },
+  { value: "indian", label: "Indian" },
+  { value: "japanese", label: "Japanese" },
+  { value: "thai", label: "Thai" },
+  { value: "french", label: "French" },
+  { value: "chinese", label: "Chinese" },
+  { value: "korean", label: "Korean" },
+  { value: "vietnamese", label: "Vietnamese" },
 ];
 
-// Grocery category options configuration
+// Enhanced grocery category options
 export const groceryCategoryOptions = [
   { value: "produce", label: "Produce" },
   { value: "dairy", label: "Dairy" },
@@ -71,4 +81,9 @@ export const groceryCategoryOptions = [
   { value: "meat", label: "Meat & Seafood" },
   { value: "organic", label: "Organic" },
   { value: "frozen", label: "Frozen Foods" },
+  { value: "pantry", label: "Pantry Staples" },
+  { value: "beverages", label: "Beverages" },
+  { value: "snacks", label: "Snacks" },
+  { value: "deli", label: "Deli" },
+  { value: "health", label: "Health & Wellness" },
 ];

@@ -9,6 +9,7 @@ export interface MapFilters {
   dietary: string[];
   nutrition: string[];
   excludeIngredients: string[];
+  includeIngredients: string[]; // New field for explicit ingredient inclusion
 }
 
 export interface MapFiltersSlice {
@@ -30,6 +31,7 @@ export const createMapFiltersSlice: StateCreator<
     dietary: [],
     nutrition: [],
     excludeIngredients: [],
+    includeIngredients: [], // Initialize new field
   },
   updateMapFilters: (filters) => set((state) => ({
     mapFilters: {
