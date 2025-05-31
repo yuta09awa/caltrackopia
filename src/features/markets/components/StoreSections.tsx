@@ -6,7 +6,7 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Section } from "../types";
+import { Section } from "@/models/Location";
 
 interface StoreSectionsProps {
   sections: Section[];

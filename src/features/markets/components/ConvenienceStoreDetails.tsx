@@ -1,9 +1,9 @@
 
 import StoreSections from "./StoreSections";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface ConvenienceStoreDetailsProps {
-  market: Market;
+  market: Location;
 }
 
 const ConvenienceStoreDetails = ({ market }: ConvenienceStoreDetailsProps) => {

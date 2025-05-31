@@ -1,10 +1,10 @@
 
 import { Link } from "react-router-dom";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface MarketReviewsTabProps {
-  market: Market;
-  similarMarkets: Market[];
+  market: Location;
+  similarMarkets: Location[];
 }
 
 const MarketReviewsTab = ({ market, similarMarkets }: MarketReviewsTabProps) => {

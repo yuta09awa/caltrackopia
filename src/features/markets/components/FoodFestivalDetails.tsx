@@ -3,10 +3,10 @@ import { Calendar, Store } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import VendorList from "./VendorList";
 import EventList from "./EventList";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface FoodFestivalDetailsProps {
-  market: Market;
+  market: Location;
 }
 
 const FoodFestivalDetails = ({ market }: FoodFestivalDetailsProps) => {

@@ -1,7 +1,7 @@
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 // Mock market data (this would come from an API in a real app)
-export const mockMarkets: Record<string, Market> = {
+export const mockMarkets: Record<string, Location> = {
   "6": {
     id: "6",
     name: "Downtown Farmers Market",

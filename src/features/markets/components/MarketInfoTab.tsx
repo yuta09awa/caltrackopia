@@ -1,9 +1,9 @@
 
 import { Card } from "@/components/ui/card";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface MarketInfoTabProps {
-  market: Market;
+  market: Location;
 }
 
 const MarketInfoTab = ({ market }: MarketInfoTabProps) => {

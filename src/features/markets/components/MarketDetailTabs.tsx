@@ -7,11 +7,11 @@ import GenericMarketDetails from "./GenericMarketDetails";
 import MarketInfoTab from "./MarketInfoTab";
 import MarketReviewsTab from "./MarketReviewsTab";
 import MarketHighlights from "./MarketHighlights";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface MarketDetailTabsProps {
-  market: Market;
-  similarMarkets: Market[];
+  market: Location;
+  similarMarkets: Location[];
 }
 
 const MarketDetailTabs = ({ market, similarMarkets }: MarketDetailTabsProps) => {

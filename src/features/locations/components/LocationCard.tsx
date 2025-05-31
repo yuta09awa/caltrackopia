@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
@@ -10,8 +8,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Location } from "../types";
-import { Market } from "@/features/markets/types";
+import { Location, HighlightItem } from "@/models/Location";
+import { Market } from "@/models/Location";
 
 interface LocationCardProps {
   location: Location;
@@ -34,17 +32,19 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
 
   // Check if this location has highlights (for markets)
   const hasHighlights = () => {
-    const marketLocation = location as Market;
-    return marketLocation.highlights && marketLocation.highlights.length > 0;
+    if (location.customData && 'highlights' in location.customData) {
+      return location.customData.highlights && location.customData.highlights.length > 0;
+    }
+    return false;
   };
 
   // Get highlight types present in this market
   const getHighlightTypes = () => {
-    const marketLocation = location as Market;
-    if (!marketLocation.highlights) return [];
-    
-    const types = new Set(marketLocation.highlights.map(h => h.type));
-    return Array.from(types);
+    if (location.customData && 'highlights' in location.customData && location.customData.highlights) {
+      const types = new Set(location.customData.highlights.map(h => h.type));
+      return Array.from(types);
+    }
+    return [];
   };
 
   // Show badge for each highlight type
@@ -183,4 +183,3 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
 };
 
 export default LocationCard;
-

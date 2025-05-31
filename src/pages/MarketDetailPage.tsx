@@ -1,10 +1,9 @@
-
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { mockMarkets } from "@/features/markets/data/mockMarkets";
 import MarketHeader from "@/features/markets/components/MarketHeader";
 import MarketDetailTabs from "@/features/markets/components/MarketDetailTabs";
-import { Market } from "@/features/markets/types";
+import { Location } from "@/models/Location";
 
 const MarketDetailPage = () => {
   const { id } = useParams<{ id: string }>();

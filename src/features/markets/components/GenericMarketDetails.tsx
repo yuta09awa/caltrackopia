@@ -1,9 +1,9 @@
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface GenericMarketDetailsProps {
-  market: Market;
+  market: Location;
 }
 
 const GenericMarketDetails = ({ market }: GenericMarketDetailsProps) => {

@@ -6,10 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Market } from "../types";
+import { Location } from "@/models/Location";
 
 interface MarketHeaderProps {
-  market: Market;
+  market: Location;
 }
 
 const MarketHeader = ({ market }: MarketHeaderProps) => {

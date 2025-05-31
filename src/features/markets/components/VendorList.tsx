@@ -1,7 +1,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Vendor } from "../types";
+import { Vendor } from "@/models/Location";
 
 interface VendorListProps {
   vendors: Vendor[];
