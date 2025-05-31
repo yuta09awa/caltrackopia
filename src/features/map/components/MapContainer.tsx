@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
@@ -18,8 +19,8 @@ interface MapContainerProps {
   onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
-// Define libraries array outside component to prevent re-renders - only include marker for now
-const libraries: ("marker")[] = ['marker'];
+// Include places library to fix the Places API error
+const libraries: ("places" | "marker")[] = ['places', 'marker'];
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
   height, 
@@ -122,7 +123,8 @@ const MapWithScript: React.FC<{
     loadErrorStack: loadError?.stack,
     markersCount: mapState.markers.length,
     searchQuery,
-    googleMapsAvailable: typeof window !== 'undefined' && 'google' in window
+    googleMapsAvailable: typeof window !== 'undefined' && 'google' in window,
+    placesAvailable: typeof window !== 'undefined' && window.google?.maps?.places
   });
 
   // Show error if Google Maps failed to load

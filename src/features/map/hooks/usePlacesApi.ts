@@ -18,13 +18,31 @@ export const usePlacesApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const waitForPlacesApi = useCallback(async (): Promise<boolean> => {
+    // Wait for Places API to be available
+    const maxAttempts = 10;
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      if (window.google?.maps?.places?.PlacesService) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    console.error('Places API not available after waiting');
+    return false;
+  }, []);
+
   const searchPlacesByText = useCallback(async (
     map: google.maps.Map,
     query: string,
     center: google.maps.LatLngLiteral,
     radius: number = 20000
   ): Promise<MarkerData[]> => {
-    if (!map || !window.google?.maps?.places || !query.trim()) {
+    if (!map || !query.trim()) {
+      console.log('Invalid map or query for search');
       return [];
     }
 
@@ -32,7 +50,12 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      // Use the traditional PlacesService instead of the new Place class
+      // Wait for Places API to be ready
+      const placesReady = await waitForPlacesApi();
+      if (!placesReady) {
+        throw new Error('Places API not available');
+      }
+
       const service = new google.maps.places.PlacesService(map);
       
       return new Promise<MarkerData[]>((resolve, reject) => {
@@ -44,10 +67,12 @@ export const usePlacesApi = () => {
         };
 
         service.textSearch(request, (results, status) => {
+          console.log('Places text search response:', { status, resultsCount: results?.length });
+          
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             const markers: MarkerData[] = results
               .filter(place => place.geometry?.location && place.place_id)
-              .slice(0, 20) // Limit results
+              .slice(0, 20)
               .map(place => ({
                 position: {
                   lat: place.geometry!.location!.lat(),
@@ -57,11 +82,11 @@ export const usePlacesApi = () => {
                 type: 'restaurant'
               }));
             
-            console.log(`Found ${markers.length} places for query: ${query} using PlacesService`);
+            console.log(`Found ${markers.length} places for query: ${query}`);
             setLoading(false);
             resolve(markers);
           } else {
-            console.log('Places search failed with status:', status);
+            console.log('Places search failed or no results:', status);
             setLoading(false);
             resolve([]);
           }
@@ -74,15 +99,15 @@ export const usePlacesApi = () => {
       console.error('Error searching places:', err);
       return [];
     }
-  }, []);
+  }, [waitForPlacesApi]);
 
   const searchNearbyPlaces = useCallback(async (
     map: google.maps.Map,
     center: google.maps.LatLngLiteral,
     radius: number = 2000
   ): Promise<MarkerData[]> => {
-    if (!map || !window.google?.maps?.places) {
-      console.error('Google Maps Places API not loaded');
+    if (!map) {
+      console.log('No map provided for nearby search');
       return [];
     }
 
@@ -90,7 +115,12 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      // Use the traditional PlacesService
+      // Wait for Places API to be ready
+      const placesReady = await waitForPlacesApi();
+      if (!placesReady) {
+        throw new Error('Places API not available');
+      }
+
       const service = new google.maps.places.PlacesService(map);
       
       return new Promise<MarkerData[]>((resolve, reject) => {
@@ -101,10 +131,12 @@ export const usePlacesApi = () => {
         };
 
         service.nearbySearch(request, (results, status) => {
+          console.log('Places nearby search response:', { status, resultsCount: results?.length });
+          
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             const markers: MarkerData[] = results
               .filter(place => place.geometry?.location && place.place_id)
-              .slice(0, 6) // Limit to 6 results for better performance
+              .slice(0, 6)
               .map(place => ({
                 position: {
                   lat: place.geometry!.location!.lat(),
@@ -114,11 +146,11 @@ export const usePlacesApi = () => {
                 type: 'restaurant'
               }));
             
-            console.log(`Found ${markers.length} nearby places using PlacesService`);
+            console.log(`Found ${markers.length} nearby places`);
             setLoading(false);
             resolve(markers);
           } else {
-            console.log('Nearby search failed with status:', status);
+            console.log('Nearby search failed or no results:', status);
             setLoading(false);
             resolve([]);
           }
@@ -131,18 +163,23 @@ export const usePlacesApi = () => {
       console.error('Error searching nearby places:', err);
       return [];
     }
-  }, []);
+  }, [waitForPlacesApi]);
 
   const getPlaceDetails = useCallback(async (
     map: google.maps.Map,
     placeId: string
   ): Promise<google.maps.places.PlaceResult | null> => {
-    if (!map || !window.google?.maps?.places) {
-      console.error('Google Maps Places API not loaded');
+    if (!map) {
+      console.log('No map provided for place details');
       return null;
     }
 
     try {
+      const placesReady = await waitForPlacesApi();
+      if (!placesReady) {
+        throw new Error('Places API not available');
+      }
+
       const service = new google.maps.places.PlacesService(map);
       
       return new Promise<google.maps.places.PlaceResult | null>((resolve) => {
@@ -164,7 +201,7 @@ export const usePlacesApi = () => {
       console.error('Place details request failed:', err);
       return null;
     }
-  }, []);
+  }, [waitForPlacesApi]);
 
   return {
     searchPlacesByText,
