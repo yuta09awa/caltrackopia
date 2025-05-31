@@ -46,6 +46,9 @@ export const staticFilterOptions = {
   ]
 };
 
+// Legacy export for backward compatibility
+export const filterCategories = dynamicFilterCategories;
+
 export const defaultFilterValues = {
   dietary: [],
   nutrition: [],

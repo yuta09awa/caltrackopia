@@ -210,123 +210,6 @@ class DatabaseService {
     return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
   }
 
-  // Enhanced mock ingredients for fallback
-  private getMockIngredients(): Ingredient[] {
-    return [
-      {
-        id: '1',
-        name: 'Organic Kale',
-        common_names: ['Kale', 'Curly Kale', 'Dinosaur Kale'],
-        category: 'Vegetables',
-        calories_per_100g: 35,
-        protein_per_100g: 2.9,
-        carbs_per_100g: 4.4,
-        fat_per_100g: 0.7,
-        fiber_per_100g: 4.1,
-        sodium_per_100g: 53,
-        vitamins: { vitamin_c: 93, vitamin_k: 390, vitamin_a: 500 },
-        minerals: { calcium: 254, iron: 1.6, potassium: 348 },
-        is_organic: true,
-        is_local: true,
-        is_seasonal: true,
-        allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free', 'paleo'],
-        peak_season_start: 10,
-        peak_season_end: 3,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '2',
-        name: 'Quinoa',
-        common_names: ['Quinoa Grain', 'Keen-wah'],
-        category: 'Grains',
-        calories_per_100g: 368,
-        protein_per_100g: 14.1,
-        carbs_per_100g: 64.2,
-        fat_per_100g: 6.1,
-        fiber_per_100g: 7.0,
-        sodium_per_100g: 5,
-        vitamins: { folate: 184, vitamin_e: 2.4 },
-        minerals: { magnesium: 197, phosphorus: 457, iron: 4.6 },
-        is_organic: true,
-        is_local: false,
-        is_seasonal: false,
-        allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free'],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '3',
-        name: 'Wild Salmon',
-        common_names: ['Salmon', 'Atlantic Salmon', 'Pacific Salmon'],
-        category: 'Seafood',
-        calories_per_100g: 208,
-        protein_per_100g: 25.4,
-        carbs_per_100g: 0,
-        fat_per_100g: 12.4,
-        fiber_per_100g: 0,
-        sodium_per_100g: 59,
-        vitamins: { vitamin_d: 526, vitamin_b12: 2.8 },
-        minerals: { selenium: 36.5, phosphorus: 252 },
-        is_organic: false,
-        is_local: false,
-        is_seasonal: true,
-        allergens: ['fish'],
-        dietary_restrictions: ['pescatarian'],
-        peak_season_start: 5,
-        peak_season_end: 9,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '4',
-        name: 'Avocado',
-        common_names: ['Avocado', 'Alligator Pear'],
-        category: 'Fruits',
-        calories_per_100g: 160,
-        protein_per_100g: 2.0,
-        carbs_per_100g: 8.5,
-        fat_per_100g: 14.7,
-        fiber_per_100g: 6.7,
-        sodium_per_100g: 7,
-        vitamins: { vitamin_k: 21, folate: 20, vitamin_e: 2.1 },
-        minerals: { potassium: 485, magnesium: 29 },
-        is_organic: true,
-        is_local: true,
-        is_seasonal: true,
-        allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free', 'keto', 'paleo'],
-        peak_season_start: 3,
-        peak_season_end: 8,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '5',
-        name: 'Greek Yogurt',
-        common_names: ['Greek Yogurt', 'Strained Yogurt'],
-        category: 'Dairy',
-        calories_per_100g: 59,
-        protein_per_100g: 10.0,
-        carbs_per_100g: 3.6,
-        fat_per_100g: 0.4,
-        fiber_per_100g: 0,
-        sodium_per_100g: 36,
-        vitamins: { vitamin_b12: 0.5, riboflavin: 0.3 },
-        minerals: { calcium: 110, phosphorus: 135 },
-        is_organic: false,
-        is_local: true,
-        is_seasonal: false,
-        allergens: ['dairy'],
-        dietary_restrictions: ['vegetarian'],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    ];
-  }
-
   // Menu items queries
   async getMenuItemsByPlace(placeId: string): Promise<MenuItem[]> {
     console.warn('Menu items table not available yet, returning mock data');
@@ -357,17 +240,10 @@ class DatabaseService {
   // Enhanced dietary restrictions queries with fallback data
   async getAllDietaryRestrictions(): Promise<DietaryRestriction[]> {
     try {
-      const { data, error } = await supabase
-        .from('dietary_restrictions')
-        .select('*')
-        .order('name');
-
-      if (error) {
-        console.warn('Dietary restrictions table not available, using mock data:', error);
-        return this.getMockDietaryRestrictions();
-      }
-
-      return data || this.getMockDietaryRestrictions();
+      // Since the dietary_restrictions table doesn't exist in Supabase yet, 
+      // we'll return mock data for now
+      console.warn('Dietary restrictions table not available, using mock data');
+      return this.getMockDietaryRestrictions();
     } catch (error) {
       console.warn('Error fetching dietary restrictions, using mock data:', error);
       return this.getMockDietaryRestrictions();
@@ -376,18 +252,10 @@ class DatabaseService {
 
   async getDietaryRestrictionByName(name: string): Promise<DietaryRestriction | null> {
     try {
-      const { data, error } = await supabase
-        .from('dietary_restrictions')
-        .select('*')
-        .eq('name', name)
-        .single();
-
-      if (error) {
-        console.warn('Dietary restrictions table not available, using mock data');
-        return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
-      }
-
-      return data;
+      // Since the dietary_restrictions table doesn't exist in Supabase yet, 
+      // we'll return mock data for now
+      console.warn('Dietary restrictions table not available, using mock data');
+      return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
     } catch (error) {
       console.warn('Error fetching dietary restriction by name, using mock data:', error);
       return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
