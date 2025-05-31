@@ -21,7 +21,9 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
     sortOption, 
     setSortOption, 
     isOpenNow, 
-    setIsOpenNow 
+    setIsOpenNow,
+    loading,
+    error
   } = useLocations();
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
@@ -71,7 +73,20 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
           ref={listContainerRef}
           className="flex-1 overflow-y-auto p-4 space-y-4"
         >
-          {displayLocations.length === 0 ? (
+          {loading ? (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">Loading locations...</p>
+              </CardContent>
+            </Card>
+          ) : error ? (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-destructive mb-2">Error loading locations</p>
+                <p className="text-muted-foreground text-sm">{error}</p>
+              </CardContent>
+            </Card>
+          ) : displayLocations.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
                 <p className="text-muted-foreground">

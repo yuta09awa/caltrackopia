@@ -1,7 +1,7 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '@/store/appStore';
-import { mockLocations } from '../data/mockLocations';
+import { locationService } from '@/services/locationService';
 import { 
   filterLocationsByType, 
   filterLocationsByOpenStatus, 
@@ -11,18 +11,54 @@ import { validateAndSanitizeLocations } from '../utils/validationUtils';
 import { Location, LocationType, SortOption } from '../types';
 
 export function useLocations() {
-  // Validate and sanitize locations on initial load
-  const [locations] = useState<Location[]>(() => validateAndSanitizeLocations(mockLocations));
+  // Initialize locations as an empty array, then fetch from database
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const [activeTab, setActiveTab] = useState<LocationType>('all');
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useAppStore();
 
+  // Fetch locations from the database on component mount
+  useEffect(() => {
+    const fetchLocations = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        console.log('Fetching locations from database...');
+        const fetchedLocations = await locationService.getLocations();
+        console.log('Fetched locations:', fetchedLocations.length, 'items');
+        setLocations(fetchedLocations);
+      } catch (err) {
+        console.error('Error fetching locations in useLocations:', err);
+        setError('Failed to load locations from database');
+        // Fallback to mock data if database fetch fails
+        try {
+          const { mockLocations } = await import('../data/mockLocations');
+          console.log('Falling back to mock locations');
+          setLocations(mockLocations);
+        } catch (mockErr) {
+          console.error('Error loading mock locations:', mockErr);
+          setLocations([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLocations();
+  }, []);
+
   // Filter locations by type, open status, and sort by selected option
   const filteredAndSortedLocations = useMemo(() => {
     try {
+      // Validate and sanitize locations before filtering
+      const validatedLocations = validateAndSanitizeLocations(locations);
+      
       // First filter by location type
-      const typeFiltered = filterLocationsByType(locations, activeTab);
+      const typeFiltered = filterLocationsByType(validatedLocations, activeTab);
       
       // Then filter by open status
       const openStatusFiltered = filterLocationsByOpenStatus(typeFiltered, isOpenNow);
@@ -47,6 +83,8 @@ export function useLocations() {
     sortOption,
     setSortOption,
     isOpenNow,
-    setIsOpenNow
+    setIsOpenNow,
+    loading,
+    error
   };
 }
