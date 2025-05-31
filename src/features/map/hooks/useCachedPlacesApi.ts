@@ -71,7 +71,7 @@ export const useCachedPlacesApi = () => {
             lng: Number(place.longitude)
           },
           locationId: place.place_id || place.id,
-          type: this.mapPlaceTypeToMarkerType(place.primary_type)
+          type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
         setLoading(false);
@@ -122,11 +122,14 @@ export const useCachedPlacesApi = () => {
         
         // Update cache statistics with better tracking
         try {
-          await supabase.rpc('update_cache_stats', { 
+          const { error: rpcError } = await supabase.rpc('update_cache_stats', { 
             hits: 1, 
             misses: 0, 
             saved: 1
           });
+          if (rpcError) {
+            console.warn('Failed to update cache stats:', rpcError);
+          }
         } catch (rpcError) {
           console.warn('Failed to update cache stats:', rpcError);
         }
@@ -139,7 +142,7 @@ export const useCachedPlacesApi = () => {
             lng: Number(place.longitude)
           },
           locationId: place.place_id,
-          type: this.mapPlaceTypeToMarkerType(place.primary_type)
+          type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
         setLoading(false);
@@ -148,7 +151,7 @@ export const useCachedPlacesApi = () => {
         console.log('No enhanced nearby places found with current filters');
         
         // Trigger background population for better future results
-        this.triggerBackgroundPopulation(center, radius).catch(err => 
+        triggerBackgroundPopulation(center, radius).catch(err => 
           console.error('Background population failed:', err)
         );
 
@@ -199,7 +202,7 @@ export const useCachedPlacesApi = () => {
           lng: Number(place.longitude)
         },
         locationId: place.place_id,
-        type: this.mapPlaceTypeToMarkerType(place.primary_type)
+        type: mapPlaceTypeToMarkerType(place.primary_type)
       }));
 
       setLoading(false);
@@ -245,7 +248,7 @@ export const useCachedPlacesApi = () => {
       const processedStats = {
         success: true,
         stats: stats,
-        total_places: stats.length > 0 ? stats[0].total_places_cached || 0 : 0,
+        total_places: stats && stats.length > 0 ? stats[0].total_places_cached || 0 : 0,
         hit_rate: cacheHitRate,
         last_updated: new Date().toISOString()
       };
