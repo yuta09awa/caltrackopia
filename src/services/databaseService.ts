@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface EnhancedPlace {
@@ -184,25 +183,144 @@ class DatabaseService {
     return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
-  // Mock implementations for missing tables
+  // Enhanced ingredient queries
   async getAllIngredients(): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning mock data');
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .limit(100);
+
+      if (error) {
+        console.error('Error fetching ingredients:', error);
+        return this.getMockIngredients();
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getAllIngredients:', error);
+      return this.getMockIngredients();
+    }
   }
 
   async searchIngredients(query: string, limit: number = 20): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning mock data');
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .or(`name.ilike.%${query}%,common_names.cs.{${query}},category.ilike.%${query}%`)
+        .limit(limit);
+
+      if (error) {
+        console.error('Error searching ingredients:', error);
+        return this.getMockIngredients().filter(ing => 
+          ing.name.toLowerCase().includes(query.toLowerCase()) ||
+          ing.category.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in searchIngredients:', error);
+      return this.getMockIngredients().filter(ing => 
+        ing.name.toLowerCase().includes(query.toLowerCase()) ||
+        ing.category.toLowerCase().includes(query.toLowerCase())
+      );
+    }
   }
 
   async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning mock data');
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .eq('category', category)
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching ingredients by category:', error);
+        return this.getMockIngredients().filter(ing => 
+          ing.category.toLowerCase() === category.toLowerCase()
+        );
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getIngredientsByCategory:', error);
+      return this.getMockIngredients().filter(ing => 
+        ing.category.toLowerCase() === category.toLowerCase()
+      );
+    }
   }
 
   async getIngredientById(ingredientId: string): Promise<Ingredient | null> {
-    console.warn('Ingredients table not available yet, returning null');
-    return null;
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .eq('id', ingredientId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching ingredient by ID:', error);
+        return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getIngredientById:', error);
+      return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
+    }
+  }
+
+  // Mock ingredients for fallback
+  private getMockIngredients(): Ingredient[] {
+    return [
+      {
+        id: '1',
+        name: 'Organic Kale',
+        common_names: ['Kale', 'Curly Kale'],
+        category: 'Vegetables',
+        calories_per_100g: 35,
+        protein_per_100g: 2.9,
+        carbs_per_100g: 4.4,
+        fat_per_100g: 0.7,
+        fiber_per_100g: 4.1,
+        sodium_per_100g: 53,
+        vitamins: { vitamin_c: 93, vitamin_k: 390 },
+        minerals: { calcium: 254, iron: 1.6 },
+        is_organic: true,
+        is_local: true,
+        is_seasonal: true,
+        allergens: [],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free'],
+        peak_season_start: 10,
+        peak_season_end: 3,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '2',
+        name: 'Quinoa',
+        common_names: ['Quinoa Grain'],
+        category: 'Grains',
+        calories_per_100g: 368,
+        protein_per_100g: 14.1,
+        carbs_per_100g: 64.2,
+        fat_per_100g: 6.1,
+        fiber_per_100g: 7.0,
+        sodium_per_100g: 5,
+        vitamins: { folate: 184 },
+        minerals: { magnesium: 197, phosphorus: 457 },
+        is_organic: true,
+        is_local: false,
+        is_seasonal: false,
+        allergens: [],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free'],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
   }
 
   // Menu items queries

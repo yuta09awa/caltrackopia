@@ -1,5 +1,5 @@
-
-import { databaseService, Ingredient, MenuItem, DietaryRestriction } from './databaseService';
+import { databaseService } from './databaseService';
+import { Ingredient, IngredientNutrition, NutritionalInfo } from '@/models/NutritionalInfo';
 
 export interface NutritionalInfo {
   calories: number;
@@ -28,9 +28,6 @@ export interface IngredientNutrition {
 }
 
 export class NutritionService {
-  /**
-   * Get nutritional information for an ingredient
-   */
   async getIngredientNutrition(ingredientId: string): Promise<IngredientNutrition | null> {
     try {
       const ingredient = await databaseService.getIngredientById(ingredientId);
@@ -43,9 +40,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Search ingredients by name
-   */
   async searchIngredients(query: string, limit: number = 20): Promise<IngredientNutrition[]> {
     try {
       const ingredients = await databaseService.searchIngredients(query, limit);
@@ -56,9 +50,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Get ingredients by category
-   */
   async getIngredientsByCategory(category: string): Promise<IngredientNutrition[]> {
     try {
       const ingredients = await databaseService.getIngredientsByCategory(category);
@@ -69,9 +60,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Search ingredients by nutritional criteria
-   */
   async searchByNutrition(criteria: {
     maxCalories?: number;
     minProtein?: number;
@@ -118,9 +106,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Get menu items with nutrition info
-   */
   async getMenuItemsWithNutrition(placeId: string): Promise<MenuItem[]> {
     try {
       return await databaseService.getMenuItemsByPlace(placeId);
@@ -130,9 +115,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Search menu items by dietary requirements
-   */
   async searchMenuItems(
     query: string,
     dietaryTags?: string[],
@@ -147,9 +129,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Get dietary restrictions
-   */
   async getDietaryRestrictions(): Promise<DietaryRestriction[]> {
     try {
       return await databaseService.getAllDietaryRestrictions();
@@ -159,9 +138,6 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Calculate total nutrition for multiple ingredients
-   */
   calculateTotalNutrition(ingredients: IngredientNutrition[]): NutritionalInfo {
     return ingredients.reduce((total, ingredient) => {
       const nutrition = ingredient.nutritionalInfo;
@@ -191,9 +167,6 @@ export class NutritionService {
     });
   }
 
-  /**
-   * Check if ingredient is in season
-   */
   private isInSeason(ingredient: Ingredient): boolean {
     if (!ingredient.peak_season_start || !ingredient.peak_season_end) {
       return true; // Available year-round if no season specified
@@ -211,17 +184,14 @@ export class NutritionService {
     }
   }
 
-  /**
-   * Transform database ingredient to nutrition format
-   */
-  private transformIngredientToNutrition(ingredient: Ingredient): IngredientNutrition {
+  private transformIngredientToNutrition(ingredient: any): IngredientNutrition {
     return {
       id: ingredient.id,
       name: ingredient.name,
       servingSize: '100g',
       category: ingredient.category,
-      isOrganic: ingredient.is_organic,
-      isLocal: ingredient.is_local,
+      isOrganic: ingredient.is_organic || false,
+      isLocal: ingredient.is_local || false,
       isInSeason: this.isInSeason(ingredient),
       nutritionalInfo: {
         calories: ingredient.calories_per_100g || 0,
@@ -234,11 +204,10 @@ export class NutritionService {
         vitamins: ingredient.vitamins,
         minerals: ingredient.minerals
       },
-      dietaryFlags: ingredient.dietary_restrictions,
-      allergens: ingredient.allergens
+      dietaryFlags: ingredient.dietary_restrictions || [],
+      allergens: ingredient.allergens || []
     };
   }
 }
 
-// Export singleton instance
 export const nutritionService = new NutritionService();
