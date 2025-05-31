@@ -11,6 +11,7 @@ export type PlaceType = Database['public']['Enums']['place_type'];
 export interface Location {
   id: string; // UUID from cached_places
   place_id?: string; // Google Place ID, now stored in DB
+  googlePlaceId?: string; // Keep Google Places ID for reference (legacy)
   name: string;
   type: "Restaurant" | "Grocery"; // Frontend simplified type
   subType?: "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market" | "Food Truck" | "Cafe" | "Bakery" | "Bar" | "Fast Food" | "Food Court" | "Butcher" | "Fish Market" | "Deli" | "Wine Shop" | "Brewery" | "Distillery"; // More granular frontend subType
