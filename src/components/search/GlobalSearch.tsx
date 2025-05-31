@@ -1,30 +1,43 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search, Clock, MapPin, Utensils, ShoppingCart, X } from 'lucide-react';
+import { Search, Clock, MapPin, Utensils, ShoppingCart, X, Leaf, CalendarDays, Beef, Apple, Milk } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useIngredientSearch } from '@/hooks/useIngredientSearch';
+import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { Ingredient } from '@/models/NutritionalInfo';
 
 interface GlobalSearchProps {
   className?: string;
-  onSelectIngredient?: (ingredient: any) => void;
+  onSelectIngredient?: (ingredient: Ingredient) => void;
   onSearchReset?: () => void;
   displayValue?: string;
   compact?: boolean;
 }
 
 const getCategoryIcon = (category?: string) => {
-  if (!category) return <Search className="h-3 w-3" />;
+  if (!category) return <Search className="h-4 w-4 text-muted-foreground" />;
   
   const lowerCategory = category.toLowerCase();
-  if (lowerCategory.includes('meat') || lowerCategory.includes('protein')) {
-    return <Utensils className="h-3 w-3" />;
+  if (lowerCategory.includes('vegetable') || lowerCategory.includes('fruit') || lowerCategory.includes('produce')) {
+    return <Apple className="h-4 w-4 text-green-600" />;
   }
-  if (lowerCategory.includes('vegetable') || lowerCategory.includes('fruit')) {
-    return <ShoppingCart className="h-3 w-3" />;
+  if (lowerCategory.includes('meat') || lowerCategory.includes('poultry') || lowerCategory.includes('seafood') || lowerCategory.includes('fish')) {
+    return <Beef className="h-4 w-4 text-red-600" />;
   }
-  return <Search className="h-3 w-3" />;
+  if (lowerCategory.includes('dairy') || lowerCategory.includes('milk') || lowerCategory.includes('cheese')) {
+    return <Milk className="h-4 w-4 text-blue-600" />;
+  }
+  if (lowerCategory.includes('grain') || lowerCategory.includes('bread') || lowerCategory.includes('bakery')) {
+    return <Utensils className="h-4 w-4 text-yellow-600" />;
+  }
+  if (lowerCategory.includes('store') || lowerCategory.includes('market')) {
+    return <ShoppingCart className="h-4 w-4 text-purple-600" />;
+  }
+  if (lowerCategory.includes('restaurant') || lowerCategory.includes('cafe') || lowerCategory.includes('bar')) {
+    return <Utensils className="h-4 w-4 text-orange-600" />;
+  }
+  return <Search className="h-4 w-4 text-muted-foreground" />;
 };
 
 const GlobalSearch = ({ 
@@ -36,7 +49,10 @@ const GlobalSearch = ({
 }: GlobalSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const { results, loading, searchIngredients } = useIngredientSearch();
+  const { data: results = [], isLoading: loading, isError, error } = useIngredientSearch(
+    { term: searchTerm }, 
+    { enabled: searchTerm.length > 2 }
+  );
   const { searchHistory, addToHistory } = useSearchHistory();
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -49,10 +65,6 @@ const GlobalSearch = ({
     const query = e.target.value;
     setSearchTerm(query);
     setIsOpen(true);
-    
-    if (query.length >= 2) {
-      searchIngredients(query);
-    }
   };
 
   const handleFocus = () => {
@@ -72,7 +84,7 @@ const GlobalSearch = ({
     setIsOpen(false);
   };
 
-  const handleSelectIngredient = (ingredient: any) => {
+  const handleSelectIngredient = (ingredient: Ingredient) => {
     // Add to search history
     addToHistory({
       id: ingredient.id,
@@ -92,12 +104,16 @@ const GlobalSearch = ({
   const handleSelectHistoryItem = (historyItem: any) => {
     setIsOpen(false);
     
-    // Create a mock ingredient object for compatibility
-    const ingredient = {
+    // Create a mock ingredient object for compatibility with the new Ingredient model
+    const ingredient: Ingredient = {
       id: historyItem.id,
       name: historyItem.name,
-      category: historyItem.category,
-      description: `Recent search: ${historyItem.name}`
+      category: historyItem.category || 'other',
+      description: `Recent search: ${historyItem.name}`,
+      nutritionPer100g: {},
+      allergens: [],
+      dietaryRestrictions: [],
+      locations: [],
     };
     
     if (onSelectIngredient) {
@@ -175,6 +191,34 @@ const GlobalSearch = ({
                         {ingredient.description}
                       </div>
                     )}
+                    {/* Enhanced properties badges */}
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {ingredient.isOrganic && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full">
+                          <Leaf className="w-2.5 h-2.5" /> Organic
+                        </span>
+                      )}
+                      {ingredient.isLocal && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full">
+                          <MapPin className="w-2.5 h-2.5" /> Local
+                        </span>
+                      )}
+                      {ingredient.isSeasonal && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded-full">
+                          <CalendarDays className="w-2.5 h-2.5" /> Seasonal
+                        </span>
+                      )}
+                      {ingredient.nutritionPer100g.calories && (
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+                          {ingredient.nutritionPer100g.calories} cal
+                        </span>
+                      )}
+                      {ingredient.nutritionPer100g.protein && (
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+                          {ingredient.nutritionPer100g.protein}g protein
+                        </span>
+                      )}
+                    </div>
                     {ingredient.locations && ingredient.locations.length > 0 && (
                       <div className="text-xs text-primary flex items-center mt-1">
                         <MapPin className="h-3 w-3 mr-1" />

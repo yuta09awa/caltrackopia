@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Utensils, ShoppingCart, Leaf } from 'lucide-react';
+import { Search, MapPin, Utensils, ShoppingCart, Leaf, CalendarDays, Beef, Apple, Milk } from 'lucide-react';
 import { Loading } from '@/components/ui/loading';
 import { useIngredientSearch } from '../hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
-import { Ingredient } from '@/hooks/useIngredientSearch';
+import { Ingredient } from '@/models/NutritionalInfo';
 
 interface IngredientSearchProps {
   onSelectIngredient?: (ingredient: Ingredient) => void;
@@ -15,19 +15,25 @@ interface IngredientSearchProps {
 }
 
 const getCategoryIcon = (category?: string) => {
-  if (!category) return <Search className="h-3 w-3" />;
+  if (!category) return <Search className="h-4 w-4" />;
   
   const lowerCategory = category.toLowerCase();
-  if (lowerCategory.includes('meat') || lowerCategory.includes('protein')) {
-    return <Utensils className="h-3 w-3 text-orange-500" />;
+  if (lowerCategory.includes('vegetable') || lowerCategory.includes('fruit') || lowerCategory.includes('produce')) {
+    return <Apple className="h-4 w-4 text-green-600" />;
   }
-  if (lowerCategory.includes('vegetable') || lowerCategory.includes('fruit')) {
-    return <Leaf className="h-3 w-3 text-green-500" />;
+  if (lowerCategory.includes('meat') || lowerCategory.includes('poultry') || lowerCategory.includes('seafood') || lowerCategory.includes('fish')) {
+    return <Beef className="h-4 w-4 text-red-600" />;
   }
-  if (lowerCategory.includes('dairy')) {
-    return <ShoppingCart className="h-3 w-3 text-blue-500" />;
+  if (lowerCategory.includes('dairy') || lowerCategory.includes('milk') || lowerCategory.includes('cheese')) {
+    return <Milk className="h-4 w-4 text-blue-600" />;
   }
-  return <Search className="h-3 w-3 text-muted-foreground" />;
+  if (lowerCategory.includes('grain') || lowerCategory.includes('bread') || lowerCategory.includes('bakery')) {
+    return <Utensils className="h-4 w-4 text-yellow-600" />;
+  }
+  if (lowerCategory.includes('store') || lowerCategory.includes('market')) {
+    return <ShoppingCart className="h-4 w-4 text-purple-600" />;
+  }
+  return <Search className="h-4 w-4 text-muted-foreground" />;
 };
 
 const IngredientSearch: React.FC<IngredientSearchProps> = ({ 
@@ -108,13 +114,41 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
                   className="p-2 hover:bg-muted cursor-pointer transition-colors text-sm flex items-center gap-2"
                   onClick={() => handleSelectIngredient(ingredient)}
                 >
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 text-muted-foreground">
                     {getCategoryIcon(ingredient.category)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{ingredient.name}</div>
+                    {ingredient.description && (
+                      <div className="text-xs text-muted-foreground truncate">
+                        {ingredient.description}
+                      </div>
+                    )}
+                    {/* Enhanced properties for compact view */}
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {ingredient.isOrganic && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-green-50 text-green-700 px-1 py-0.5 rounded-full">
+                          <Leaf className="w-2.5 h-2.5" /> Organic
+                        </span>
+                      )}
+                      {ingredient.isLocal && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-blue-50 text-blue-700 px-1 py-0.5 rounded-full">
+                          <MapPin className="w-2.5 h-2.5" /> Local
+                        </span>
+                      )}
+                      {ingredient.isSeasonal && (
+                        <span className="flex items-center gap-0.5 text-[10px] bg-orange-50 text-orange-700 px-1 py-0.5 rounded-full">
+                          <CalendarDays className="w-2.5 h-2.5" /> Seasonal
+                        </span>
+                      )}
+                      {ingredient.nutritionPer100g.calories && (
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-1 py-0.5 rounded-full">
+                          {ingredient.nutritionPer100g.calories} cal
+                        </span>
+                      )}
+                    </div>
                     {ingredient.locations && ingredient.locations.length > 0 && (
-                      <div className="text-xs text-primary flex items-center mt-0.5">
+                      <div className="text-xs text-primary flex items-center mt-1">
                         <MapPin className="h-3 w-3 mr-1" />
                         <span>{ingredient.locations.length} location{ingredient.locations.length !== 1 ? 's' : ''}</span>
                       </div>
@@ -181,6 +215,34 @@ const IngredientSearch: React.FC<IngredientSearchProps> = ({
                       {ingredient.description}
                     </div>
                   )}
+                  {/* Enhanced properties for non-compact view */}
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {ingredient.isOrganic && (
+                      <span className="flex items-center gap-0.5 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+                        <Leaf className="w-3 h-3" /> Organic
+                      </span>
+                    )}
+                    {ingredient.isLocal && (
+                      <span className="flex items-center gap-0.5 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+                        <MapPin className="w-3 h-3" /> Local
+                      </span>
+                    )}
+                    {ingredient.isSeasonal && (
+                      <span className="flex items-center gap-0.5 text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full">
+                        <CalendarDays className="w-3 h-3" /> Seasonal
+                      </span>
+                    )}
+                    {ingredient.nutritionPer100g.calories && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                        {ingredient.nutritionPer100g.calories} cal
+                      </span>
+                    )}
+                    {ingredient.nutritionPer100g.protein && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                        {ingredient.nutritionPer100g.protein}g protein
+                      </span>
+                    )}
+                  </div>
                   {ingredient.locations && ingredient.locations.length > 0 && (
                     <div className="mt-1 text-xs text-primary flex items-center">
                       <MapPin className="h-3 w-3 mr-1" />
