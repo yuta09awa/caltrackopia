@@ -1,7 +1,7 @@
 
 import React from 'react';
 import IngredientSearchComponent from '@/features/ingredients/components/IngredientSearch';
-import { Ingredient } from '@/hooks/useIngredientSearch';
+import { Ingredient } from '@/models/NutritionalInfo';
 
 // Re-export the component with the same interface for backward compatibility
 interface IngredientSearchProps {

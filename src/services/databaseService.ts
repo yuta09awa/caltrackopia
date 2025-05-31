@@ -183,103 +183,40 @@ class DatabaseService {
     return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
-  // Enhanced ingredient queries
+  // Enhanced ingredient queries - using mock data since ingredients table doesn't exist yet
   async getAllIngredients(): Promise<Ingredient[]> {
-    try {
-      const { data, error } = await supabase
-        .from('ingredients')
-        .select('*')
-        .limit(100);
-
-      if (error) {
-        console.error('Error fetching ingredients:', error);
-        return this.getMockIngredients();
-      }
-
-      return data || [];
-    } catch (error) {
-      console.error('Error in getAllIngredients:', error);
-      return this.getMockIngredients();
-    }
+    console.warn('Ingredients table not available yet, returning mock data');
+    return this.getMockIngredients();
   }
 
   async searchIngredients(query: string, limit: number = 20): Promise<Ingredient[]> {
-    try {
-      const { data, error } = await supabase
-        .from('ingredients')
-        .select('*')
-        .or(`name.ilike.%${query}%,common_names.cs.{${query}},category.ilike.%${query}%`)
-        .limit(limit);
-
-      if (error) {
-        console.error('Error searching ingredients:', error);
-        return this.getMockIngredients().filter(ing => 
-          ing.name.toLowerCase().includes(query.toLowerCase()) ||
-          ing.category.toLowerCase().includes(query.toLowerCase())
-        );
-      }
-
-      return data || [];
-    } catch (error) {
-      console.error('Error in searchIngredients:', error);
-      return this.getMockIngredients().filter(ing => 
-        ing.name.toLowerCase().includes(query.toLowerCase()) ||
-        ing.category.toLowerCase().includes(query.toLowerCase())
-      );
-    }
+    console.warn('Ingredients table not available yet, returning filtered mock data');
+    return this.getMockIngredients().filter(ing => 
+      ing.name.toLowerCase().includes(query.toLowerCase()) ||
+      ing.category.toLowerCase().includes(query.toLowerCase()) ||
+      ing.common_names.some(name => name.toLowerCase().includes(query.toLowerCase()))
+    ).slice(0, limit);
   }
 
   async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    try {
-      const { data, error } = await supabase
-        .from('ingredients')
-        .select('*')
-        .eq('category', category)
-        .limit(50);
-
-      if (error) {
-        console.error('Error fetching ingredients by category:', error);
-        return this.getMockIngredients().filter(ing => 
-          ing.category.toLowerCase() === category.toLowerCase()
-        );
-      }
-
-      return data || [];
-    } catch (error) {
-      console.error('Error in getIngredientsByCategory:', error);
-      return this.getMockIngredients().filter(ing => 
-        ing.category.toLowerCase() === category.toLowerCase()
-      );
-    }
+    console.warn('Ingredients table not available yet, returning filtered mock data');
+    return this.getMockIngredients().filter(ing => 
+      ing.category.toLowerCase() === category.toLowerCase()
+    );
   }
 
   async getIngredientById(ingredientId: string): Promise<Ingredient | null> {
-    try {
-      const { data, error } = await supabase
-        .from('ingredients')
-        .select('*')
-        .eq('id', ingredientId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching ingredient by ID:', error);
-        return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error in getIngredientById:', error);
-      return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
-    }
+    console.warn('Ingredients table not available yet, returning mock data');
+    return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
   }
 
-  // Mock ingredients for fallback
+  // Enhanced mock ingredients for fallback
   private getMockIngredients(): Ingredient[] {
     return [
       {
         id: '1',
         name: 'Organic Kale',
-        common_names: ['Kale', 'Curly Kale'],
+        common_names: ['Kale', 'Curly Kale', 'Dinosaur Kale'],
         category: 'Vegetables',
         calories_per_100g: 35,
         protein_per_100g: 2.9,
@@ -287,13 +224,13 @@ class DatabaseService {
         fat_per_100g: 0.7,
         fiber_per_100g: 4.1,
         sodium_per_100g: 53,
-        vitamins: { vitamin_c: 93, vitamin_k: 390 },
-        minerals: { calcium: 254, iron: 1.6 },
+        vitamins: { vitamin_c: 93, vitamin_k: 390, vitamin_a: 500 },
+        minerals: { calcium: 254, iron: 1.6, potassium: 348 },
         is_organic: true,
         is_local: true,
         is_seasonal: true,
         allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free'],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free', 'paleo'],
         peak_season_start: 10,
         peak_season_end: 3,
         created_at: new Date().toISOString(),
@@ -302,7 +239,7 @@ class DatabaseService {
       {
         id: '2',
         name: 'Quinoa',
-        common_names: ['Quinoa Grain'],
+        common_names: ['Quinoa Grain', 'Keen-wah'],
         category: 'Grains',
         calories_per_100g: 368,
         protein_per_100g: 14.1,
@@ -310,13 +247,80 @@ class DatabaseService {
         fat_per_100g: 6.1,
         fiber_per_100g: 7.0,
         sodium_per_100g: 5,
-        vitamins: { folate: 184 },
-        minerals: { magnesium: 197, phosphorus: 457 },
+        vitamins: { folate: 184, vitamin_e: 2.4 },
+        minerals: { magnesium: 197, phosphorus: 457, iron: 4.6 },
         is_organic: true,
         is_local: false,
         is_seasonal: false,
         allergens: [],
         dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free'],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '3',
+        name: 'Wild Salmon',
+        common_names: ['Salmon', 'Atlantic Salmon', 'Pacific Salmon'],
+        category: 'Seafood',
+        calories_per_100g: 208,
+        protein_per_100g: 25.4,
+        carbs_per_100g: 0,
+        fat_per_100g: 12.4,
+        fiber_per_100g: 0,
+        sodium_per_100g: 59,
+        vitamins: { vitamin_d: 526, vitamin_b12: 2.8 },
+        minerals: { selenium: 36.5, phosphorus: 252 },
+        is_organic: false,
+        is_local: false,
+        is_seasonal: true,
+        allergens: ['fish'],
+        dietary_restrictions: ['pescatarian'],
+        peak_season_start: 5,
+        peak_season_end: 9,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '4',
+        name: 'Avocado',
+        common_names: ['Avocado', 'Alligator Pear'],
+        category: 'Fruits',
+        calories_per_100g: 160,
+        protein_per_100g: 2.0,
+        carbs_per_100g: 8.5,
+        fat_per_100g: 14.7,
+        fiber_per_100g: 6.7,
+        sodium_per_100g: 7,
+        vitamins: { vitamin_k: 21, folate: 20, vitamin_e: 2.1 },
+        minerals: { potassium: 485, magnesium: 29 },
+        is_organic: true,
+        is_local: true,
+        is_seasonal: true,
+        allergens: [],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten_free', 'keto', 'paleo'],
+        peak_season_start: 3,
+        peak_season_end: 8,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '5',
+        name: 'Greek Yogurt',
+        common_names: ['Greek Yogurt', 'Strained Yogurt'],
+        category: 'Dairy',
+        calories_per_100g: 59,
+        protein_per_100g: 10.0,
+        carbs_per_100g: 3.6,
+        fat_per_100g: 0.4,
+        fiber_per_100g: 0,
+        sodium_per_100g: 36,
+        vitamins: { vitamin_b12: 0.5, riboflavin: 0.3 },
+        minerals: { calcium: 110, phosphorus: 135 },
+        is_organic: false,
+        is_local: true,
+        is_seasonal: false,
+        allergens: ['dairy'],
+        dietary_restrictions: ['vegetarian'],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }

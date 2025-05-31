@@ -3,6 +3,9 @@ import { Ingredient } from '@/models/NutritionalInfo';
 import { databaseService } from '@/services/databaseService';
 import { hybridLocationService } from '@/services/hybridLocationService';
 
+// Re-export Ingredient for backward compatibility
+export type { Ingredient } from '@/models/NutritionalInfo';
+
 export function useIngredientSearch() {
   const [results, setResults] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,8 +82,6 @@ export function useIngredientSearch() {
       setLoading(false);
     }
   }, []);
-
-  // ... keep existing code (other search methods and return statement)
 
   return {
     results,

@@ -1,10 +1,11 @@
+
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Navbar from "@/components/layout/Navbar";
 import MapContainer from "@/features/map/components/MapContainer";
 import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
-import { Ingredient } from "@/hooks/useIngredientSearch";
+import { Ingredient } from "@/models/NutritionalInfo";
 import { toast } from "sonner";
 import { Location } from "@/features/locations/types";
 import MapInfoCard from "@/features/map/components/MapInfoCard";

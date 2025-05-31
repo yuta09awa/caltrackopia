@@ -4,7 +4,7 @@ import { useLoadScript } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
 import MapLoadingState from './MapLoadingState';
 import MapView from './MapView';
-import { Ingredient } from '@/hooks/useIngredientSearch';
+import { Ingredient } from '@/models/NutritionalInfo';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapContainerProps {
