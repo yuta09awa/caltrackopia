@@ -1,9 +1,9 @@
-
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Navbar from "@/components/layout/Navbar";
 import MapContainer from "@/features/map/components/MapContainer";
 import LocationList from "@/features/locations/components/LocationList";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
 import { Ingredient } from "@/hooks/useIngredientSearch";
 import { toast } from "sonner";
 import { Location } from "@/features/locations/types";
@@ -26,6 +26,7 @@ import { useUserLocation } from "@/features/map/hooks/useUserLocation";
  * - Memoized callbacks and computed values
  * - Consolidated marker state management
  * - Efficient Places API usage with proper field selection
+ * - Cached Places API integration for cost reduction and performance
  */
 const MapScreen = () => {
   // State for managing selected ingredient from search
@@ -63,8 +64,8 @@ const MapScreen = () => {
     clearMarkers 
   } = useMapState();
   
-  // Custom hook for interacting with Google Places API
-  const { searchPlacesByText, searchNearbyPlaces } = usePlacesApi();
+  // Custom hook for interacting with Google Places API (now with caching)
+  const { searchPlacesByText, searchNearbyPlaces, cacheHitRate } = usePlacesApi();
 
   // Custom hook to get the user's current geographical location
   const { userLocation, getUserLocation } = useUserLocation();
@@ -314,6 +315,9 @@ const MapScreen = () => {
         <div className="flex-1 max-w-2xl mx-4">
           <GlobalSearch {...searchProps} />
         </div>
+        <div className="hidden sm:block">
+          <CacheStatusIndicator />
+        </div>
       </Navbar>
       
       <main className="flex-1 flex flex-col relative w-full">
@@ -341,6 +345,12 @@ const MapScreen = () => {
           <div className="w-full flex justify-center py-2">
             <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
           </div>
+          
+          {/* Cache status for mobile */}
+          <div className="sm:hidden px-4 pb-2">
+            <CacheStatusIndicator />
+          </div>
+          
           {/* 
             PERFORMANCE NOTE: For a global food access app with potentially hundreds of thousands 
             or millions of locations, it is CRITICAL to implement list virtualization 
