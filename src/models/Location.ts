@@ -1,4 +1,3 @@
-
 export interface Location {
   id: string;
   name: string;
@@ -23,7 +22,21 @@ export interface Location {
   
   // Hybrid approach fields
   googlePlaceId?: string; // Reference to Google Places
-  customData?: RestaurantCustomData; // Our custom restaurant data
+  customData?: RestaurantCustomData | MarketCustomData; // Support both types of custom data
+}
+
+// Add MarketCustomData interface to the models file
+export interface MarketCustomData {
+  id: string;
+  description: string;
+  hours: Array<{ day: string; isOpen: boolean; openTime?: string; closeTime?: string; specialNotes?: string }>;
+  features: string[];
+  vendors: Array<{ id: string; name: string; type: string; description: string; popular: string[]; images: string[] }>;
+  events: Array<{ id: string; name: string; date: string; time: string; description: string }>;
+  sections: Array<{ name: string; description: string; popular: string[] }>;
+  highlights: Array<{ id: string; name: string; type: string; description: string; vendor?: string }>;
+  isVerified: boolean;
+  lastUpdated: string;
 }
 
 export interface RestaurantCustomData {

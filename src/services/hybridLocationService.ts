@@ -1,22 +1,8 @@
 
-import { Location, RestaurantCustomData } from "@/models/Location";
+import { Location, RestaurantCustomData, MarketCustomData } from "@/models/Location";
 import { locationService } from "./locationService";
 import { databaseService } from "./databaseService";
 import { mockLocations } from "@/features/locations/data/mockLocations";
-
-// Define MarketCustomData interface since it's missing from Location.ts
-export interface MarketCustomData {
-  id: string;
-  description: string;
-  hours: Array<{ day: string; isOpen: boolean; openTime?: string; closeTime?: string; specialNotes?: string }>;
-  features: string[];
-  vendors: Array<{ id: string; name: string; type: string; description: string; popular: string[]; images: string[] }>;
-  events: Array<{ id: string; name: string; date: string; time: string; description: string }>;
-  sections: Array<{ name: string; description: string; popular: string[] }>;
-  highlights: Array<{ id: string; name: string; type: string; description: string; vendor?: string }>;
-  isVerified: boolean;
-  lastUpdated: string;
-}
 
 export class HybridLocationService {
   
@@ -120,7 +106,11 @@ export class HybridLocationService {
         // Fallback to mock data
         const mockRestaurant = mockLocations.find(loc => loc.id === placeId && loc.type === "Restaurant");
         if (mockRestaurant?.customData) {
-          return mockRestaurant.customData as RestaurantCustomData;
+          // Ensure we return only RestaurantCustomData
+          const customData = mockRestaurant.customData;
+          if ('menuItems' in customData) {
+            return customData as RestaurantCustomData;
+          }
         }
         return null;
       }
@@ -157,7 +147,19 @@ export class HybridLocationService {
         // Fallback to mock data
         const mockGrocery = mockLocations.find(loc => loc.id === placeId && loc.type === "Grocery");
         if (mockGrocery?.customData) {
-          return mockGrocery.customData as MarketCustomData;
+          // Create a MarketCustomData from the mock data
+          return {
+            id: placeId,
+            description: mockGrocery.description || mockGrocery.name,
+            hours: [],
+            features: [],
+            vendors: [],
+            events: [],
+            sections: [],
+            highlights: [],
+            isVerified: false,
+            lastUpdated: new Date().toISOString(),
+          };
         }
         return null;
       }
