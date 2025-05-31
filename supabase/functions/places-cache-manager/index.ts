@@ -65,6 +65,37 @@ serve(async (req) => {
   }
 })
 
+async function getPlaceType(supabase: any, googleTypes: string[]): Promise<string> {
+  if (!googleTypes || googleTypes.length === 0) {
+    return 'other'
+  }
+
+  try {
+    // Query place_type_mapping table for the best match
+    const { data: mappings, error } = await supabase
+      .from('place_type_mapping')
+      .select('our_place_type, priority, is_food_related')
+      .in('google_place_type', googleTypes)
+      .order('priority', { ascending: false })
+      .order('is_food_related', { ascending: false })
+      .limit(1)
+
+    if (error) {
+      console.error('Error querying place type mapping:', error)
+      return 'other'
+    }
+
+    if (mappings && mappings.length > 0) {
+      return mappings[0].our_place_type
+    }
+
+    return 'other'
+  } catch (error) {
+    console.error('Error in getPlaceType:', error)
+    return 'other'
+  }
+}
+
 async function populateSearchArea(supabase: any, apiKey: string, areaId?: string) {
   // Get search areas to populate (prioritize by priority and last_populated_at)
   const { data: areas, error: areasError } = await supabase
@@ -74,7 +105,6 @@ async function populateSearchArea(supabase: any, apiKey: string, areaId?: string
     .order('priority', { ascending: false })
     .order('last_populated_at', { ascending: true, nullsFirst: true })
     .limit(areaId ? 1 : 3)
-    .apply((query: any) => areaId ? query.eq('id', areaId) : query)
 
   if (areasError) {
     throw new Error(`Failed to fetch search areas: ${areasError.message}`)
@@ -100,7 +130,7 @@ async function populateSearchArea(supabase: any, apiKey: string, areaId?: string
 }
 
 async function populateAreaWithPlaces(supabase: any, apiKey: string, area: any) {
-  const placeTypes = ['restaurant', 'grocery_store', 'convenience_store', 'pharmacy']
+  const placeTypes = ['restaurant', 'grocery_store', 'convenience_store', 'pharmacy', 'cafe', 'bakery']
   let totalCached = 0
   let totalApiCalls = 0
 
@@ -123,7 +153,7 @@ async function populateAreaWithPlaces(supabase: any, apiKey: string, area: any) 
 
       if (data.status === 'OK' && data.results) {
         for (const place of data.results) {
-          const cached = await cachePlace(supabase, place, type)
+          const cached = await cachePlace(supabase, place)
           if (cached) totalCached++
         }
       }
@@ -136,7 +166,9 @@ async function populateAreaWithPlaces(supabase: any, apiKey: string, area: any) 
   await supabase.rpc('update_cache_stats', {
     hits: 0,
     misses: totalApiCalls,
-    saved: 0
+    saved: 0,
+    new_places: totalCached,
+    updated_places: 0
   })
 
   return { cached: totalCached, api_calls: totalApiCalls }
@@ -145,16 +177,24 @@ async function populateAreaWithPlaces(supabase: any, apiKey: string, area: any) 
 async function searchAndCache(supabase: any, apiKey: string, query: string, lat: number, lng: number, radius = 5000) {
   console.log(`Search and cache: ${query} at ${lat},${lng}`)
   
-  // First check if we have cached results
-  const { data: cachedResults } = await supabase.rpc('find_places_within_radius', {
+  // First check if we have cached results using the new search function
+  const { data: cachedResults, error: searchError } = await supabase.rpc('find_places_within_radius', {
     search_lat: lat,
     search_lng: lng,
     radius_meters: radius,
     limit_count: 20
   })
 
-  if (cachedResults && cachedResults.length > 0) {
-    await supabase.rpc('update_cache_stats', { hits: 1, misses: 0, saved: 1 })
+  if (searchError) {
+    console.error('Cache search error:', searchError)
+  } else if (cachedResults && cachedResults.length > 0) {
+    await supabase.rpc('update_cache_stats', { 
+      hits: 1, 
+      misses: 0, 
+      saved: 1,
+      new_places: 0,
+      updated_places: 0
+    })
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -180,11 +220,17 @@ async function searchAndCache(supabase: any, apiKey: string, query: string, lat:
     if (data.status === 'OK' && data.results) {
       const cachedPlaces = []
       for (const place of data.results.slice(0, 20)) {
-        const cached = await cachePlace(supabase, place, 'restaurant')
+        const cached = await cachePlace(supabase, place)
         if (cached) cachedPlaces.push(cached)
       }
 
-      await supabase.rpc('update_cache_stats', { hits: 0, misses: 1, saved: 0 })
+      await supabase.rpc('update_cache_stats', { 
+        hits: 0, 
+        misses: 1, 
+        saved: 0,
+        new_places: cachedPlaces.length,
+        updated_places: 0
+      })
 
       return new Response(
         JSON.stringify({ 
@@ -206,20 +252,26 @@ async function searchAndCache(supabase: any, apiKey: string, query: string, lat:
   )
 }
 
-async function cachePlace(supabase: any, place: any, primaryType: string) {
+async function cachePlace(supabase: any, place: any) {
   if (!place.place_id || !place.geometry?.location) {
     return null
   }
+
+  const googleTypes = place.types || []
+  const primaryType = await getPlaceType(supabase, googleTypes)
+
+  // Calculate next refresh time (7 days for fresh data)
+  const nextRefresh = new Date()
+  nextRefresh.setDate(nextRefresh.getDate() + 7)
 
   const placeData = {
     place_id: place.place_id,
     name: place.name || 'Unknown',
     formatted_address: place.formatted_address,
-    latitude: place.geometry.location.lat,
-    longitude: place.geometry.location.lng,
     location: `POINT(${place.geometry.location.lng} ${place.geometry.location.lat})`,
-    place_types: place.types || [],
-    primary_type: mapGoogleTypeToEnum(place.types?.[0] || primaryType),
+    place_types: googleTypes,
+    primary_type: primaryType,
+    google_primary_type: googleTypes[0] || null,
     rating: place.rating,
     price_level: place.price_level,
     phone_number: place.formatted_phone_number,
@@ -227,8 +279,13 @@ async function cachePlace(supabase: any, place: any, primaryType: string) {
     opening_hours: place.opening_hours,
     is_open_now: place.opening_hours?.open_now,
     photo_references: place.photos?.map((p: any) => p.photo_reference) || [],
-    raw_google_data: place,
-    freshness_status: 'fresh'
+    timezone: null, // Could be enhanced with timezone detection
+    quality_score: 5, // Default quality score
+    verification_count: 0,
+    data_source: 'google_places',
+    next_refresh_at: nextRefresh.toISOString(),
+    freshness_status: 'fresh',
+    raw_google_data: place
   }
 
   // Upsert the place (insert or update if exists)
@@ -249,28 +306,15 @@ async function cachePlace(supabase: any, place: any, primaryType: string) {
   return data
 }
 
-function mapGoogleTypeToEnum(googleType: string): string {
-  const typeMap: { [key: string]: string } = {
-    'restaurant': 'restaurant',
-    'food': 'restaurant',
-    'grocery_or_supermarket': 'grocery_store',
-    'supermarket': 'grocery_store',
-    'convenience_store': 'convenience_store',
-    'gas_station': 'gas_station',
-    'pharmacy': 'pharmacy',
-    'shopping_mall': 'shopping_mall'
-  }
-  
-  return typeMap[googleType] || 'other'
-}
-
 async function refreshStaleData(supabase: any, apiKey: string) {
-  // Get stale places (older than 7 days)
+  // Get stale places (older than 7 days or marked as stale)
+  const staleDate = new Date()
+  staleDate.setDate(staleDate.getDate() - 7)
+
   const { data: stalePlaces, error } = await supabase
     .from('cached_places')
     .select('*')
-    .eq('freshness_status', 'fresh')
-    .lt('last_updated_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+    .or(`last_updated_at.lt.${staleDate.toISOString()},freshness_status.eq.stale`)
     .limit(50)
 
   if (error) {
@@ -283,14 +327,14 @@ async function refreshStaleData(supabase: any, apiKey: string) {
       // Get fresh details from Google
       const url = `https://maps.googleapis.com/maps/api/place/details/json?` +
         `place_id=${place.place_id}&` +
-        `fields=place_id,name,formatted_address,geometry,rating,price_level,opening_hours,photos&` +
+        `fields=place_id,name,formatted_address,geometry,rating,price_level,opening_hours,photos,types&` +
         `key=${apiKey}`
 
       const response = await fetch(url)
       const data = await response.json()
 
       if (data.status === 'OK' && data.result) {
-        await cachePlace(supabase, data.result, place.primary_type)
+        await cachePlace(supabase, data.result)
         refreshed++
       } else {
         // Mark as stale if we can't refresh

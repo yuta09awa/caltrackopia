@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MarkerData } from '../types';
+import { databaseService } from '@/services/databaseService';
 
 export interface CachedPlaceResult {
   place_id: string;
@@ -14,6 +15,8 @@ export interface CachedPlaceResult {
   price_level: number;
   is_open_now: boolean;
   distance_meters: number;
+  available_ingredients?: string[];
+  dietary_compatible?: boolean;
 }
 
 export const useCachedPlacesApi = () => {
@@ -32,7 +35,7 @@ export const useCachedPlacesApi = () => {
     try {
       console.log(`Searching cached places: ${query} at ${center.lat},${center.lng}`);
 
-      // Call our cache manager Edge Function
+      // Call our enhanced cache manager Edge Function
       const { data, error: functionError } = await supabase.functions.invoke('places-cache-manager', {
         body: {
           action: 'search_and_cache',
@@ -64,7 +67,7 @@ export const useCachedPlacesApi = () => {
             lng: Number(place.longitude)
           },
           locationId: place.place_id,
-          type: 'restaurant'
+          type: place.primary_type === 'restaurant' || place.primary_type === 'cafe' ? 'restaurant' : 'grocery'
         }));
 
         setLoading(false);
@@ -91,32 +94,37 @@ export const useCachedPlacesApi = () => {
     try {
       console.log(`Searching nearby cached places at ${center.lat},${center.lng}`);
 
-      // Use the Supabase RPC function directly for nearby search
-      const { data: cachedResults, error: rpcError } = await supabase.rpc('find_places_within_radius', {
-        search_lat: center.lat,
-        search_lng: center.lng,
-        radius_meters: radius,
-        limit_count: 20
-      });
+      // Use the enhanced database service for nearby search
+      const results = await databaseService.findPlacesWithIngredients(
+        center.lat,
+        center.lng,
+        radius,
+        undefined, // no ingredient filter
+        undefined, // no dietary restrictions
+        undefined, // no place type filter
+        20
+      );
 
-      if (rpcError) {
-        throw new Error(rpcError.message);
-      }
-
-      if (cachedResults && cachedResults.length > 0) {
-        console.log(`Found ${cachedResults.length} nearby cached places`);
+      if (results && results.length > 0) {
+        console.log(`Found ${results.length} nearby cached places`);
         
         // Update cache statistics
-        await supabase.rpc('update_cache_stats', { hits: 1, misses: 0, saved: 1 });
+        await supabase.rpc('update_cache_stats', { 
+          hits: 1, 
+          misses: 0, 
+          saved: 1,
+          new_places: 0,
+          updated_places: 0
+        });
         setCacheHitRate(prev => prev ? (prev + 1) / 2 : 1);
 
-        const markers: MarkerData[] = cachedResults.map((place: CachedPlaceResult) => ({
+        const markers: MarkerData[] = results.map((place: any) => ({
           position: {
             lat: Number(place.latitude),
             lng: Number(place.longitude)
           },
           locationId: place.place_id,
-          type: 'restaurant'
+          type: place.primary_type === 'restaurant' || place.primary_type === 'cafe' ? 'restaurant' : 'grocery'
         }));
 
         setLoading(false);
@@ -148,6 +156,49 @@ export const useCachedPlacesApi = () => {
     }
   }, []);
 
+  const searchPlacesWithIngredients = useCallback(async (
+    center: google.maps.LatLngLiteral,
+    ingredientNames: string[],
+    dietaryRestrictions?: string[],
+    placeType?: string,
+    radius: number = 5000
+  ): Promise<MarkerData[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log(`Searching places with ingredients: ${ingredientNames.join(', ')}`);
+
+      const results = await databaseService.findPlacesWithIngredients(
+        center.lat,
+        center.lng,
+        radius,
+        ingredientNames,
+        dietaryRestrictions,
+        placeType,
+        20
+      );
+
+      const markers: MarkerData[] = results.map((place: any) => ({
+        position: {
+          lat: Number(place.latitude),
+          lng: Number(place.longitude)
+        },
+        locationId: place.place_id,
+        type: place.primary_type === 'restaurant' || place.primary_type === 'cafe' ? 'restaurant' : 'grocery'
+      }));
+
+      setLoading(false);
+      return markers;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to search places with ingredients';
+      setError(errorMessage);
+      setLoading(false);
+      console.error('Places with ingredients search error:', err);
+      return [];
+    }
+  }, []);
+
   const populateArea = useCallback(async (areaId?: string) => {
     try {
       const { data, error: functionError } = await supabase.functions.invoke('places-cache-manager', {
@@ -170,15 +221,8 @@ export const useCachedPlacesApi = () => {
 
   const getCacheStats = useCallback(async () => {
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('places-cache-manager', {
-        body: { action: 'get_stats' }
-      });
-
-      if (functionError) {
-        throw new Error(functionError.message);
-      }
-
-      return data;
+      const stats = await databaseService.getCacheStats();
+      return { success: true, stats, total_places: stats.length > 0 ? stats[0].total_places_cached : 0 };
     } catch (err) {
       console.error('Cache stats error:', err);
       throw err;
@@ -188,6 +232,7 @@ export const useCachedPlacesApi = () => {
   return {
     searchCachedPlaces,
     searchNearbyPlaces,
+    searchPlacesWithIngredients,
     populateArea,
     getCacheStats,
     loading,

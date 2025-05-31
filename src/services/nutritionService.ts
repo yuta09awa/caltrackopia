@@ -1,6 +1,31 @@
 
-import { NutritionalInfo, IngredientNutrition } from "@/models/NutritionalInfo";
-import { apiService } from "./api/apiService";
+import { databaseService, Ingredient, MenuItem, DietaryRestriction } from './databaseService';
+
+export interface NutritionalInfo {
+  calories: number;
+  protein: number;
+  carbohydrates: number;
+  fat: number;
+  fiber?: number;
+  sugar?: number;
+  sodium?: number;
+  cholesterol?: number;
+  vitamins?: Record<string, number>;
+  minerals?: Record<string, number>;
+}
+
+export interface IngredientNutrition {
+  id: string;
+  name: string;
+  servingSize: string;
+  nutritionalInfo: NutritionalInfo;
+  dietaryFlags: string[];
+  allergens: string[];
+  category: string;
+  isOrganic: boolean;
+  isLocal: boolean;
+  isInSeason: boolean;
+}
 
 export class NutritionService {
   /**
@@ -8,10 +33,39 @@ export class NutritionService {
    */
   async getIngredientNutrition(ingredientId: string): Promise<IngredientNutrition | null> {
     try {
-      return await apiService.get<IngredientNutrition>(`/nutrition/ingredients/${ingredientId}`);
+      const ingredient = await databaseService.getIngredientById(ingredientId);
+      if (!ingredient) return null;
+
+      return this.transformIngredientToNutrition(ingredient);
     } catch (error) {
       console.error('Error fetching ingredient nutrition:', error);
       return null;
+    }
+  }
+
+  /**
+   * Search ingredients by name
+   */
+  async searchIngredients(query: string, limit: number = 20): Promise<IngredientNutrition[]> {
+    try {
+      const ingredients = await databaseService.searchIngredients(query, limit);
+      return ingredients.map(ingredient => this.transformIngredientToNutrition(ingredient));
+    } catch (error) {
+      console.error('Error searching ingredients:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get ingredients by category
+   */
+  async getIngredientsByCategory(category: string): Promise<IngredientNutrition[]> {
+    try {
+      const ingredients = await databaseService.getIngredientsByCategory(category);
+      return ingredients.map(ingredient => this.transformIngredientToNutrition(ingredient));
+    } catch (error) {
+      console.error('Error fetching ingredients by category:', error);
+      return [];
     }
   }
 
@@ -22,18 +76,85 @@ export class NutritionService {
     maxCalories?: number;
     minProtein?: number;
     dietaryFlags?: string[];
+    allergenFree?: string[];
   }): Promise<IngredientNutrition[]> {
     try {
-      const params = new URLSearchParams();
-      if (criteria.maxCalories) params.append('maxCalories', criteria.maxCalories.toString());
-      if (criteria.minProtein) params.append('minProtein', criteria.minProtein.toString());
-      if (criteria.dietaryFlags) {
-        criteria.dietaryFlags.forEach(flag => params.append('dietaryFlags', flag));
-      }
-
-      return await apiService.get<IngredientNutrition[]>(`/nutrition/search?${params.toString()}`);
+      const allIngredients = await databaseService.getAllIngredients();
+      
+      return allIngredients
+        .filter(ingredient => {
+          // Filter by max calories
+          if (criteria.maxCalories && ingredient.calories_per_100g && ingredient.calories_per_100g > criteria.maxCalories) {
+            return false;
+          }
+          
+          // Filter by min protein
+          if (criteria.minProtein && ingredient.protein_per_100g && ingredient.protein_per_100g < criteria.minProtein) {
+            return false;
+          }
+          
+          // Filter by dietary flags
+          if (criteria.dietaryFlags && criteria.dietaryFlags.length > 0) {
+            const hasAllFlags = criteria.dietaryFlags.every(flag => 
+              ingredient.dietary_restrictions.includes(flag)
+            );
+            if (!hasAllFlags) return false;
+          }
+          
+          // Filter by allergen-free
+          if (criteria.allergenFree && criteria.allergenFree.length > 0) {
+            const hasAllergen = criteria.allergenFree.some(allergen => 
+              ingredient.allergens.includes(allergen)
+            );
+            if (hasAllergen) return false;
+          }
+          
+          return true;
+        })
+        .map(ingredient => this.transformIngredientToNutrition(ingredient));
     } catch (error) {
       console.error('Error searching nutrition data:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get menu items with nutrition info
+   */
+  async getMenuItemsWithNutrition(placeId: string): Promise<MenuItem[]> {
+    try {
+      return await databaseService.getMenuItemsByPlace(placeId);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Search menu items by dietary requirements
+   */
+  async searchMenuItems(
+    query: string,
+    dietaryTags?: string[],
+    allergenFree?: string[],
+    limit: number = 20
+  ): Promise<MenuItem[]> {
+    try {
+      return await databaseService.searchMenuItems(query, dietaryTags, allergenFree, limit);
+    } catch (error) {
+      console.error('Error searching menu items:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get dietary restrictions
+   */
+  async getDietaryRestrictions(): Promise<DietaryRestriction[]> {
+    try {
+      return await databaseService.getAllDietaryRestrictions();
+    } catch (error) {
+      console.error('Error fetching dietary restrictions:', error);
       return [];
     }
   }
@@ -52,7 +173,9 @@ export class NutritionService {
         fiber: (total.fiber || 0) + (nutrition.fiber || 0),
         sugar: (total.sugar || 0) + (nutrition.sugar || 0),
         sodium: (total.sodium || 0) + (nutrition.sodium || 0),
-        cholesterol: (total.cholesterol || 0) + (nutrition.cholesterol || 0)
+        cholesterol: (total.cholesterol || 0) + (nutrition.cholesterol || 0),
+        vitamins: { ...total.vitamins, ...nutrition.vitamins },
+        minerals: { ...total.minerals, ...nutrition.minerals }
       };
     }, {
       calories: 0,
@@ -62,8 +185,58 @@ export class NutritionService {
       fiber: 0,
       sugar: 0,
       sodium: 0,
-      cholesterol: 0
+      cholesterol: 0,
+      vitamins: {},
+      minerals: {}
     });
+  }
+
+  /**
+   * Check if ingredient is in season
+   */
+  private isInSeason(ingredient: Ingredient): boolean {
+    if (!ingredient.peak_season_start || !ingredient.peak_season_end) {
+      return true; // Available year-round if no season specified
+    }
+
+    const currentMonth = new Date().getMonth() + 1; // 1-12
+    const start = ingredient.peak_season_start;
+    const end = ingredient.peak_season_end;
+
+    // Handle seasons that cross year boundary (e.g., Nov-Feb)
+    if (start <= end) {
+      return currentMonth >= start && currentMonth <= end;
+    } else {
+      return currentMonth >= start || currentMonth <= end;
+    }
+  }
+
+  /**
+   * Transform database ingredient to nutrition format
+   */
+  private transformIngredientToNutrition(ingredient: Ingredient): IngredientNutrition {
+    return {
+      id: ingredient.id,
+      name: ingredient.name,
+      servingSize: '100g',
+      category: ingredient.category,
+      isOrganic: ingredient.is_organic,
+      isLocal: ingredient.is_local,
+      isInSeason: this.isInSeason(ingredient),
+      nutritionalInfo: {
+        calories: ingredient.calories_per_100g || 0,
+        protein: ingredient.protein_per_100g || 0,
+        carbohydrates: ingredient.carbs_per_100g || 0,
+        fat: ingredient.fat_per_100g || 0,
+        fiber: ingredient.fiber_per_100g,
+        sugar: ingredient.sugar_per_100g,
+        sodium: ingredient.sodium_per_100g,
+        vitamins: ingredient.vitamins,
+        minerals: ingredient.minerals
+      },
+      dietaryFlags: ingredient.dietary_restrictions,
+      allergens: ingredient.allergens
+    };
   }
 }
 
