@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+
+import { useCallback, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MarkerData } from '../types';
 import { databaseService } from '@/services/databaseService';
@@ -23,6 +24,22 @@ export interface CachedPlaceResult {
 export const useCachedPlacesApi = () => {
   const { mapFilters } = useAppStore();
   const searchState = useSearchState();
+  const [cacheHitRate, setCacheHitRate] = useState<number | null>(null);
+  const cacheHits = useRef(0);
+  const cacheMisses = useRef(0);
+
+  const updateCacheStats = useCallback((hit: boolean) => {
+    if (hit) {
+      cacheHits.current++;
+    } else {
+      cacheMisses.current++;
+    }
+    
+    const total = cacheHits.current + cacheMisses.current;
+    if (total > 0) {
+      setCacheHitRate(cacheHits.current / total);
+    }
+  }, []);
 
   const searchNearbyPlaces = useCallback(async (
     center: google.maps.LatLngLiteral,
@@ -44,6 +61,8 @@ export const useCachedPlacesApi = () => {
       );
 
       if (results && results.length > 0) {
+        updateCacheStats(true);
+        
         const filteredResults = results.filter(place => {
           // Price range filter
           if (mapFilters.priceRange && place.price_level !== undefined && place.price_level !== null) {
@@ -78,6 +97,7 @@ export const useCachedPlacesApi = () => {
         searchState.completeSearch(filteredResults.length);
         return markers;
       } else {
+        updateCacheStats(false);
         console.log('No enhanced nearby places found with current filters');
         triggerBackgroundPopulation(center, radius).catch(err => 
           console.error('Background population failed:', err)
@@ -86,12 +106,13 @@ export const useCachedPlacesApi = () => {
         return [];
       }
     } catch (err) {
+      updateCacheStats(false);
       const errorMessage = err instanceof Error ? err.message : 'Failed to search enhanced nearby places';
       searchState.errorSearch(errorMessage);
       console.error('Enhanced nearby search error:', err);
       return [];
     }
-  }, [mapFilters, searchState]);
+  }, [mapFilters, searchState, updateCacheStats]);
 
   const searchCachedPlaces = useCallback(async (
     query: string,
@@ -128,6 +149,7 @@ export const useCachedPlacesApi = () => {
       }
 
       if (data && data.success) {
+        updateCacheStats(data.source === 'cache');
         console.log(`Cache ${data.source}: Found ${data.count} filtered places`);
         
         const results = data.results || [];
@@ -143,12 +165,13 @@ export const useCachedPlacesApi = () => {
         throw new Error('Failed to search places via cache manager');
       }
     } catch (err) {
+      updateCacheStats(false);
       const errorMessage = err instanceof Error ? err.message : 'Failed to search cached places';
       searchState.errorSearch(errorMessage);
       console.error('Enhanced search error:', err);
       return [];
     }
-  }, [mapFilters, searchState]);
+  }, [mapFilters, searchState, updateCacheStats]);
 
   const searchPlacesWithIngredients = useCallback(async (
     center: google.maps.LatLngLiteral,
@@ -175,6 +198,8 @@ export const useCachedPlacesApi = () => {
         options?.limit || 20
       );
 
+      updateCacheStats(results.length > 0);
+
       const markers: MarkerData[] = results.map((place: any) => ({
         position: {
           lat: Number(place.latitude),
@@ -187,12 +212,13 @@ export const useCachedPlacesApi = () => {
       searchState.completeSearch(markers.length);
       return markers;
     } catch (err) {
+      updateCacheStats(false);
       const errorMessage = err instanceof Error ? err.message : 'Failed to search places with ingredients';
       searchState.errorSearch(errorMessage);
       console.error('Enhanced ingredient search error:', err);
       return [];
     }
-  }, [searchState]);
+  }, [searchState, updateCacheStats]);
 
   const populateArea = useCallback(async (areaId?: string) => {
     try {
@@ -252,6 +278,10 @@ export const useCachedPlacesApi = () => {
   return {
     searchCachedPlaces,
     searchNearbyPlaces,
+    searchPlacesWithIngredients,
+    populateArea,
+    getCacheStats,
+    cacheHitRate,
     ...searchState
   };
 };
