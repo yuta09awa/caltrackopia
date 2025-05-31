@@ -10,10 +10,15 @@ interface RestaurantDetailsProps {
   location: Location;
 }
 
+// Type guard to check if customData is RestaurantCustomData
+function isRestaurantCustomData(customData: any): customData is RestaurantCustomData {
+  return customData && 'menuItems' in customData && 'specialFeatures' in customData;
+}
+
 const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ location }) => {
   const customData = location.customData;
 
-  if (!customData) {
+  if (!customData || !isRestaurantCustomData(customData)) {
     return (
       <Card>
         <CardContent className="p-4">
