@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface EnhancedPlace {
@@ -260,6 +261,48 @@ class DatabaseService {
       console.warn('Error fetching dietary restriction by name, using mock data:', error);
       return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
     }
+  }
+
+  // Mock ingredients data for fallback
+  private getMockIngredients(): Ingredient[] {
+    return [
+      {
+        id: '1',
+        name: 'Spinach',
+        common_names: ['baby spinach', 'leaf spinach'],
+        category: 'vegetables',
+        calories_per_100g: 23,
+        protein_per_100g: 2.9,
+        carbs_per_100g: 3.6,
+        fat_per_100g: 0.4,
+        fiber_per_100g: 2.2,
+        is_organic: false,
+        is_local: true,
+        is_seasonal: true,
+        allergens: [],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten-free'],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '2',
+        name: 'Quinoa',
+        common_names: ['quinoa grain', 'superfood grain'],
+        category: 'grains',
+        calories_per_100g: 368,
+        protein_per_100g: 14.1,
+        carbs_per_100g: 64.2,
+        fat_per_100g: 6.1,
+        fiber_per_100g: 7.0,
+        is_organic: true,
+        is_local: false,
+        is_seasonal: false,
+        allergens: [],
+        dietary_restrictions: ['vegan', 'vegetarian', 'gluten-free'],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
   }
 
   // Mock dietary restrictions for fallback
