@@ -99,20 +99,7 @@ export class LocationService {
 
       return results.map(result => {
         const location = this.transformPlaceToLocation(result as any);
-        // Add ingredient availability info if available
-        if (result.available_ingredients) {
-          location.customData = {
-            ...location.customData,
-            ingredients: result.available_ingredients.map(name => ({
-              id: name,
-              name,
-              category: 'unknown',
-              isOrganic: false,
-              isLocal: false,
-              availability: 'always' as const
-            }))
-          };
-        }
+        // Note: ingredient availability would be added here when the database schema supports it
         return location;
       });
     } catch (error) {
@@ -178,15 +165,13 @@ export class LocationService {
   /**
    * Map database place type to subtype
    */
-  private mapDbTypeToSubType(dbType: string): string | undefined {
-    const subTypeMap: { [key: string]: string } = {
+  private mapDbTypeToSubType(dbType: string): "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market" | undefined {
+    const subTypeMap: { [key: string]: "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market" } = {
       'grocery_store': 'Supermarket',
       'convenience_store': 'Convenience Store',
       'specialty_food_store': 'Health Food Store',
       'farmers_market': 'Farmers Market',
-      'pharmacy': 'Pharmacy',
-      'cafe': 'Cafe',
-      'bakery': 'Bakery'
+      'pharmacy': 'Pharmacy'
     };
     return subTypeMap[dbType];
   }
