@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
@@ -16,7 +15,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ className, resultCount }) => 
   const activeFilters = React.useMemo(() => {
     const filters: Array<{ key: string; label: string; value: string; type: 'single' | 'array' }> = [];
 
-    // Price range filter
+    // Price range filter - fixed type handling
     if (mapFilters.priceRange) {
       const [min, max] = mapFilters.priceRange;
       filters.push({
@@ -27,7 +26,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ className, resultCount }) => 
       });
     }
 
-    // Cuisine filter
+    // cuisine filter
     if (mapFilters.cuisine && mapFilters.cuisine !== 'all') {
       filters.push({
         key: 'cuisine',
@@ -37,7 +36,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ className, resultCount }) => 
       });
     }
 
-    // Grocery category filter
+    // grocery category filter
     if (mapFilters.groceryCategory && mapFilters.groceryCategory !== 'all') {
       filters.push({
         key: 'groceryCategory',

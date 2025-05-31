@@ -27,6 +27,91 @@ export const useCachedPlacesApi = () => {
   
   const { mapFilters } = useAppStore();
 
+  const searchNearbyPlaces = useCallback(async (
+    center: google.maps.LatLngLiteral,
+    radius: number = 2000
+  ): Promise<MarkerData[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log(`Enhanced nearby search with filters:`, {
+        center,
+        radius,
+        filters: mapFilters
+      });
+
+      const results = await databaseService.findPlacesWithIngredients(
+        center.lat,
+        center.lng,
+        radius,
+        mapFilters.includeIngredients.length > 0 ? mapFilters.includeIngredients : undefined,
+        mapFilters.dietary.length > 0 ? mapFilters.dietary : undefined,
+        mapFilters.cuisine !== 'all' ? mapFilters.cuisine : undefined,
+        20
+      );
+
+      if (results && results.length > 0) {
+        // Apply additional client-side filtering for features not yet in database
+        const filteredResults = results.filter(place => {
+          // Price range filter - fixed type comparison
+          if (mapFilters.priceRange && place.price_level !== undefined && place.price_level !== null) {
+            const [minPrice, maxPrice] = mapFilters.priceRange;
+            if (place.price_level < minPrice || place.price_level > maxPrice) {
+              return false;
+            }
+          }
+
+          if (mapFilters.excludeIngredients.length > 0) {
+            const placeName = place.name.toLowerCase();
+            const hasExcludedIngredient = mapFilters.excludeIngredients.some(ingredient =>
+              placeName.includes(ingredient.toLowerCase())
+            );
+            if (hasExcludedIngredient) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+        console.log(`Found ${filteredResults.length} enhanced nearby places after filtering`);
+        setResultCount(filteredResults.length);
+        
+        setCacheHitRate(prev => prev === null ? 1 : (prev * 0.9 + 0.1));
+
+        const markers: MarkerData[] = filteredResults.map((place: any) => ({
+          position: {
+            lat: Number(place.latitude),
+            lng: Number(place.longitude)
+          },
+          locationId: place.place_id,
+          type: mapPlaceTypeToMarkerType(place.primary_type)
+        }));
+
+        setLoading(false);
+        return markers;
+      } else {
+        console.log('No enhanced nearby places found with current filters');
+        setResultCount(0);
+        
+        triggerBackgroundPopulation(center, radius).catch(err => 
+          console.error('Background population failed:', err)
+        );
+
+        setLoading(false);
+        return [];
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to search enhanced nearby places';
+      setError(errorMessage);
+      setLoading(false);
+      setResultCount(0);
+      console.error('Enhanced nearby search error:', err);
+      return [];
+    }
+  }, [mapFilters]);
+
   /**
    * Enhanced search with filter integration
    */
@@ -102,97 +187,6 @@ export const useCachedPlacesApi = () => {
       setLoading(false);
       setResultCount(0);
       console.error('Enhanced search error:', err);
-      return [];
-    }
-  }, [mapFilters]);
-
-  /**
-   * Enhanced nearby search with comprehensive filtering
-   */
-  const searchNearbyPlaces = useCallback(async (
-    center: google.maps.LatLngLiteral,
-    radius: number = 2000
-  ): Promise<MarkerData[]> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log(`Enhanced nearby search with filters:`, {
-        center,
-        radius,
-        filters: mapFilters
-      });
-
-      const results = await databaseService.findPlacesWithIngredients(
-        center.lat,
-        center.lng,
-        radius,
-        mapFilters.includeIngredients.length > 0 ? mapFilters.includeIngredients : undefined,
-        mapFilters.dietary.length > 0 ? mapFilters.dietary : undefined,
-        mapFilters.cuisine !== 'all' ? mapFilters.cuisine : undefined,
-        20
-      );
-
-      if (results && results.length > 0) {
-        // Apply additional client-side filtering for features not yet in database
-        const filteredResults = results.filter(place => {
-          // Price range filter
-          if (mapFilters.priceRange && place.price_level !== undefined) {
-            const [minPrice, maxPrice] = mapFilters.priceRange;
-            if (place.price_level < minPrice || place.price_level > maxPrice) {
-              return false;
-            }
-          }
-
-          // Exclude ingredients filter (basic implementation)
-          if (mapFilters.excludeIngredients.length > 0) {
-            // This would need to be enhanced with actual ingredient data
-            const placeName = place.name.toLowerCase();
-            const hasExcludedIngredient = mapFilters.excludeIngredients.some(ingredient =>
-              placeName.includes(ingredient.toLowerCase())
-            );
-            if (hasExcludedIngredient) {
-              return false;
-            }
-          }
-
-          return true;
-        });
-
-        console.log(`Found ${filteredResults.length} enhanced nearby places after filtering`);
-        setResultCount(filteredResults.length);
-        
-        setCacheHitRate(prev => prev === null ? 1 : (prev * 0.9 + 0.1));
-
-        const markers: MarkerData[] = filteredResults.map((place: any) => ({
-          position: {
-            lat: Number(place.latitude),
-            lng: Number(place.longitude)
-          },
-          locationId: place.place_id,
-          type: mapPlaceTypeToMarkerType(place.primary_type)
-        }));
-
-        setLoading(false);
-        return markers;
-      } else {
-        console.log('No enhanced nearby places found with current filters');
-        setResultCount(0);
-        
-        // Trigger background population for better future results
-        triggerBackgroundPopulation(center, radius).catch(err => 
-          console.error('Background population failed:', err)
-        );
-
-        setLoading(false);
-        return [];
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to search enhanced nearby places';
-      setError(errorMessage);
-      setLoading(false);
-      setResultCount(0);
-      console.error('Enhanced nearby search error:', err);
       return [];
     }
   }, [mapFilters]);

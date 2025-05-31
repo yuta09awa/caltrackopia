@@ -2,14 +2,14 @@
 import { StateCreator } from 'zustand';
 
 export interface MapFilters {
-  priceRange: string | null;
+  priceRange: [number, number] | null;
   cuisine: string;
   groceryCategory: string;
   sources: string[];
   dietary: string[];
   nutrition: string[];
   excludeIngredients: string[];
-  includeIngredients: string[]; // New field for explicit ingredient inclusion
+  includeIngredients: string[];
 }
 
 export interface MapFiltersSlice {
@@ -31,7 +31,7 @@ export const createMapFiltersSlice: StateCreator<
     dietary: [],
     nutrition: [],
     excludeIngredients: [],
-    includeIngredients: [], // Initialize new field
+    includeIngredients: [],
   },
   updateMapFilters: (filters) => set((state) => ({
     mapFilters: {

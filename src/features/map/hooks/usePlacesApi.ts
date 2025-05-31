@@ -122,8 +122,8 @@ export const usePlacesApi = () => {
                 }
               }
 
-              // Price level filtering
-              if (mapFilters.priceRange && place.price_level !== undefined) {
+              // Price level filtering - fixed type comparison
+              if (mapFilters.priceRange && place.price_level !== undefined && place.price_level !== null) {
                 const [minPrice, maxPrice] = mapFilters.priceRange;
                 if (place.price_level < minPrice || place.price_level > maxPrice) {
                   return false;
@@ -232,7 +232,8 @@ export const usePlacesApi = () => {
                 }
               }
 
-              if (mapFilters.priceRange && place.price_level !== undefined) {
+              // Price level filtering - fixed type comparison
+              if (mapFilters.priceRange && place.price_level !== undefined && place.price_level !== null) {
                 const [minPrice, maxPrice] = mapFilters.priceRange;
                 if (place.price_level < minPrice || place.price_level > maxPrice) {
                   return false;
