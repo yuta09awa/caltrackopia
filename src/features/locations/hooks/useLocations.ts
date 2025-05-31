@@ -30,15 +30,25 @@ export function useLocations() {
         console.log('Fetching locations from database...');
         const fetchedLocations = await locationService.getLocations();
         console.log('Fetched locations:', fetchedLocations.length, 'items');
-        setLocations(fetchedLocations);
+        
+        if (fetchedLocations.length === 0) {
+          console.log('No locations found in database, falling back to mock data');
+          // If database returns empty array, use mock data
+          const { mockLocations } = await import('../data/mockLocations');
+          setLocations(mockLocations);
+        } else {
+          setLocations(fetchedLocations);
+        }
       } catch (err) {
         console.error('Error fetching locations in useLocations:', err);
         setError('Failed to load locations from database');
         // Fallback to mock data if database fetch fails
         try {
           const { mockLocations } = await import('../data/mockLocations');
-          console.log('Falling back to mock locations');
+          console.log('Falling back to mock locations due to error');
           setLocations(mockLocations);
+          // Clear error since we have fallback data
+          setError(null);
         } catch (mockErr) {
           console.error('Error loading mock locations:', mockErr);
           setLocations([]);
