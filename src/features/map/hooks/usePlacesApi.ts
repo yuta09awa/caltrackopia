@@ -1,7 +1,7 @@
-
 import { useState, useCallback } from 'react';
 import { MarkerData } from '../types';
 import { useCachedPlacesApi } from './useCachedPlacesApi';
+import { useAppStore } from '@/store/appStore';
 
 export interface PlaceResult {
   place_id: string;
@@ -19,13 +19,16 @@ export const usePlacesApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Use cached Places API as primary source
+  const { mapFilters } = useAppStore();
+  
+  // Use enhanced cached Places API as primary source
   const { 
     searchCachedPlaces, 
     searchNearbyPlaces: searchNearbyCached,
     loading: cacheLoading,
     error: cacheError,
-    cacheHitRate
+    cacheHitRate,
+    resultCount
   } = useCachedPlacesApi();
 
   const waitForPlacesApi = useCallback(async (): Promise<boolean> => {
@@ -59,13 +62,21 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      console.log(`Hybrid search: ${query} at ${center.lat},${center.lng}`);
+      console.log(`Hybrid search with filters: ${query} at ${center.lat},${center.lng}`, {
+        activeFilters: {
+          dietary: mapFilters.dietary,
+          nutrition: mapFilters.nutrition,
+          sources: mapFilters.sources,
+          includeIngredients: mapFilters.includeIngredients,
+          excludeIngredients: mapFilters.excludeIngredients
+        }
+      });
       
-      // First try cached search
+      // First try enhanced cached search with filters
       const cachedResults = await searchCachedPlaces(query, center, radius);
       
       if (cachedResults.length > 0) {
-        console.log(`Found ${cachedResults.length} results from cache`);
+        console.log(`Found ${cachedResults.length} filtered results from cache`);
         setLoading(false);
         return cachedResults;
       }
@@ -77,7 +88,7 @@ export const usePlacesApi = () => {
         return [];
       }
 
-      console.log('No cached results, falling back to Google Places API');
+      console.log('No filtered cached results, falling back to Google Places API');
       
       const placesReady = await waitForPlacesApi();
       if (!placesReady) {
@@ -98,7 +109,31 @@ export const usePlacesApi = () => {
           console.log('Google Places API response:', { status, resultsCount: results?.length });
           
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const markers: MarkerData[] = results
+            // Apply client-side filtering to Google Places results
+            const filteredResults = results.filter(place => {
+              // Basic name-based filtering for exclude ingredients
+              if (mapFilters.excludeIngredients.length > 0) {
+                const placeName = place.name?.toLowerCase() || '';
+                const hasExcludedIngredient = mapFilters.excludeIngredients.some(ingredient =>
+                  placeName.includes(ingredient.toLowerCase())
+                );
+                if (hasExcludedIngredient) {
+                  return false;
+                }
+              }
+
+              // Price level filtering
+              if (mapFilters.priceRange && place.price_level !== undefined) {
+                const [minPrice, maxPrice] = mapFilters.priceRange;
+                if (place.price_level < minPrice || place.price_level > maxPrice) {
+                  return false;
+                }
+              }
+
+              return true;
+            });
+
+            const markers: MarkerData[] = filteredResults
               .filter(place => place.geometry?.location && place.place_id)
               .slice(0, 20)
               .map(place => ({
@@ -110,7 +145,7 @@ export const usePlacesApi = () => {
                 type: 'restaurant'
               }));
             
-            console.log(`Found ${markers.length} places from Google API for query: ${query}`);
+            console.log(`Found ${markers.length} filtered places from Google API for query: ${query}`);
             setLoading(false);
             resolve(markers);
           } else {
@@ -127,7 +162,7 @@ export const usePlacesApi = () => {
       console.error('Error searching places:', err);
       return [];
     }
-  }, [searchCachedPlaces, waitForPlacesApi]);
+  }, [searchCachedPlaces, waitForPlacesApi, mapFilters]);
 
   const searchNearbyPlaces = useCallback(async (
     map: google.maps.Map,
@@ -138,13 +173,21 @@ export const usePlacesApi = () => {
     setError(null);
 
     try {
-      console.log(`Hybrid nearby search at ${center.lat},${center.lng}`);
+      console.log(`Hybrid nearby search with filters at ${center.lat},${center.lng}`, {
+        activeFilters: {
+          dietary: mapFilters.dietary,
+          nutrition: mapFilters.nutrition,
+          sources: mapFilters.sources,
+          includeIngredients: mapFilters.includeIngredients,
+          excludeIngredients: mapFilters.excludeIngredients
+        }
+      });
       
-      // First try cached nearby search
+      // First try enhanced cached nearby search with filters
       const cachedResults = await searchNearbyCached(center, radius);
       
       if (cachedResults.length > 0) {
-        console.log(`Found ${cachedResults.length} nearby results from cache`);
+        console.log(`Found ${cachedResults.length} filtered nearby results from cache`);
         setLoading(false);
         return cachedResults;
       }
@@ -156,7 +199,7 @@ export const usePlacesApi = () => {
         return [];
       }
 
-      console.log('No cached nearby results, falling back to Google Places API');
+      console.log('No filtered cached nearby results, falling back to Google Places API');
       
       const placesReady = await waitForPlacesApi();
       if (!placesReady) {
@@ -176,7 +219,30 @@ export const usePlacesApi = () => {
           console.log('Google Places nearby API response:', { status, resultsCount: results?.length });
           
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const markers: MarkerData[] = results
+            // Apply client-side filtering to Google Places results
+            const filteredResults = results.filter(place => {
+              // Basic filtering logic (same as above)
+              if (mapFilters.excludeIngredients.length > 0) {
+                const placeName = place.name?.toLowerCase() || '';
+                const hasExcludedIngredient = mapFilters.excludeIngredients.some(ingredient =>
+                  placeName.includes(ingredient.toLowerCase())
+                );
+                if (hasExcludedIngredient) {
+                  return false;
+                }
+              }
+
+              if (mapFilters.priceRange && place.price_level !== undefined) {
+                const [minPrice, maxPrice] = mapFilters.priceRange;
+                if (place.price_level < minPrice || place.price_level > maxPrice) {
+                  return false;
+                }
+              }
+
+              return true;
+            });
+
+            const markers: MarkerData[] = filteredResults
               .filter(place => place.geometry?.location && place.place_id)
               .slice(0, 6)
               .map(place => ({
@@ -188,7 +254,7 @@ export const usePlacesApi = () => {
                 type: 'restaurant'
               }));
             
-            console.log(`Found ${markers.length} nearby places from Google API`);
+            console.log(`Found ${markers.length} filtered nearby places from Google API`);
             setLoading(false);
             resolve(markers);
           } else {
@@ -205,7 +271,7 @@ export const usePlacesApi = () => {
       console.error('Error searching nearby places:', err);
       return [];
     }
-  }, [searchNearbyCached, waitForPlacesApi]);
+  }, [searchNearbyCached, waitForPlacesApi, mapFilters]);
 
   const getPlaceDetails = useCallback(async (
     map: google.maps.Map,
@@ -251,6 +317,7 @@ export const usePlacesApi = () => {
     getPlaceDetails,
     loading: loading || cacheLoading,
     error: error || cacheError,
-    cacheHitRate
+    cacheHitRate,
+    resultCount
   };
 };

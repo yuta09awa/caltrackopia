@@ -1,8 +1,8 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MarkerData } from '../types';
 import { databaseService } from '@/services/databaseService';
+import { useAppStore } from '@/store/appStore';
 
 export interface CachedPlaceResult {
   place_id: string;
@@ -23,10 +23,12 @@ export const useCachedPlacesApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cacheHitRate, setCacheHitRate] = useState<number | null>(null);
+  const [resultCount, setResultCount] = useState<number>(0);
+  
+  const { mapFilters } = useAppStore();
 
   /**
-   * Searches cached places by text query, falling back to Google Places API via Edge Function.
-   * Enhanced with better error handling and cache statistics.
+   * Enhanced search with filter integration
    */
   const searchCachedPlaces = useCallback(async (
     query: string,
@@ -37,7 +39,12 @@ export const useCachedPlacesApi = () => {
     setError(null);
 
     try {
-      console.log(`Enhanced search via Edge Function: ${query} at ${center.lat},${center.lng}`);
+      console.log(`Enhanced search with filters:`, {
+        query,
+        center,
+        radius,
+        filters: mapFilters
+      });
 
       const { data, error: functionError } = await supabase.functions.invoke('places-cache-manager', {
         body: {
@@ -45,7 +52,17 @@ export const useCachedPlacesApi = () => {
           search_query: query,
           latitude: center.lat,
           longitude: center.lng,
-          radius: radius
+          radius: radius,
+          filters: {
+            dietary: mapFilters.dietary,
+            nutrition: mapFilters.nutrition,
+            sources: mapFilters.sources,
+            includeIngredients: mapFilters.includeIngredients,
+            excludeIngredients: mapFilters.excludeIngredients,
+            priceRange: mapFilters.priceRange,
+            cuisine: mapFilters.cuisine !== 'all' ? mapFilters.cuisine : null,
+            groceryCategory: mapFilters.groceryCategory !== 'all' ? mapFilters.groceryCategory : null
+          }
         }
       });
 
@@ -54,16 +71,16 @@ export const useCachedPlacesApi = () => {
       }
 
       if (data && data.success) {
-        console.log(`Cache ${data.source}: Found ${data.count} places`);
+        console.log(`Cache ${data.source}: Found ${data.count} filtered places`);
+        setResultCount(data.count || 0);
         
-        // Enhanced cache hit rate calculation with smoother updates
+        // Update cache hit rate
         if (data.source === 'cache') {
           setCacheHitRate(prev => prev === null ? 1 : (prev * 0.9 + 0.1));
         } else {
           setCacheHitRate(prev => prev === null ? 0 : (prev * 0.9));
         }
 
-        // Enhanced data transformation with better type handling
         const results = data.results || [];
         const markers: MarkerData[] = results.map((place: any) => ({
           position: {
@@ -83,60 +100,71 @@ export const useCachedPlacesApi = () => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search cached places';
       setError(errorMessage);
       setLoading(false);
+      setResultCount(0);
       console.error('Enhanced search error:', err);
       return [];
     }
-  }, []);
+  }, [mapFilters]);
 
   /**
-   * Enhanced nearby search with advanced filtering capabilities.
+   * Enhanced nearby search with comprehensive filtering
    */
   const searchNearbyPlaces = useCallback(async (
     center: google.maps.LatLngLiteral,
-    radius: number = 2000,
-    options?: {
-      ingredientNames?: string[];
-      dietaryRestrictions?: string[];
-      placeType?: string;
-      limit?: number;
-    }
+    radius: number = 2000
   ): Promise<MarkerData[]> => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log(`Enhanced nearby search at ${center.lat},${center.lng} with filters:`, options);
+      console.log(`Enhanced nearby search with filters:`, {
+        center,
+        radius,
+        filters: mapFilters
+      });
 
       const results = await databaseService.findPlacesWithIngredients(
         center.lat,
         center.lng,
         radius,
-        options?.ingredientNames,
-        options?.dietaryRestrictions,
-        options?.placeType,
-        options?.limit || 20
+        mapFilters.includeIngredients.length > 0 ? mapFilters.includeIngredients : undefined,
+        mapFilters.dietary.length > 0 ? mapFilters.dietary : undefined,
+        mapFilters.cuisine !== 'all' ? mapFilters.cuisine : undefined,
+        20
       );
 
       if (results && results.length > 0) {
-        console.log(`Found ${results.length} enhanced nearby places`);
-        
-        // Update cache statistics with better tracking
-        try {
-          const { error: rpcError } = await supabase.rpc('update_cache_stats', { 
-            hits: 1, 
-            misses: 0, 
-            saved: 1
-          });
-          if (rpcError) {
-            console.warn('Failed to update cache stats:', rpcError);
+        // Apply additional client-side filtering for features not yet in database
+        const filteredResults = results.filter(place => {
+          // Price range filter
+          if (mapFilters.priceRange && place.price_level !== undefined) {
+            const [minPrice, maxPrice] = mapFilters.priceRange;
+            if (place.price_level < minPrice || place.price_level > maxPrice) {
+              return false;
+            }
           }
-        } catch (rpcError) {
-          console.warn('Failed to update cache stats:', rpcError);
-        }
+
+          // Exclude ingredients filter (basic implementation)
+          if (mapFilters.excludeIngredients.length > 0) {
+            // This would need to be enhanced with actual ingredient data
+            const placeName = place.name.toLowerCase();
+            const hasExcludedIngredient = mapFilters.excludeIngredients.some(ingredient =>
+              placeName.includes(ingredient.toLowerCase())
+            );
+            if (hasExcludedIngredient) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+        console.log(`Found ${filteredResults.length} enhanced nearby places after filtering`);
+        setResultCount(filteredResults.length);
         
         setCacheHitRate(prev => prev === null ? 1 : (prev * 0.9 + 0.1));
 
-        const markers: MarkerData[] = results.map((place: any) => ({
+        const markers: MarkerData[] = filteredResults.map((place: any) => ({
           position: {
             lat: Number(place.latitude),
             lng: Number(place.longitude)
@@ -149,6 +177,7 @@ export const useCachedPlacesApi = () => {
         return markers;
       } else {
         console.log('No enhanced nearby places found with current filters');
+        setResultCount(0);
         
         // Trigger background population for better future results
         triggerBackgroundPopulation(center, radius).catch(err => 
@@ -162,14 +191,12 @@ export const useCachedPlacesApi = () => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search enhanced nearby places';
       setError(errorMessage);
       setLoading(false);
+      setResultCount(0);
       console.error('Enhanced nearby search error:', err);
       return [];
     }
-  }, []);
+  }, [mapFilters]);
 
-  /**
-   * Enhanced ingredient-based search with dietary compatibility.
-   */
   const searchPlacesWithIngredients = useCallback(async (
     center: google.maps.LatLngLiteral,
     ingredientNames: string[],
@@ -298,6 +325,7 @@ export const useCachedPlacesApi = () => {
     getCacheStats,
     loading,
     error,
-    cacheHitRate
+    cacheHitRate,
+    resultCount
   };
 };
