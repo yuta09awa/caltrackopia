@@ -1,5 +1,6 @@
+
 import { databaseService } from './databaseService';
-import { Ingredient, IngredientNutrition, NutritionalInfo } from '@/models/NutritionalInfo';
+import { Ingredient, DietaryRestriction } from '@/models/NutritionalInfo';
 
 export interface NutritionalInfo {
   calories: number;
@@ -25,6 +26,30 @@ export interface IngredientNutrition {
   isOrganic: boolean;
   isLocal: boolean;
   isInSeason: boolean;
+}
+
+export interface MenuItem {
+  id: string;
+  place_id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  price?: number;
+  currency_code: string;
+  calories?: number;
+  protein_grams?: number;
+  carbs_grams?: number;
+  fat_grams?: number;
+  allergens: string[];
+  dietary_tags: string[];
+  spice_level?: number;
+  is_available: boolean;
+  seasonal_availability?: string;
+  image_url?: string;
+  rating?: number;
+  popularity_score: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export class NutritionService {
@@ -167,7 +192,7 @@ export class NutritionService {
     });
   }
 
-  private isInSeason(ingredient: Ingredient): boolean {
+  private isInSeason(ingredient: any): boolean {
     if (!ingredient.peak_season_start || !ingredient.peak_season_end) {
       return true; // Available year-round if no season specified
     }
