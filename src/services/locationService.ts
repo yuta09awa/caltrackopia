@@ -1,4 +1,3 @@
-
 import { Location } from "@/models/Location";
 import { databaseService } from "./databaseService";
 import { mockLocations } from "@/features/locations/data/mockLocations";
@@ -110,10 +109,11 @@ export class LocationService {
 
   /**
    * Transform database place to Location model
+   * FIXED: Now uses place.id (database UUID) as Location.id instead of place_id
    */
   private transformPlaceToLocation(place: any): Location {
     return {
-      id: place.place_id,
+      id: place.id, // FIXED: Use internal database UUID instead of place_id
       name: place.name,
       type: this.mapDbTypeToFrontendType(place.primary_type),
       subType: this.mapDbTypeToSubType(place.primary_type),
@@ -135,7 +135,7 @@ export class LocationService {
         lat: place.latitude,
         lng: place.longitude
       },
-      googlePlaceId: place.place_id,
+      googlePlaceId: place.place_id, // Keep Google Places ID for reference
       customData: undefined // Will be populated by hybrid service if needed
     };
   }
@@ -227,6 +227,11 @@ export class LocationService {
    */
   private getMockLocations(): Location[] {
     return mockLocations;
+  }
+
+  // NEW METHOD: Make the transformPlaceToLocation method accessible to hybridLocationService
+  public mapCachedPlaceToLocation(place: any): Location {
+    return this.transformPlaceToLocation(place);
   }
 }
 

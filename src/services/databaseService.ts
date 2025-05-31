@@ -410,6 +410,49 @@ class DatabaseService {
       data_source: place.data_source || 'google_places'
     };
   }
+
+  // NEW METHOD: Get cached place by internal UUID
+  async getCachedPlaceById(id: string): Promise<EnhancedPlace | null> {
+    const { data, error } = await supabase
+      .from('cached_places')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching cached place by ID:', error);
+      return null;
+    }
+
+    return this.transformToEnhancedPlace(data);
+  }
+
+  // NEW METHOD: Get multiple cached places by internal UUIDs
+  async getCachedPlacesByIds(ids: string[]): Promise<EnhancedPlace[]> {
+    const { data, error } = await supabase
+      .from('cached_places')
+      .select('*')
+      .in('id', ids);
+
+    if (error) {
+      console.error('Error fetching cached places by IDs:', error);
+      return [];
+    }
+
+    return (data || []).map(place => this.transformToEnhancedPlace(place));
+  }
+
+  // NEW METHOD: Get menu items by place internal UUID
+  async getMenuItemsByPlaceId(placeId: string): Promise<MenuItem[]> {
+    console.warn('Menu items table not available yet, returning empty array');
+    return [];
+  }
+
+  // NEW METHOD: Get place ingredients by place internal UUID
+  async getPlaceIngredientsByPlaceId(placeId: string): Promise<PlaceIngredient[]> {
+    console.warn('Place ingredients table not available yet, returning empty array');
+    return [];
+  }
 }
 
 export const databaseService = new DatabaseService();

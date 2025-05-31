@@ -1,4 +1,3 @@
-
 import { Location, RestaurantCustomData } from "@/models/Location";
 import { locationService } from "./locationService";
 
@@ -8,130 +7,145 @@ export class HybridLocationService {
    * Get location with both Google Places data and custom restaurant data
    */
   async getEnrichedLocation(locationId: string): Promise<Location | null> {
+    console.log(`[HybridLocationService] Attempting to get enriched location for ID: ${locationId}`);
+    
     try {
-      // Get base location data (currently from mock, but could be from Google Places)
-      const baseLocation = await locationService.getLocationById(locationId);
-      if (!baseLocation) return null;
+      let baseLocation: Location | null = null;
+      let dbPlace: any = null;
 
-      // Get custom restaurant data if it's a restaurant
-      if (baseLocation.type === "Restaurant") {
-        const customData = await this.getCustomRestaurantData(locationId);
-        if (customData) {
-          baseLocation.customData = customData;
+      // Step 1: Try to fetch by database UUID (primary method)
+      console.log(`[HybridLocationService] Step 1: Trying database lookup by UUID: ${locationId}`);
+      dbPlace = await databaseService.getCachedPlaceById(locationId);
+      
+      if (dbPlace) {
+        console.log(`[HybridLocationService] Found DB entry by UUID: ${locationId}`);
+        baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
+      } else {
+        // Step 2: Try to fetch by Google place_id (fallback for legacy data)
+        console.log(`[HybridLocationService] Step 2: Trying database lookup by place_id: ${locationId}`);
+        dbPlace = await databaseService.getPlaceById(locationId);
+        
+        if (dbPlace) {
+          console.log(`[HybridLocationService] Found DB entry by place_id: ${locationId}`);
+          baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
+        } else {
+          // Step 3: Fallback to mock data
+          console.log(`[HybridLocationService] Step 3: Trying mock data lookup: ${locationId}`);
+          const mockLocation = mockLocations.find(loc => loc.id === locationId);
+          
+          if (mockLocation) {
+            console.log(`[HybridLocationService] Found mock data for ID: ${locationId}`);
+            baseLocation = JSON.parse(JSON.stringify(mockLocation)) as Location;
+          } else {
+            console.error(`[HybridLocationService] Location not found in DB or mock data: ${locationId}`);
+            return null;
+          }
         }
       }
 
-      return baseLocation;
+      if (!baseLocation) {
+        console.error(`[HybridLocationService] Base location is null after all lookups for ID: ${locationId}`);
+        return null;
+      }
+
+      // Determine location type and fetch custom data if applicable
+      const resolvedType = dbPlace?.primary_type || baseLocation.type.toLowerCase();
+      const isRestaurantType = ['restaurant', 'cafe', 'bakery', 'bar', 'fast_food', 'food_court', 'food_truck'].includes(resolvedType);
+      const isGroceryType = ['grocery_store', 'supermarket', 'convenience_store', 'specialty_food_store', 'farmers_market', 'health_food_store', 'butcher', 'fish_market', 'deli', 'wine_shop', 'brewery', 'distillery'].includes(resolvedType);
+
+      let customData: RestaurantCustomData | MarketCustomData | undefined = undefined;
+
+      if (isRestaurantType) {
+        customData = await this.getCustomRestaurantData(baseLocation.id, dbPlace);
+      } else if (isGroceryType) {
+        customData = await this.getCustomGroceryData(baseLocation.id, dbPlace);
+      }
+
+      return {
+        ...baseLocation,
+        customData: customData,
+      };
+
     } catch (error) {
-      console.error('Error getting enriched location:', error);
+      console.error(`[HybridLocationService] Error getting enriched location for ID ${locationId}:`, error);
       return null;
     }
   }
 
   /**
-   * Get custom restaurant data by location ID
+   * SIMPLIFIED: Get custom restaurant data with proper fallback handling
    */
-  async getCustomRestaurantData(locationId: string): Promise<RestaurantCustomData | null> {
+  async getCustomRestaurantData(placeId: string, dbPlace: any | null): Promise<RestaurantCustomData | null> {
+    console.log(`[HybridLocationService] Getting custom restaurant data for ID: ${placeId}, from DB: ${!!dbPlace}`);
+    
     try {
-      // This would typically fetch from your database
-      // For now, returning mock data that demonstrates the structure
-      const mockCustomData: RestaurantCustomData = {
-        id: locationId,
-        businessOwnerId: "owner_123",
-        isVerified: true,
-        lastUpdated: new Date().toISOString(),
-        menuItems: [
-          {
-            id: "menu_1",
-            name: "Organic Caesar Salad",
-            price: "$12.99",
-            description: "Fresh romaine lettuce with organic croutons",
-            image: "/placeholder.svg",
-            dietaryTags: ["vegetarian", "organic"],
-            rating: 4.5,
-            category: "Salads",
-            ingredients: ["romaine lettuce", "parmesan cheese", "croutons", "caesar dressing"],
-            nutritionInfo: {
-              calories: 280,
-              protein: 8,
-              carbs: 15,
-              fat: 22,
-              fiber: 3,
-              sodium: 650
-            },
-            isAvailable: true
-          }
-        ],
-        featuredItems: [
-          {
-            id: "featured_1",
-            name: "Today's Special: Quinoa Bowl",
-            price: "$14.99",
-            description: "Organic quinoa with seasonal vegetables",
-            image: "/placeholder.svg",
-            dietaryTags: ["vegan", "gluten-free"],
-            rating: 4.8,
-            category: "Bowls",
-            isSpecialOffer: true,
-            validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }
-        ],
-        ingredients: [
-          {
-            id: "ing_1",
-            name: "Organic Kale",
-            category: "Vegetables",
-            isOrganic: true,
-            isLocal: true,
-            supplier: "Local Farm Co-op",
-            availability: "always",
-            lastRestocked: new Date().toISOString()
-          }
-        ],
-        specialFeatures: ["farm-to-table", "zero-waste", "locally-sourced"],
-        deliveryOptions: [
-          {
-            type: "pickup",
-            isAvailable: true,
-            estimatedTime: "15-20 min"
-          },
-          {
-            type: "delivery",
-            isAvailable: true,
-            estimatedTime: "30-45 min",
-            fee: 2.99,
-            radius: 3
-          },
-          {
-            type: "dine-in",
-            isAvailable: true
-          }
-        ],
-        loyaltyProgram: {
-          name: "Green Rewards",
-          type: "points",
-          description: "Earn 1 point per dollar spent, redeem for free items",
-          isActive: true
-        },
-        businessHours: [
-          {
-            day: "Monday",
-            isOpen: true,
-            openTime: "08:00",
-            closeTime: "22:00"
-          },
-          {
-            day: "Tuesday",
-            isOpen: true,
-            openTime: "08:00",
-            closeTime: "22:00"
-          }
-        ]
-      };
-
-      return mockCustomData;
+      if (dbPlace) {
+        // Fetch from database (when tables are available)
+        const menuItems = await databaseService.getMenuItemsByPlaceId(dbPlace.id);
+        // Since tables don't exist yet, this will return empty arrays
+        return {
+          id: placeId,
+          businessOwnerId: "owner_temp",
+          menuItems: [],
+          featuredItems: [],
+          ingredients: [],
+          specialFeatures: ["Outdoor Seating", "WiFi"],
+          deliveryOptions: [
+            { type: "pickup", isAvailable: true, estimatedTime: "15-20 min" },
+            { type: "delivery", isAvailable: true, estimatedTime: "30-45 min", fee: 3.99, radius: 5 }
+          ],
+          loyaltyProgram: { name: "Rewards", type: "points", description: "Earn points", isActive: true },
+          businessHours: [],
+          isVerified: dbPlace.verification_count > 0,
+          lastUpdated: dbPlace.last_updated_at,
+        };
+      } else {
+        // Fallback to mock data
+        const mockRestaurant = mockLocations.find(loc => loc.id === placeId && loc.type === "Restaurant");
+        if (mockRestaurant?.customData) {
+          return mockRestaurant.customData as RestaurantCustomData;
+        }
+        return null;
+      }
     } catch (error) {
-      console.error('Error fetching custom restaurant data:', error);
+      console.error(`[HybridLocationService] Error fetching custom restaurant data:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * SIMPLIFIED: Get custom grocery data with proper fallback handling  
+   */
+  async getCustomGroceryData(placeId: string, dbPlace: any | null): Promise<MarketCustomData | null> {
+    console.log(`[HybridLocationService] Getting custom grocery data for ID: ${placeId}, from DB: ${!!dbPlace}`);
+    
+    try {
+      if (dbPlace) {
+        // Fetch from database (when tables are available)
+        return {
+          id: placeId,
+          description: dbPlace.custom_notes || dbPlace.name,
+          hours: [],
+          features: ["Parking", "Wheelchair Accessible"],
+          vendors: [],
+          events: [],
+          sections: [
+            { name: "Produce", description: "Fresh fruits and vegetables", popular: ["Apples", "Bananas"] }
+          ],
+          highlights: [],
+          isVerified: dbPlace.verification_count > 0,
+          lastUpdated: dbPlace.last_updated_at,
+        };
+      } else {
+        // Fallback to mock data
+        const mockGrocery = mockLocations.find(loc => loc.id === placeId && loc.type === "Grocery");
+        if (mockGrocery?.customData) {
+          return mockGrocery.customData as MarketCustomData;
+        }
+        return null;
+      }
+    } catch (error) {
+      console.error(`[HybridLocationService] Error fetching custom grocery data:`, error);
       return null;
     }
   }
