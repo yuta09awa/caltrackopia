@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { DatabaseError, NetworkError } from './errors/DatabaseError';
 
 export interface EnhancedPlace {
   id: string;
@@ -108,56 +109,74 @@ export interface PlaceIngredient {
 export class DatabaseService {
   // Places queries
   async getPlaceById(placeId: string): Promise<EnhancedPlace | null> {
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .eq('place_id', placeId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .eq('place_id', placeId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching place by ID:', error);
-      return null;
+      if (error) {
+        console.error('Error fetching place by ID:', error);
+        throw new DatabaseError(`Failed to fetch place: ${error.message}`, 'PLACE_FETCH_ERROR', error);
+      }
+
+      return this.transformToEnhancedPlace(data);
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching place by ID:', error);
+      throw new NetworkError('Network error while fetching place');
     }
-
-    return this.transformToEnhancedPlace(data);
   }
 
   async searchPlaces(
     query: string,
     limit: number = 20
   ): Promise<EnhancedPlace[]> {
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .ilike('name', `%${query}%`)
-      .eq('freshness_status', 'fresh')
-      .limit(limit);
+    try {
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .ilike('name', `%${query}%`)
+        .eq('freshness_status', 'fresh')
+        .limit(limit);
 
-    if (error) {
-      console.error('Error searching places:', error);
-      return [];
+      if (error) {
+        console.error('Error searching places:', error);
+        throw new DatabaseError(`Failed to search places: ${error.message}`, 'PLACE_SEARCH_ERROR', error);
+      }
+
+      return (data || []).map(place => this.transformToEnhancedPlace(place));
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error searching places:', error);
+      throw new NetworkError('Network error while searching places');
     }
-
-    return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
   async getPlacesByType(
     placeType: string,
     limit: number = 20
   ): Promise<EnhancedPlace[]> {
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .eq('primary_type', placeType as any)
-      .eq('freshness_status', 'fresh')
-      .limit(limit);
+    try {
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .eq('primary_type', placeType as any)
+        .eq('freshness_status', 'fresh')
+        .limit(limit);
 
-    if (error) {
-      console.error('Error fetching places by type:', error);
-      return [];
+      if (error) {
+        console.error('Error fetching places by type:', error);
+        throw new DatabaseError(`Failed to fetch places by type: ${error.message}`, 'PLACE_TYPE_FETCH_ERROR', error);
+      }
+
+      return (data || []).map(place => this.transformToEnhancedPlace(place));
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching places by type:', error);
+      throw new NetworkError('Network error while fetching places by type');
     }
-
-    return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
   async findPlacesWithIngredients(
@@ -169,92 +188,62 @@ export class DatabaseService {
     placeType?: string,
     limit: number = 20
   ) {
-    // For now, return nearby places from cached_places since the RPC function doesn't exist yet
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .eq('freshness_status', 'fresh')
-      .limit(limit);
+    try {
+      // For now, return nearby places from cached_places since the RPC function doesn't exist yet
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .eq('freshness_status', 'fresh')
+        .limit(limit);
 
-    if (error) {
-      console.error('Error finding places with ingredients:', error);
-      return [];
+      if (error) {
+        console.error('Error finding places with ingredients:', error);
+        throw new DatabaseError(`Failed to find places with ingredients: ${error.message}`, 'PLACE_INGREDIENT_SEARCH_ERROR', error);
+      }
+
+      return (data || []).map(place => this.transformToEnhancedPlace(place));
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error finding places with ingredients:', error);
+      throw new NetworkError('Network error while finding places with ingredients');
     }
-
-    return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
-  // Ingredient queries - will throw errors until ingredients table is implemented
+  // Ingredient queries - these tables don't exist yet, so throw appropriate errors
   async getAllIngredients(): Promise<Ingredient[]> {
-    const { data, error } = await supabase
-      .from('ingredients')
-      .select('*');
-
-    if (error) {
-      console.error('Error fetching ingredients:', error);
-      throw new Error('Ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async searchIngredients(query: string, limit: number = 20): Promise<Ingredient[]> {
-    const { data, error } = await supabase
-      .from('ingredients')
-      .select('*')
-      .ilike('name', `%${query}%`)
-      .limit(limit);
-
-    if (error) {
-      console.error('Error searching ingredients:', error);
-      throw new Error('Ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    const { data, error } = await supabase
-      .from('ingredients')
-      .select('*')
-      .eq('category', category);
-
-    if (error) {
-      console.error('Error fetching ingredients by category:', error);
-      throw new Error('Ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async getIngredientById(ingredientId: string): Promise<Ingredient | null> {
-    const { data, error } = await supabase
-      .from('ingredients')
-      .select('*')
-      .eq('id', ingredientId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching ingredient by ID:', error);
-      return null;
-    }
-
-    return data;
+    throw new DatabaseError(
+      'Ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   // Menu items queries
   async getMenuItemsByPlace(placeId: string): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('place_id', placeId);
-
-    if (error) {
-      console.error('Error fetching menu items:', error);
-      throw new Error('Menu items table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Menu items table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async searchMenuItems(
@@ -263,102 +252,62 @@ export class DatabaseService {
     allergenFree?: string[],
     limit: number = 20
   ): Promise<MenuItem[]> {
-    let queryBuilder = supabase
-      .from('menu_items')
-      .select('*')
-      .ilike('name', `%${query}%`)
-      .limit(limit);
-
-    if (dietaryTags && dietaryTags.length > 0) {
-      queryBuilder = queryBuilder.overlaps('dietary_tags', dietaryTags);
-    }
-
-    if (allergenFree && allergenFree.length > 0) {
-      queryBuilder = queryBuilder.not('allergens', 'cs', `{${allergenFree.join(',')}}`);
-    }
-
-    const { data, error } = await queryBuilder;
-
-    if (error) {
-      console.error('Error searching menu items:', error);
-      throw new Error('Menu items table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Menu items table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   // Place ingredients queries
   async getPlaceIngredients(placeId: string): Promise<PlaceIngredient[]> {
-    const { data, error } = await supabase
-      .from('place_ingredients')
-      .select('*, ingredient:ingredients(*)')
-      .eq('place_id', placeId);
-
-    if (error) {
-      console.error('Error fetching place ingredients:', error);
-      throw new Error('Place ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Place ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async getPlacesWithIngredient(ingredientId: string): Promise<PlaceIngredient[]> {
-    const { data, error } = await supabase
-      .from('place_ingredients')
-      .select('*, ingredient:ingredients(*)')
-      .eq('ingredient_id', ingredientId);
-
-    if (error) {
-      console.error('Error fetching places with ingredient:', error);
-      throw new Error('Place ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Place ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   // Dietary restrictions queries
   async getAllDietaryRestrictions(): Promise<DietaryRestriction[]> {
-    const { data, error } = await supabase
-      .from('dietary_restrictions')
-      .select('*');
-
-    if (error) {
-      console.error('Error fetching dietary restrictions:', error);
-      throw new Error('Dietary restrictions table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Dietary restrictions table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   async getDietaryRestrictionByName(name: string): Promise<DietaryRestriction | null> {
-    const { data, error } = await supabase
-      .from('dietary_restrictions')
-      .select('*')
-      .eq('name', name)
-      .single();
-
-    if (error) {
-      console.error('Error fetching dietary restriction by name:', error);
-      return null;
-    }
-
-    return data;
+    throw new DatabaseError(
+      'Dietary restrictions table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   // Cache statistics
   async getCacheStats() {
-    const { data, error } = await supabase
-      .from('cache_statistics')
-      .select('*')
-      .order('date', { ascending: false })
-      .limit(30);
+    try {
+      const { data, error } = await supabase
+        .from('cache_statistics')
+        .select('*')
+        .order('date', { ascending: false })
+        .limit(30);
 
-    if (error) {
-      console.error('Error fetching cache stats:', error);
-      return [];
+      if (error) {
+        console.error('Error fetching cache stats:', error);
+        throw new DatabaseError(`Failed to fetch cache statistics: ${error.message}`, 'CACHE_STATS_ERROR', error);
+      }
+
+      return data || [];
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching cache stats:', error);
+      throw new NetworkError('Network error while fetching cache statistics');
     }
-
-    return data || [];
   }
 
   // Helper method to transform database place to EnhancedPlace
@@ -393,63 +342,61 @@ export class DatabaseService {
 
   // NEW METHOD: Get cached place by internal UUID
   async getCachedPlaceById(id: string): Promise<EnhancedPlace | null> {
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .eq('id', id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (error) {
-      console.error('Error fetching cached place by ID:', error);
-      return null;
+      if (error) {
+        console.error('Error fetching cached place by ID:', error);
+        throw new DatabaseError(`Failed to fetch cached place: ${error.message}`, 'PLACE_FETCH_ERROR', error);
+      }
+
+      return this.transformToEnhancedPlace(data);
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching cached place by ID:', error);
+      throw new NetworkError('Network error while fetching cached place');
     }
-
-    return this.transformToEnhancedPlace(data);
   }
 
   // NEW METHOD: Get multiple cached places by internal UUIDs
   async getCachedPlacesByIds(ids: string[]): Promise<EnhancedPlace[]> {
-    const { data, error } = await supabase
-      .from('cached_places')
-      .select('*')
-      .in('id', ids);
+    try {
+      const { data, error } = await supabase
+        .from('cached_places')
+        .select('*')
+        .in('id', ids);
 
-    if (error) {
-      console.error('Error fetching cached places by IDs:', error);
-      return [];
+      if (error) {
+        console.error('Error fetching cached places by IDs:', error);
+        throw new DatabaseError(`Failed to fetch cached places: ${error.message}`, 'PLACE_FETCH_ERROR', error);
+      }
+
+      return (data || []).map(place => this.transformToEnhancedPlace(place));
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching cached places by IDs:', error);
+      throw new NetworkError('Network error while fetching cached places');
     }
-
-    return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
   // NEW METHOD: Get menu items by place internal UUID
   async getMenuItemsByPlaceId(placeId: string): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('place_id', placeId);
-
-    if (error) {
-      console.error('Error fetching menu items by place ID:', error);
-      throw new Error('Menu items table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Menu items table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 
   // NEW METHOD: Get place ingredients by place internal UUID
   async getPlaceIngredientsByPlaceId(placeId: string): Promise<PlaceIngredient[]> {
-    const { data, error } = await supabase
-      .from('place_ingredients')
-      .select('*, ingredient:ingredients(*)')
-      .eq('place_id', placeId);
-
-    if (error) {
-      console.error('Error fetching place ingredients by place ID:', error);
-      throw new Error('Place ingredients table not available yet');
-    }
-
-    return data || [];
+    throw new DatabaseError(
+      'Place ingredients table is not available yet. Please use the mock data service.',
+      'TABLE_NOT_AVAILABLE'
+    );
   }
 }
 
