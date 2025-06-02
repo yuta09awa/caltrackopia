@@ -9,11 +9,11 @@ import { useMapInteractions } from "@/features/map/hooks/useMapInteractions";
 import { useMapUI } from "@/features/map/hooks/useMapUI";
 import { useToastManager } from "@/features/map/hooks/useToastManager";
 import { MapScreenHeader, MapScreenContent, MapScreenList } from "./components";
+import { Ingredient } from "@/models/NutritionalInfo";
 
 const MapScreen = () => {
   const mapRef = useRef<google.maps.Map | null>(null);
   
-  // Data hooks
   const { locations } = useLocations();
   const { 
     mapState, 
@@ -23,10 +23,11 @@ const MapScreen = () => {
     selectLocation, 
     clearMarkers 
   } = useMapState();
+  
   const { searchPlacesByText, searchNearbyPlaces } = usePlacesApi();
   const { userLocation } = useUserLocation();
+  const { showSuccessToast, showInfoToast, showErrorToast } = useToastManager();
   
-  // Custom hooks
   const {
     selectedIngredient,
     currentSearchQuery,
@@ -46,10 +47,9 @@ const MapScreen = () => {
   } = useMapInteractions();
   
   const { mapHeight, listRef, handleScroll } = useMapUI();
-  const { showSuccessToast, showInfoToast, showErrorToast } = useToastManager();
 
   // Wrapped handlers to connect hooks
-  const wrappedHandleSelectIngredient = useCallback(async (ingredient: any) => {
+  const wrappedHandleSelectIngredient = useCallback(async (ingredient: Ingredient) => {
     await handleSelectIngredient(
       ingredient,
       mapRef,
