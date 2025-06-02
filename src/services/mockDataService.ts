@@ -183,6 +183,51 @@ export class MockDataService {
     ];
   }
 
+  // Database-compatible methods
+  async searchPlaces(query: string, limit: number = 20): Promise<EnhancedPlace[]> {
+    // Return empty array since mock data doesn't have places
+    console.log(`Mock searchPlaces called with query: ${query}, limit: ${limit}`);
+    return [];
+  }
+
+  async getPlaceById(placeId: string): Promise<EnhancedPlace | null> {
+    console.log(`Mock getPlaceById called with ID: ${placeId}`);
+    return null;
+  }
+
+  async getPlacesByType(placeType: string, limit: number = 20): Promise<EnhancedPlace[]> {
+    console.log(`Mock getPlacesByType called with type: ${placeType}, limit: ${limit}`);
+    return [];
+  }
+
+  async findPlacesWithIngredients(
+    latitude: number,
+    longitude: number,
+    radius: number = 5000,
+    ingredientNames?: string[],
+    dietaryRestrictions?: string[],
+    placeType?: string,
+    limit: number = 20
+  ): Promise<EnhancedPlace[]> {
+    console.log(`Mock findPlacesWithIngredients called`);
+    return [];
+  }
+
+  async getCachedPlaceById(id: string): Promise<EnhancedPlace | null> {
+    console.log(`Mock getCachedPlaceById called with ID: ${id}`);
+    return null;
+  }
+
+  async getCachedPlacesByIds(ids: string[]): Promise<EnhancedPlace[]> {
+    console.log(`Mock getCachedPlacesByIds called with IDs: ${ids.join(', ')}`);
+    return [];
+  }
+
+  async getCacheStats() {
+    console.log('Mock getCacheStats called');
+    return [];
+  }
+
   // Search methods that mirror DatabaseService interface
   async getAllIngredients(): Promise<Ingredient[]> {
     return this.getMockIngredients();

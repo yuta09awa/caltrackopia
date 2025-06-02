@@ -2,6 +2,7 @@
 import { dataService } from './serviceFactory';
 import { Location } from '@/features/locations/types';
 import { mockLocations } from '@/features/locations/data/mockLocations';
+import { EnhancedPlace } from './databaseService';
 
 class LocationService {
   async getLocations(): Promise<Location[]> {
@@ -15,24 +16,7 @@ class LocationService {
       }
 
       // Transform database places to Location format
-      const locations: Location[] = places.map(place => ({
-        id: place.place_id,
-        name: place.name,
-        type: this.mapPlaceTypeToLocationType(place.primary_type),
-        subType: place.secondary_type,
-        rating: place.rating || 4.0,
-        distance: "0.5 mi", // This would be calculated based on user location
-        address: place.formatted_address || '',
-        openNow: place.is_open_now ?? true,
-        price: this.mapPriceLevelToString(place.price_level),
-        dietaryOptions: this.extractDietaryOptions(place.place_types),
-        cuisine: this.extractCuisine(place.place_types),
-        coordinates: {
-          lat: Number(place.latitude),
-          lng: Number(place.longitude)
-        },
-        images: place.photo_references.slice(0, 2) || ["/placeholder.svg", "/placeholder.svg"]
-      }));
+      const locations: Location[] = places.map(place => this.mapCachedPlaceToLocation(place));
 
       return locations;
     } catch (error) {
@@ -40,6 +24,51 @@ class LocationService {
       console.log('Falling back to mock locations');
       return mockLocations;
     }
+  }
+
+  async searchLocations(query: string): Promise<Location[]> {
+    try {
+      const places = await dataService.searchPlaces(query, 20);
+      
+      if (places.length === 0) {
+        // Filter mock locations by query
+        return mockLocations.filter(loc => 
+          loc.name.toLowerCase().includes(query.toLowerCase()) ||
+          loc.address.toLowerCase().includes(query.toLowerCase()) ||
+          loc.cuisine?.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+
+      return places.map(place => this.mapCachedPlaceToLocation(place));
+    } catch (error) {
+      console.error('Error searching locations:', error);
+      return mockLocations.filter(loc => 
+        loc.name.toLowerCase().includes(query.toLowerCase()) ||
+        loc.address.toLowerCase().includes(query.toLowerCase()) ||
+        loc.cuisine?.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+  }
+
+  mapCachedPlaceToLocation(place: EnhancedPlace): Location {
+    return {
+      id: place.place_id,
+      name: place.name,
+      type: this.mapPlaceTypeToLocationType(place.primary_type),
+      subType: place.secondary_type,
+      rating: place.rating || 4.0,
+      distance: "0.5 mi", // This would be calculated based on user location
+      address: place.formatted_address || '',
+      openNow: place.is_open_now ?? true,
+      price: this.mapPriceLevelToString(place.price_level),
+      dietaryOptions: this.extractDietaryOptions(place.place_types),
+      cuisine: this.extractCuisine(place.place_types),
+      coordinates: {
+        lat: Number(place.latitude),
+        lng: Number(place.longitude)
+      },
+      images: place.photo_references.slice(0, 2) || ["/placeholder.svg", "/placeholder.svg"]
+    };
   }
 
   private mapPlaceTypeToLocationType(placeType: string): "Restaurant" | "Grocery" {
