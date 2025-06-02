@@ -55,7 +55,7 @@ class LocationService {
       id: place.place_id,
       name: place.name,
       type: this.mapPlaceTypeToLocationType(place.primary_type),
-      subType: place.secondary_type,
+      subType: this.mapPlaceTypeToSubType(place.primary_type),
       rating: place.rating || 4.0,
       distance: "0.5 mi", // This would be calculated based on user location
       address: place.formatted_address || '',
@@ -76,7 +76,36 @@ class LocationService {
     return restaurantTypes.includes(placeType) ? "Restaurant" : "Grocery";
   }
 
-  private mapPriceLevelToString(priceLevel?: number): string {
+  private mapPlaceTypeToSubType(placeType: string): "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market" | "Food Truck" | "Cafe" | "Bakery" | "Bar" | "Fast Food" | "Food Court" | "Butcher" | "Fish Market" | "Deli" | "Wine Shop" | "Brewery" | "Distillery" | undefined {
+    const subTypeMap: Record<string, "Supermarket" | "Health Food Store" | "Farmers Market" | "Convenience Store" | "Food Festival" | "Public Market" | "Department Store" | "Pharmacy" | "Gourmet Market" | "Food Truck" | "Cafe" | "Bakery" | "Bar" | "Fast Food" | "Food Court" | "Butcher" | "Fish Market" | "Deli" | "Wine Shop" | "Brewery" | "Distillery"> = {
+      'supermarket': 'Supermarket',
+      'grocery_or_supermarket': 'Supermarket',
+      'health_food_store': 'Health Food Store',
+      'farmers_market': 'Farmers Market',
+      'convenience_store': 'Convenience Store',
+      'food_festival': 'Food Festival',
+      'public_market': 'Public Market',
+      'department_store': 'Department Store',
+      'pharmacy': 'Pharmacy',
+      'gourmet_market': 'Gourmet Market',
+      'food_truck': 'Food Truck',
+      'cafe': 'Cafe',
+      'bakery': 'Bakery',
+      'bar': 'Bar',
+      'fast_food': 'Fast Food',
+      'food_court': 'Food Court',
+      'butcher': 'Butcher',
+      'fish_market': 'Fish Market',
+      'deli': 'Deli',
+      'wine_shop': 'Wine Shop',
+      'brewery': 'Brewery',
+      'distillery': 'Distillery'
+    };
+
+    return subTypeMap[placeType];
+  }
+
+  private mapPriceLevelToString(priceLevel?: number): "$" | "$$" | "$$$" | "$$$$" {
     if (!priceLevel) return "$$";
     switch (priceLevel) {
       case 1: return "$";
