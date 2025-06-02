@@ -1,5 +1,5 @@
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useMemo } from "react";
 import { useLocations } from "@/features/locations/hooks/useLocations";
 import { useMapState, LatLng } from "@/features/map/hooks/useMapState";
 import { usePlacesApi } from "@/features/map/hooks/usePlacesApi";
@@ -48,63 +48,86 @@ const MapScreen = () => {
   
   const { mapHeight, listRef, handleScroll } = useMapUI();
 
-  // Wrapped handlers to connect hooks
+  // Memoize stable dependencies for callbacks
+  const stableDependencies = useMemo(() => ({
+    updateMarkers,
+    updateCenter,
+    selectLocation,
+    clearMarkers,
+    searchPlacesByText,
+    searchNearbyPlaces,
+    showInfoToast,
+    showErrorToast,
+    locations
+  }), [
+    updateMarkers,
+    updateCenter,
+    selectLocation,
+    clearMarkers,
+    searchPlacesByText,
+    searchNearbyPlaces,
+    showInfoToast,
+    showErrorToast,
+    locations
+  ]);
+
+  // Optimized wrapped handlers with proper dependencies
   const wrappedHandleSelectIngredient = useCallback(async (ingredient: Ingredient) => {
     await handleSelectIngredient(
       ingredient,
       mapRef,
       mapState,
-      updateMarkers,
-      updateCenter,
-      searchPlacesByText
+      stableDependencies.updateMarkers,
+      stableDependencies.updateCenter,
+      stableDependencies.searchPlacesByText
     );
-  }, [handleSelectIngredient, mapState, updateMarkers, updateCenter, searchPlacesByText]);
+  }, [handleSelectIngredient, mapState, stableDependencies]);
 
   const wrappedHandleSearchReset = useCallback(() => {
     handleSearchReset(
-      clearMarkers,
+      stableDependencies.clearMarkers,
       mapRef,
       mapState,
-      searchNearbyPlaces,
-      updateMarkers
+      stableDependencies.searchNearbyPlaces,
+      stableDependencies.updateMarkers
     );
-  }, [handleSearchReset, clearMarkers, mapState, searchNearbyPlaces, updateMarkers]);
+  }, [handleSearchReset, mapState, stableDependencies]);
 
   const wrappedHandleLocationSelect = useCallback((locationId: string) => {
-    handleLocationSelect(locationId, locations, selectLocation);
-  }, [handleLocationSelect, locations, selectLocation]);
+    handleLocationSelect(locationId, stableDependencies.locations, stableDependencies.selectLocation);
+  }, [handleLocationSelect, stableDependencies]);
 
   const wrappedHandleMarkerClick = useCallback((locationId: string, position: { x: number; y: number }) => {
-    handleMarkerClick(locationId, position, locations, selectLocation);
-  }, [handleMarkerClick, locations, selectLocation]);
+    handleMarkerClick(locationId, position, stableDependencies.locations, stableDependencies.selectLocation);
+  }, [handleMarkerClick, stableDependencies]);
 
   const wrappedHandleInfoCardClose = useCallback(() => {
-    handleInfoCardClose(selectLocation);
-  }, [handleInfoCardClose, selectLocation]);
+    handleInfoCardClose(stableDependencies.selectLocation);
+  }, [handleInfoCardClose, stableDependencies]);
 
   const wrappedHandleViewDetails = useCallback((locationId: string) => {
-    handleViewDetails(locationId, locations);
+    handleViewDetails(locationId, stableDependencies.locations);
     wrappedHandleInfoCardClose();
-  }, [handleViewDetails, locations, wrappedHandleInfoCardClose]);
+  }, [handleViewDetails, stableDependencies, wrappedHandleInfoCardClose]);
 
   const handleMapLoaded = useCallback(async (map: google.maps.Map) => {
     mapRef.current = map;
     
     if (!currentSearchQuery) {
       try {
-        const nearbyPlaces = await searchNearbyPlaces(map, mapState.center);
-        updateMarkers(nearbyPlaces);
+        const nearbyPlaces = await stableDependencies.searchNearbyPlaces(map, mapState.center);
+        stableDependencies.updateMarkers(nearbyPlaces);
         if (nearbyPlaces.length > 0) {
-          showInfoToast(`Loaded ${nearbyPlaces.length} nearby places.`);
+          stableDependencies.showInfoToast(`Loaded ${nearbyPlaces.length} nearby places.`);
         }
       } catch (error) {
         console.error('Failed to load initial nearby places:', error);
-        showErrorToast('Failed to load nearby places.');
+        stableDependencies.showErrorToast('Failed to load nearby places.');
       }
     } else if (selectedIngredient) {
       wrappedHandleSelectIngredient(selectedIngredient);
     }
-  }, [currentSearchQuery, mapState.center, searchNearbyPlaces, updateMarkers, showInfoToast, showErrorToast, selectedIngredient, wrappedHandleSelectIngredient]);
+  }, [currentSearchQuery, mapState.center, selectedIngredient, wrappedHandleSelectIngredient, stableDependencies]);
 
   const handleMapIdle = useCallback((center: LatLng, zoom: number) => {
     updateCenter(center);
@@ -118,36 +141,56 @@ const MapScreen = () => {
     }
   }, [userLocation, updateCenter]);
 
+  // Memoize props objects to prevent unnecessary re-renders
+  const headerProps = useMemo(() => ({
+    displayedSearchQuery,
+    onSelectIngredient: wrappedHandleSelectIngredient,
+    onSearchReset: wrappedHandleSearchReset
+  }), [displayedSearchQuery, wrappedHandleSelectIngredient, wrappedHandleSearchReset]);
+
+  const contentProps = useMemo(() => ({
+    mapHeight,
+    selectedIngredient,
+    currentSearchQuery,
+    mapState,
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    onLocationSelect: wrappedHandleLocationSelect,
+    onMarkerClick: wrappedHandleMarkerClick,
+    onMapLoaded: handleMapLoaded,
+    onMapIdle: handleMapIdle,
+    onInfoCardClose: wrappedHandleInfoCardClose,
+    onViewDetails: wrappedHandleViewDetails
+  }), [
+    mapHeight,
+    selectedIngredient,
+    currentSearchQuery,
+    mapState,
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    wrappedHandleLocationSelect,
+    wrappedHandleMarkerClick,
+    handleMapLoaded,
+    handleMapIdle,
+    wrappedHandleInfoCardClose,
+    wrappedHandleViewDetails
+  ]);
+
+  const listProps = useMemo(() => ({
+    listRef,
+    selectedLocationId: mapState.selectedLocationId,
+    onScroll: handleScroll
+  }), [listRef, mapState.selectedLocationId, handleScroll]);
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
-      <MapScreenHeader 
-        displayedSearchQuery={displayedSearchQuery}
-        onSelectIngredient={wrappedHandleSelectIngredient}
-        onSearchReset={wrappedHandleSearchReset}
-      />
+      <MapScreenHeader {...headerProps} />
       
       <main className="flex-1 flex flex-col relative w-full">
-        <MapScreenContent 
-          mapHeight={mapHeight}
-          selectedIngredient={selectedIngredient}
-          currentSearchQuery={currentSearchQuery}
-          mapState={mapState}
-          showInfoCard={showInfoCard}
-          selectedLocation={selectedLocation}
-          infoCardPosition={infoCardPosition}
-          onLocationSelect={wrappedHandleLocationSelect}
-          onMarkerClick={wrappedHandleMarkerClick}
-          onMapLoaded={handleMapLoaded}
-          onMapIdle={handleMapIdle}
-          onInfoCardClose={wrappedHandleInfoCardClose}
-          onViewDetails={wrappedHandleViewDetails}
-        />
-
-        <MapScreenList 
-          listRef={listRef}
-          selectedLocationId={mapState.selectedLocationId}
-          onScroll={handleScroll}
-        />
+        <MapScreenContent {...contentProps} />
+        <MapScreenList {...listProps} />
       </main>
     </div>
   );

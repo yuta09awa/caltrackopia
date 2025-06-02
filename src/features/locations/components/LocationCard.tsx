@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
 import {
@@ -16,9 +17,9 @@ interface LocationCardProps {
   isHighlighted?: boolean;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = false }) => {
-  // Determine the correct route based on location type and subType
-  const getDetailLink = () => {
+const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHighlighted = false }) => {
+  // Memoize the detail link calculation
+  const detailLink = useMemo(() => {
     // Only route to markets page for specific grocery subtypes that have market-specific features
     if (location.type.toLowerCase() === "grocery" && 
         location.subType && 
@@ -28,44 +29,44 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
       // All restaurants and other location types go to location detail page
       return `/location/${location.id}`;
     }
-  };
+  }, [location.type, location.subType, location.id]);
 
-  // Check if this location has highlights (for markets)
-  const hasHighlights = () => {
+  // Memoize highlights check
+  const hasHighlights = useMemo(() => {
     if (location.customData && 'highlights' in location.customData) {
       return location.customData.highlights && location.customData.highlights.length > 0;
     }
     return false;
-  };
+  }, [location.customData]);
 
-  // Get highlight types present in this market
-  const getHighlightTypes = () => {
+  // Memoize highlight types
+  const highlightTypes = useMemo(() => {
     if (location.customData && 'highlights' in location.customData && location.customData.highlights) {
       const types = new Set(location.customData.highlights.map(h => h.type));
       return Array.from(types);
     }
     return [];
-  };
+  }, [location.customData]);
 
-  // Show badge for each highlight type
-  const renderHighlightBadges = () => {
-    const types = getHighlightTypes();
+  // Memoize highlight badges rendering
+  const highlightBadges = useMemo(() => {
+    if (highlightTypes.length === 0) return null;
     
     return (
       <div className="flex gap-1.5 mt-1">
-        {types.includes("new") && (
+        {highlightTypes.includes("new") && (
           <div className="flex items-center gap-0.5 bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full text-[10px]">
             <CalendarDays className="w-2.5 h-2.5" />
             <span>New</span>
           </div>
         )}
-        {types.includes("popular") && (
+        {highlightTypes.includes("popular") && (
           <div className="flex items-center gap-0.5 bg-yellow-50 text-yellow-700 px-1.5 py-0.5 rounded-full text-[10px]">
             <Star className="w-2.5 h-2.5 fill-yellow-500" />
             <span>Popular</span>
           </div>
         )}
-        {types.includes("seasonal") && (
+        {highlightTypes.includes("seasonal") && (
           <div className="flex items-center gap-0.5 bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full text-[10px]">
             <LeafyGreen className="w-2.5 h-2.5" />
             <span>Seasonal</span>
@@ -73,9 +74,20 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
         )}
       </div>
     );
-  };
+  }, [highlightTypes]);
 
-  const handleCardClick = (e: React.MouseEvent) => {
+  // Memoize dietary options rendering
+  const dietaryOptionsElements = useMemo(() => {
+    if (!location.dietaryOptions) return null;
+    
+    return location.dietaryOptions.map((option, idx) => (
+      <span key={idx} className="text-[10px] sm:text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+        {option}
+      </span>
+    ));
+  }, [location.dietaryOptions]);
+
+  const handleCardClick = useCallback((e: React.MouseEvent) => {
     // Prevent navigation if clicking on carousel controls or buttons
     const target = e.target as HTMLElement;
     const button = target.closest('button');
@@ -85,7 +97,12 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
       e.stopPropagation();
       return false;
     }
-  };
+  }, []);
+
+  const handleCarouselClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
   return (
     <div 
@@ -100,7 +117,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
       
       <Link 
         key={location.id}
-        to={getDetailLink()}
+        to={detailLink}
         className="flex"
         onClick={handleCardClick}
       >
@@ -115,6 +132,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
                       src={image} 
                       alt={`${location.name} image ${index + 1}`}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 </CarouselItem>
@@ -123,17 +141,11 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
             {/* Floating overlay navigation buttons with higher z-index and event prevention */}
             <CarouselPrevious 
               className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
+              onClick={handleCarouselClick}
             />
             <CarouselNext 
               className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
+              onClick={handleCarouselClick}
             />
           </Carousel>
         </div>
@@ -160,7 +172,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
               </div>
               
               {/* Show highlight badges if any */}
-              {hasHighlights() && renderHighlightBadges()}
+              {highlightBadges}
             </div>
             <div className="flex items-center gap-0.5 sm:gap-1 ml-1 flex-shrink-0">
               <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500 fill-yellow-500" />
@@ -170,16 +182,14 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, isHighlighted = f
           
           {/* Show dietary options */}
           <div className="mt-0.5 sm:mt-1 flex flex-wrap gap-1">
-            {location.dietaryOptions && location.dietaryOptions.map((option, idx) => (
-              <span key={idx} className="text-[10px] sm:text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                {option}
-              </span>
-            ))}
+            {dietaryOptionsElements}
           </div>
         </div>
       </Link>
     </div>
   );
-};
+});
+
+LocationCard.displayName = 'LocationCard';
 
 export default LocationCard;

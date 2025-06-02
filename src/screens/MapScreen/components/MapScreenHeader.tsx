@@ -11,7 +11,7 @@ interface MapScreenHeaderProps {
   onSearchReset: () => void;
 }
 
-const MapScreenHeader: React.FC<MapScreenHeaderProps> = ({
+const MapScreenHeader: React.FC<MapScreenHeaderProps> = React.memo(({
   displayedSearchQuery,
   onSelectIngredient,
   onSearchReset
@@ -32,6 +32,8 @@ const MapScreenHeader: React.FC<MapScreenHeaderProps> = ({
       </div>
     </Navbar>
   );
-};
+});
+
+MapScreenHeader.displayName = 'MapScreenHeader';
 
 export default MapScreenHeader;

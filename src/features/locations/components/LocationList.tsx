@@ -1,11 +1,12 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { LocationErrorBoundary } from './LocationErrorBoundary';
 import LocationListHeader from './LocationListHeader';
 import LocationCard from './LocationCard';
 import LocationFilters from './LocationFilters';
 import FilterChips from '@/components/search/FilterChips';
+import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
 
@@ -13,7 +14,7 @@ interface LocationListProps {
   selectedLocationId?: string | null;
 }
 
-const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
+const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId }) => {
   const { 
     locations, 
     activeTab, 
@@ -29,27 +30,41 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
   const listContainerRef = useRef<HTMLDivElement>(null);
   
-  // Use spoofed locations if spoofing is active, otherwise use filtered locations
-  const displayLocations = activeSpoof ? getFilteredLocations() : locations;
+  // Memoize display locations calculation
+  const displayLocations = useMemo(() => {
+    return activeSpoof ? getFilteredLocations() : locations;
+  }, [activeSpoof, getFilteredLocations, locations]);
+
+  // Memoize scroll to selected location function
+  const scrollToSelectedLocation = useCallback((locationId: string) => {
+    if (!listContainerRef.current) return;
+    
+    const locationElement = document.getElementById(`location-${locationId}`);
+    if (locationElement) {
+      locationElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      
+      // Add a temporary highlight effect
+      locationElement.classList.add('bg-primary/10', 'border-primary/20');
+      const timeoutId = setTimeout(() => {
+        locationElement.classList.remove('bg-primary/10', 'border-primary/20');
+      }, 2000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, []);
 
   // Scroll to selected location when selectedLocationId changes
   useEffect(() => {
-    if (selectedLocationId && listContainerRef.current) {
-      const locationElement = document.getElementById(`location-${selectedLocationId}`);
-      if (locationElement) {
-        locationElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-        
-        // Add a temporary highlight effect
-        locationElement.classList.add('bg-primary/10', 'border-primary/20');
-        setTimeout(() => {
-          locationElement.classList.remove('bg-primary/10', 'border-primary/20');
-        }, 2000);
-      }
+    if (selectedLocationId) {
+      scrollToSelectedLocation(selectedLocationId);
     }
-  }, [selectedLocationId]);
+  }, [selectedLocationId, scrollToSelectedLocation]);
+
+  // Memoize loading skeleton count
+  const skeletonCount = useMemo(() => 6, []);
 
   return (
     <LocationErrorBoundary>
@@ -74,11 +89,11 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
           className="flex-1 overflow-y-auto p-4 space-y-4"
         >
           {loading ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">Loading locations...</p>
-              </CardContent>
-            </Card>
+            <LoadingSkeleton 
+              variant="location-card" 
+              count={skeletonCount}
+              className="space-y-4"
+            />
           ) : error ? (
             <Card>
               <CardContent className="p-6 text-center">
@@ -111,6 +126,8 @@ const LocationList: React.FC<LocationListProps> = ({ selectedLocationId }) => {
       </div>
     </LocationErrorBoundary>
   );
-};
+});
+
+LocationList.displayName = 'LocationList';
 
 export default LocationList;

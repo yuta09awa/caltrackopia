@@ -1,11 +1,13 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search, Clock, MapPin, Utensils, ShoppingCart, X, Leaf, CalendarDays, Beef, Apple, Milk } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Ingredient } from '@/models/NutritionalInfo';
+import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 
 interface GlobalSearchProps {
   className?: string;
@@ -40,18 +42,22 @@ const getCategoryIcon = (category?: string) => {
   return <Search className="h-4 w-4 text-muted-foreground" />;
 };
 
-const GlobalSearch = ({ 
+const GlobalSearch = React.memo<GlobalSearchProps>(({ 
   className, 
   onSelectIngredient, 
   onSearchReset,
   displayValue = "",
   compact = false 
-}: GlobalSearchProps) => {
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Debounce search term for API calls (300ms delay)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  
   const { data: results = [], isLoading: loading, isError, error } = useIngredientSearch(
-    { term: searchTerm }, 
-    { enabled: searchTerm.length > 2 }
+    { term: debouncedSearchTerm }, 
+    { enabled: debouncedSearchTerm.length > 2 }
   );
   const { searchHistory, addToHistory } = useSearchHistory();
   const searchRef = useRef<HTMLDivElement>(null);
@@ -61,30 +67,30 @@ const GlobalSearch = ({
     setSearchTerm(displayValue);
   }, [displayValue]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchTerm(query);
     setIsOpen(true);
-  };
+  }, []);
 
-  const handleFocus = () => {
+  const handleFocus = useCallback(() => {
     // If there's a displayed value (active search), clear it to start new search
     if (displayValue && onSearchReset) {
       onSearchReset();
       setSearchTerm('');
     }
     setIsOpen(true);
-  };
+  }, [displayValue, onSearchReset]);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     if (onSearchReset) {
       onSearchReset();
     }
     setSearchTerm('');
     setIsOpen(false);
-  };
+  }, [onSearchReset]);
 
-  const handleSelectIngredient = (ingredient: Ingredient) => {
+  const handleSelectIngredient = useCallback((ingredient: Ingredient) => {
     // Add to search history
     addToHistory({
       id: ingredient.id,
@@ -99,9 +105,9 @@ const GlobalSearch = ({
     if (onSelectIngredient) {
       onSelectIngredient(ingredient);
     }
-  };
+  }, [addToHistory, onSelectIngredient]);
 
-  const handleSelectHistoryItem = (historyItem: any) => {
+  const handleSelectHistoryItem = useCallback((historyItem: any) => {
     setIsOpen(false);
     
     // Create a mock ingredient object for compatibility with the new Ingredient model
@@ -119,7 +125,7 @@ const GlobalSearch = ({
     if (onSelectIngredient) {
       onSelectIngredient(ingredient);
     }
-  };
+  }, [onSelectIngredient]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -133,7 +139,15 @@ const GlobalSearch = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const showDropdown = isOpen && (results.length > 0 || searchHistory.length > 0 || searchTerm.length >= 2);
+  // Memoize dropdown visibility calculation
+  const showDropdown = useMemo(() => 
+    isOpen && (results.length > 0 || searchHistory.length > 0 || debouncedSearchTerm.length >= 2),
+    [isOpen, results.length, searchHistory.length, debouncedSearchTerm.length]
+  );
+
+  // Show loading state when typing but before debounced search
+  const isTyping = searchTerm !== debouncedSearchTerm && searchTerm.length > 2;
+  const showLoading = loading || isTyping;
 
   return (
     <div className={cn("relative w-full", className)} ref={searchRef}>
@@ -162,7 +176,7 @@ const GlobalSearch = ({
           </button>
         )}
         
-        {loading && !displayValue && (
+        {showLoading && !displayValue && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
@@ -171,8 +185,13 @@ const GlobalSearch = ({
 
       {showDropdown && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
+          {/* Loading State */}
+          {showLoading && debouncedSearchTerm.length >= 2 && (
+            <LoadingSkeleton variant="search-dropdown" />
+          )}
+
           {/* Search Results */}
-          {results.length > 0 && (
+          {!showLoading && results.length > 0 && (
             <div className="p-2">
               <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Search Results</div>
               {results.map((ingredient) => (
@@ -232,7 +251,7 @@ const GlobalSearch = ({
           )}
 
           {/* Search History */}
-          {searchHistory.length > 0 && results.length === 0 && searchTerm.length < 2 && (
+          {!showLoading && searchHistory.length > 0 && results.length === 0 && debouncedSearchTerm.length < 2 && (
             <div className="p-2">
               <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Recent Searches</div>
               {searchHistory.slice(0, 5).map((item) => (
@@ -258,15 +277,17 @@ const GlobalSearch = ({
           )}
 
           {/* No Results */}
-          {results.length === 0 && searchTerm.length >= 2 && !loading && (
+          {!showLoading && results.length === 0 && debouncedSearchTerm.length >= 2 && (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              No ingredients found for "{searchTerm}"
+              No ingredients found for "{debouncedSearchTerm}"
             </div>
           )}
         </div>
       )}
     </div>
   );
-};
+});
+
+GlobalSearch.displayName = 'GlobalSearch';
 
 export default GlobalSearch;

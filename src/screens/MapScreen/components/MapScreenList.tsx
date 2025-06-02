@@ -9,7 +9,7 @@ interface MapScreenListProps {
   onScroll: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
-const MapScreenList: React.FC<MapScreenListProps> = ({
+const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   listRef,
   selectedLocationId,
   onScroll
@@ -31,6 +31,8 @@ const MapScreenList: React.FC<MapScreenListProps> = ({
       <LocationList selectedLocationId={selectedLocationId} />
     </div>
   );
-};
+});
+
+MapScreenList.displayName = 'MapScreenList';
 
 export default MapScreenList;

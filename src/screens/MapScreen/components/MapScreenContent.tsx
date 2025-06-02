@@ -22,7 +22,7 @@ interface MapScreenContentProps {
   onViewDetails: (locationId: string) => void;
 }
 
-const MapScreenContent: React.FC<MapScreenContentProps> = ({
+const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
   mapHeight,
   selectedIngredient,
   currentSearchQuery,
@@ -61,6 +61,8 @@ const MapScreenContent: React.FC<MapScreenContentProps> = ({
       )}
     </div>
   );
-};
+});
+
+MapScreenContent.displayName = 'MapScreenContent';
 
 export default MapScreenContent;
