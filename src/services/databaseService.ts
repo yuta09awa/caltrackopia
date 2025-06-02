@@ -105,7 +105,7 @@ export interface PlaceIngredient {
   ingredient?: Ingredient;
 }
 
-class DatabaseService {
+export class DatabaseService {
   // Places queries
   async getPlaceById(placeId: string): Promise<EnhancedPlace | null> {
     const { data, error } = await supabase
@@ -184,37 +184,77 @@ class DatabaseService {
     return (data || []).map(place => this.transformToEnhancedPlace(place));
   }
 
-  // Enhanced ingredient queries - using mock data since ingredients table doesn't exist yet
+  // Ingredient queries - will throw errors until ingredients table is implemented
   async getAllIngredients(): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning mock data');
-    return this.getMockIngredients();
+    const { data, error } = await supabase
+      .from('ingredients')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching ingredients:', error);
+      throw new Error('Ingredients table not available yet');
+    }
+
+    return data || [];
   }
 
   async searchIngredients(query: string, limit: number = 20): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning filtered mock data');
-    return this.getMockIngredients().filter(ing => 
-      ing.name.toLowerCase().includes(query.toLowerCase()) ||
-      ing.category.toLowerCase().includes(query.toLowerCase()) ||
-      ing.common_names.some(name => name.toLowerCase().includes(query.toLowerCase()))
-    ).slice(0, limit);
+    const { data, error } = await supabase
+      .from('ingredients')
+      .select('*')
+      .ilike('name', `%${query}%`)
+      .limit(limit);
+
+    if (error) {
+      console.error('Error searching ingredients:', error);
+      throw new Error('Ingredients table not available yet');
+    }
+
+    return data || [];
   }
 
   async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    console.warn('Ingredients table not available yet, returning filtered mock data');
-    return this.getMockIngredients().filter(ing => 
-      ing.category.toLowerCase() === category.toLowerCase()
-    );
+    const { data, error } = await supabase
+      .from('ingredients')
+      .select('*')
+      .eq('category', category);
+
+    if (error) {
+      console.error('Error fetching ingredients by category:', error);
+      throw new Error('Ingredients table not available yet');
+    }
+
+    return data || [];
   }
 
   async getIngredientById(ingredientId: string): Promise<Ingredient | null> {
-    console.warn('Ingredients table not available yet, returning mock data');
-    return this.getMockIngredients().find(ing => ing.id === ingredientId) || null;
+    const { data, error } = await supabase
+      .from('ingredients')
+      .select('*')
+      .eq('id', ingredientId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching ingredient by ID:', error);
+      return null;
+    }
+
+    return data;
   }
 
   // Menu items queries
   async getMenuItemsByPlace(placeId: string): Promise<MenuItem[]> {
-    console.warn('Menu items table not available yet, returning mock data');
-    return [];
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('place_id', placeId);
+
+    if (error) {
+      console.error('Error fetching menu items:', error);
+      throw new Error('Menu items table not available yet');
+    }
+
+    return data || [];
   }
 
   async searchMenuItems(
@@ -223,156 +263,86 @@ class DatabaseService {
     allergenFree?: string[],
     limit: number = 20
   ): Promise<MenuItem[]> {
-    console.warn('Menu items table not available yet, returning mock data');
-    return [];
+    let queryBuilder = supabase
+      .from('menu_items')
+      .select('*')
+      .ilike('name', `%${query}%`)
+      .limit(limit);
+
+    if (dietaryTags && dietaryTags.length > 0) {
+      queryBuilder = queryBuilder.overlaps('dietary_tags', dietaryTags);
+    }
+
+    if (allergenFree && allergenFree.length > 0) {
+      queryBuilder = queryBuilder.not('allergens', 'cs', `{${allergenFree.join(',')}}`);
+    }
+
+    const { data, error } = await queryBuilder;
+
+    if (error) {
+      console.error('Error searching menu items:', error);
+      throw new Error('Menu items table not available yet');
+    }
+
+    return data || [];
   }
 
   // Place ingredients queries
   async getPlaceIngredients(placeId: string): Promise<PlaceIngredient[]> {
-    console.warn('Place ingredients table not available yet, returning mock data');
-    return [];
+    const { data, error } = await supabase
+      .from('place_ingredients')
+      .select('*, ingredient:ingredients(*)')
+      .eq('place_id', placeId);
+
+    if (error) {
+      console.error('Error fetching place ingredients:', error);
+      throw new Error('Place ingredients table not available yet');
+    }
+
+    return data || [];
   }
 
   async getPlacesWithIngredient(ingredientId: string): Promise<PlaceIngredient[]> {
-    console.warn('Place ingredients table not available yet, returning mock data');
-    return [];
+    const { data, error } = await supabase
+      .from('place_ingredients')
+      .select('*, ingredient:ingredients(*)')
+      .eq('ingredient_id', ingredientId);
+
+    if (error) {
+      console.error('Error fetching places with ingredient:', error);
+      throw new Error('Place ingredients table not available yet');
+    }
+
+    return data || [];
   }
 
-  // Enhanced dietary restrictions queries with fallback data
+  // Dietary restrictions queries
   async getAllDietaryRestrictions(): Promise<DietaryRestriction[]> {
-    try {
-      // Since the dietary_restrictions table doesn't exist in Supabase yet, 
-      // we'll return mock data for now
-      console.warn('Dietary restrictions table not available, using mock data');
-      return this.getMockDietaryRestrictions();
-    } catch (error) {
-      console.warn('Error fetching dietary restrictions, using mock data:', error);
-      return this.getMockDietaryRestrictions();
+    const { data, error } = await supabase
+      .from('dietary_restrictions')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching dietary restrictions:', error);
+      throw new Error('Dietary restrictions table not available yet');
     }
+
+    return data || [];
   }
 
   async getDietaryRestrictionByName(name: string): Promise<DietaryRestriction | null> {
-    try {
-      // Since the dietary_restrictions table doesn't exist in Supabase yet, 
-      // we'll return mock data for now
-      console.warn('Dietary restrictions table not available, using mock data');
-      return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
-    } catch (error) {
-      console.warn('Error fetching dietary restriction by name, using mock data:', error);
-      return this.getMockDietaryRestrictions().find(r => r.name === name) || null;
+    const { data, error } = await supabase
+      .from('dietary_restrictions')
+      .select('*')
+      .eq('name', name)
+      .single();
+
+    if (error) {
+      console.error('Error fetching dietary restriction by name:', error);
+      return null;
     }
-  }
 
-  // Mock ingredients data for fallback
-  private getMockIngredients(): Ingredient[] {
-    return [
-      {
-        id: '1',
-        name: 'Spinach',
-        common_names: ['baby spinach', 'leaf spinach'],
-        category: 'vegetables',
-        calories_per_100g: 23,
-        protein_per_100g: 2.9,
-        carbs_per_100g: 3.6,
-        fat_per_100g: 0.4,
-        fiber_per_100g: 2.2,
-        is_organic: false,
-        is_local: true,
-        is_seasonal: true,
-        allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten-free'],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: '2',
-        name: 'Quinoa',
-        common_names: ['quinoa grain', 'superfood grain'],
-        category: 'grains',
-        calories_per_100g: 368,
-        protein_per_100g: 14.1,
-        carbs_per_100g: 64.2,
-        fat_per_100g: 6.1,
-        fiber_per_100g: 7.0,
-        is_organic: true,
-        is_local: false,
-        is_seasonal: false,
-        allergens: [],
-        dietary_restrictions: ['vegan', 'vegetarian', 'gluten-free'],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    ];
-  }
-
-  // Mock dietary restrictions for fallback
-  private getMockDietaryRestrictions(): DietaryRestriction[] {
-    return [
-      {
-        id: '1',
-        name: 'Vegan',
-        description: 'No animal products',
-        excluded_ingredients: ['meat', 'dairy', 'eggs', 'honey'],
-        excluded_allergens: ['dairy', 'eggs'],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '2',
-        name: 'Vegetarian',
-        description: 'No meat or fish',
-        excluded_ingredients: ['meat', 'fish', 'poultry'],
-        excluded_allergens: [],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '3',
-        name: 'Gluten Free',
-        description: 'No gluten-containing grains',
-        excluded_ingredients: ['wheat', 'barley', 'rye', 'oats'],
-        excluded_allergens: ['gluten'],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '4',
-        name: 'Dairy Free',
-        description: 'No dairy products',
-        excluded_ingredients: ['milk', 'cheese', 'butter', 'cream'],
-        excluded_allergens: ['dairy'],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '5',
-        name: 'Nut Free',
-        description: 'No tree nuts or peanuts',
-        excluded_ingredients: ['almonds', 'walnuts', 'peanuts', 'cashews'],
-        excluded_allergens: ['nuts', 'peanuts'],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '6',
-        name: 'Kosher',
-        description: 'Follows Jewish dietary laws',
-        excluded_ingredients: ['pork', 'shellfish', 'non-kosher meat'],
-        excluded_allergens: [],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '7',
-        name: 'Halal',
-        description: 'Follows Islamic dietary laws',
-        excluded_ingredients: ['pork', 'alcohol', 'non-halal meat'],
-        excluded_allergens: [],
-        created_at: new Date().toISOString()
-      },
-      {
-        id: '8',
-        name: 'Paleo',
-        description: 'Paleolithic diet - no processed foods',
-        excluded_ingredients: ['grains', 'legumes', 'dairy', 'processed_sugar'],
-        excluded_allergens: ['gluten', 'dairy'],
-        created_at: new Date().toISOString()
-      }
-    ];
+    return data;
   }
 
   // Cache statistics
@@ -454,14 +424,32 @@ class DatabaseService {
 
   // NEW METHOD: Get menu items by place internal UUID
   async getMenuItemsByPlaceId(placeId: string): Promise<MenuItem[]> {
-    console.warn('Menu items table not available yet, returning empty array');
-    return [];
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('place_id', placeId);
+
+    if (error) {
+      console.error('Error fetching menu items by place ID:', error);
+      throw new Error('Menu items table not available yet');
+    }
+
+    return data || [];
   }
 
   // NEW METHOD: Get place ingredients by place internal UUID
   async getPlaceIngredientsByPlaceId(placeId: string): Promise<PlaceIngredient[]> {
-    console.warn('Place ingredients table not available yet, returning empty array');
-    return [];
+    const { data, error } = await supabase
+      .from('place_ingredients')
+      .select('*, ingredient:ingredients(*)')
+      .eq('place_id', placeId);
+
+    if (error) {
+      console.error('Error fetching place ingredients by place ID:', error);
+      throw new Error('Place ingredients table not available yet');
+    }
+
+    return data || [];
   }
 }
 
