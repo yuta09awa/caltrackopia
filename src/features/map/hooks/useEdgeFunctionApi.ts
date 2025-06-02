@@ -25,15 +25,18 @@ export const useEdgeFunctionApi = () => {
       try {
         console.log(`Calling edge function ${functionName}, attempt ${attempt + 1}`, payload);
         
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
-        const { data, error } = await supabase.functions.invoke(functionName, {
-          body: payload,
-          signal: controller.signal
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout')), timeout);
         });
         
-        clearTimeout(timeoutId);
+        // Create the function call promise
+        const functionPromise = supabase.functions.invoke(functionName, {
+          body: payload
+        });
+        
+        // Race between timeout and function call
+        const { data, error } = await Promise.race([functionPromise, timeoutPromise]) as any;
         
         if (error) {
           throw new Error(`Edge function error: ${error.message}`);
@@ -46,8 +49,8 @@ export const useEdgeFunctionApi = () => {
         lastError = error instanceof Error ? error : new Error('Unknown error');
         console.warn(`Edge function ${functionName} attempt ${attempt + 1} failed:`, lastError);
         
-        // Don't retry on certain types of errors
-        if (error instanceof Error && error.name === 'AbortError') {
+        // Don't retry on timeout errors
+        if (error instanceof Error && error.message === 'Timeout') {
           throw new Error(`Edge function ${functionName} timed out after ${timeout}ms`);
         }
         
