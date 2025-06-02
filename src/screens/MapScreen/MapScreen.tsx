@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Navbar from "@/components/layout/Navbar";
 import MapContainer from "@/features/map/components/MapContainer";
@@ -235,7 +236,7 @@ const MapScreen = () => {
           />
         </div>
         <div className="hidden sm:block">
-          <CacheStatusIndicator />
+          <CacheStatusIndicator cacheHitRate={null} />
         </div>
       </Navbar>
       
@@ -273,7 +274,7 @@ const MapScreen = () => {
           </div>
           
           <div className="sm:hidden px-4 pb-2">
-            <CacheStatusIndicator />
+            <CacheStatusIndicator cacheHitRate={null} />
           </div>
           
           <LocationList selectedLocationId={mapState.selectedLocationId} />
