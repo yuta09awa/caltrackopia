@@ -35,9 +35,6 @@ const CacheStatusIndicator: React.FC = () => {
       <Badge variant={hitRate > 80 ? "default" : hitRate > 60 ? "secondary" : "destructive"}>
         Cache: {hitRate.toFixed(0)}%
       </Badge>
-      <span className="text-muted-foreground">
-        {stats.total_places} places cached
-      </span>
       {cacheHitRate !== null && (
         <Badge variant="outline">
           Session: {(cacheHitRate * 100).toFixed(0)}%
