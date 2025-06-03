@@ -1,7 +1,7 @@
 
 import React from 'react';
-import MapContainer from "@/features/map/components/MapContainer";
-import MapInfoCard from "@/features/map/components/MapInfoCard";
+import MapScreenMap from './MapScreenMap';
+import MapScreenInfoCard from './MapScreenInfoCard';
 import { Ingredient } from "@/models/NutritionalInfo";
 import { Location } from "@/features/locations/types";
 import { MapState, LatLng } from "@/features/map/hooks/useMapState";
@@ -39,26 +39,24 @@ const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
 }) => {
   return (
     <div className="relative">
-      <MapContainer 
-        height={mapHeight}
+      <MapScreenMap
+        mapHeight={mapHeight}
         selectedIngredient={selectedIngredient}
-        onLocationSelect={onLocationSelect}
-        selectedLocationId={mapState.selectedLocationId}
-        onMarkerClick={onMarkerClick}
+        currentSearchQuery={currentSearchQuery}
         mapState={mapState}
-        searchQuery={currentSearchQuery}
+        onLocationSelect={onLocationSelect}
+        onMarkerClick={onMarkerClick}
         onMapLoaded={onMapLoaded}
         onMapIdle={onMapIdle}
       />
       
-      {showInfoCard && selectedLocation && (selectedLocation.type === "Restaurant" || selectedLocation.type === "Grocery") && (
-        <MapInfoCard
-          location={selectedLocation}
-          position={infoCardPosition}
-          onClose={onInfoCardClose}
-          onViewDetails={onViewDetails}
-        />
-      )}
+      <MapScreenInfoCard
+        showInfoCard={showInfoCard}
+        selectedLocation={selectedLocation}
+        infoCardPosition={infoCardPosition}
+        onInfoCardClose={onInfoCardClose}
+        onViewDetails={onViewDetails}
+      />
     </div>
   );
 });

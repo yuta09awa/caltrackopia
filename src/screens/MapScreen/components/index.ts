@@ -1,4 +1,3 @@
-
-export { default as MapScreenHeader } from './MapScreenHeader';
-export { default as MapScreenContent } from './MapScreenContent';
-export { default as MapScreenList } from './MapScreenList';
+export { MapScreenHeader, MapScreenContent, MapScreenList } from './MapScreenComponents';
+export { default as MapScreenMap } from './MapScreenMap';
+export { default as MapScreenInfoCard } from './MapScreenInfoCard';
