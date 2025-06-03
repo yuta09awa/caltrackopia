@@ -1,4 +1,3 @@
-
 import { Location, RestaurantCustomData, MarketCustomData } from "@/models/Location";
 import { locationService } from "./locationService";
 import { databaseService } from "./databaseService";
@@ -6,6 +5,14 @@ import { mockLocations } from "@/features/locations/data/mockLocations";
 
 export class HybridLocationService {
   
+  /**
+   * Check if a string is a valid UUID format
+   */
+  private isValidUUID(str: string): boolean {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  }
+
   /**
    * Get location with both Google Places data and custom restaurant data
    */
@@ -16,33 +23,43 @@ export class HybridLocationService {
       let baseLocation: Location | null = null;
       let dbPlace: any = null;
 
-      // Step 1: Try to fetch by database UUID (primary method)
-      console.log(`[HybridLocationService] Step 1: Trying database lookup by UUID: ${locationId}`);
-      dbPlace = await databaseService.getCachedPlaceById(locationId);
-      
-      if (dbPlace) {
-        console.log(`[HybridLocationService] Found DB entry by UUID: ${locationId}`);
-        baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
-      } else {
-        // Step 2: Try to fetch by Google place_id (fallback for legacy data)
-        console.log(`[HybridLocationService] Step 2: Trying database lookup by place_id: ${locationId}`);
-        dbPlace = await databaseService.getPlaceById(locationId);
+      // Step 1: Check if this is a mock location ID first (non-UUID format)
+      if (!this.isValidUUID(locationId)) {
+        console.log(`[HybridLocationService] Non-UUID ID detected, checking mock data: ${locationId}`);
+        const mockLocation = mockLocations.find(loc => loc.id === locationId);
         
-        if (dbPlace) {
-          console.log(`[HybridLocationService] Found DB entry by place_id: ${locationId}`);
-          baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
+        if (mockLocation) {
+          console.log(`[HybridLocationService] Found mock data for ID: ${locationId}`);
+          baseLocation = JSON.parse(JSON.stringify(mockLocation)) as Location;
         } else {
-          // Step 3: Fallback to mock data
-          console.log(`[HybridLocationService] Step 3: Trying mock data lookup: ${locationId}`);
-          const mockLocation = mockLocations.find(loc => loc.id === locationId);
+          console.log(`[HybridLocationService] Mock location not found for ID: ${locationId}`);
+          return null;
+        }
+      } else {
+        // Step 2: Try to fetch by database UUID (for valid UUIDs)
+        console.log(`[HybridLocationService] UUID format detected, trying database lookup: ${locationId}`);
+        try {
+          dbPlace = await databaseService.getCachedPlaceById(locationId);
           
-          if (mockLocation) {
-            console.log(`[HybridLocationService] Found mock data for ID: ${locationId}`);
-            baseLocation = JSON.parse(JSON.stringify(mockLocation)) as Location;
+          if (dbPlace) {
+            console.log(`[HybridLocationService] Found DB entry by UUID: ${locationId}`);
+            baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
           } else {
-            console.error(`[HybridLocationService] Location not found in DB or mock data: ${locationId}`);
-            return null;
+            // Step 3: Try to fetch by Google place_id (fallback for legacy data)
+            console.log(`[HybridLocationService] Trying database lookup by place_id: ${locationId}`);
+            dbPlace = await databaseService.getPlaceById(locationId);
+            
+            if (dbPlace) {
+              console.log(`[HybridLocationService] Found DB entry by place_id: ${locationId}`);
+              baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
+            } else {
+              console.error(`[HybridLocationService] Location not found in database: ${locationId}`);
+              return null;
+            }
           }
+        } catch (dbError) {
+          console.error(`[HybridLocationService] Database error for UUID ${locationId}:`, dbError);
+          return null;
         }
       }
 
