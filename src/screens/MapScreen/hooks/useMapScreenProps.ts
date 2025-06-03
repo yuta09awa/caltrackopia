@@ -16,10 +16,10 @@ interface UseMapScreenPropsParams {
   listRef: React.RefObject<HTMLDivElement>;
   wrappedHandleSelectIngredient: (ingredient: Ingredient) => Promise<void>;
   wrappedHandleSearchReset: () => void;
-  wrappedHandleLocationSelect: (locationId: string) => void;
-  wrappedHandleMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
-  wrappedHandleInfoCardClose: () => void;
-  wrappedHandleViewDetails: (locationId: string) => void;
+  handleLocationSelect: (locationId: string) => void;
+  handleMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
+  handleInfoCardClose: () => void;
+  handleViewDetails: (locationId: string) => void;
   handleMapLoaded: (map: google.maps.Map) => Promise<void>;
   handleMapIdle: (center: { lat: number; lng: number }, zoom: number) => void;
   handleScroll: (e: React.UIEvent<HTMLDivElement>) => void;
@@ -37,10 +37,10 @@ export const useMapScreenProps = ({
   listRef,
   wrappedHandleSelectIngredient,
   wrappedHandleSearchReset,
-  wrappedHandleLocationSelect,
-  wrappedHandleMarkerClick,
-  wrappedHandleInfoCardClose,
-  wrappedHandleViewDetails,
+  handleLocationSelect,
+  handleMarkerClick,
+  handleInfoCardClose,
+  handleViewDetails,
   handleMapLoaded,
   handleMapIdle,
   handleScroll
@@ -61,12 +61,12 @@ export const useMapScreenProps = ({
     showInfoCard,
     selectedLocation,
     infoCardPosition,
-    onLocationSelect: wrappedHandleLocationSelect,
-    onMarkerClick: wrappedHandleMarkerClick,
+    onLocationSelect: handleLocationSelect,
+    onMarkerClick: handleMarkerClick,
     onMapLoaded: handleMapLoaded,
     onMapIdle: handleMapIdle,
-    onInfoCardClose: wrappedHandleInfoCardClose,
-    onViewDetails: wrappedHandleViewDetails
+    onInfoCardClose: handleInfoCardClose,
+    onViewDetails: handleViewDetails
   }), [
     mapHeight,
     selectedIngredient,
@@ -75,12 +75,12 @@ export const useMapScreenProps = ({
     showInfoCard,
     selectedLocation,
     infoCardPosition,
-    wrappedHandleLocationSelect,
-    wrappedHandleMarkerClick,
+    handleLocationSelect,
+    handleMarkerClick,
     handleMapLoaded,
     handleMapIdle,
-    wrappedHandleInfoCardClose,
-    wrappedHandleViewDetails
+    handleInfoCardClose,
+    handleViewDetails
   ]);
 
   const listProps = useMemo(() => ({
