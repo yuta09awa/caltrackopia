@@ -4,27 +4,14 @@ import { MarkerData } from '../types';
 import { useSearchState } from './useSearchState';
 import { useEdgeFunctionApi } from './useEdgeFunctionApi';
 import { usePlaceFilters } from './usePlaceFilters';
+import { usePlacesApiService } from './usePlacesApiService';
+import { mapPlaceTypeToMarkerType } from '../utils/placeTypeMapper';
 
 export const usePlaceSearch = () => {
   const searchState = useSearchState();
   const { callEdgeFunction } = useEdgeFunctionApi();
   const { applyFilters } = usePlaceFilters();
-
-  const waitForPlacesApi = useCallback(async (): Promise<boolean> => {
-    const maxAttempts = 10;
-    let attempts = 0;
-    
-    while (attempts < maxAttempts) {
-      if (window.google?.maps?.places?.PlacesService) {
-        return true;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
-    }
-    
-    console.error('Places API not available after waiting');
-    return false;
-  }, []);
+  const { waitForPlacesApi } = usePlacesApiService();
 
   const searchPlacesByText = useCallback(async (
     map: google.maps.Map,
@@ -266,15 +253,6 @@ export const usePlaceSearch = () => {
       return [];
     }
   }, [callEdgeFunction, searchState]);
-
-  const mapPlaceTypeToMarkerType = (placeType: string): 'restaurant' | 'grocery' | 'search-result' => {
-    const restaurantTypes = ['restaurant', 'cafe', 'bakery', 'bar', 'fast_food', 'food_court'];
-    const groceryTypes = ['grocery_store', 'convenience_store', 'specialty_food_store', 'farmers_market'];
-    
-    if (restaurantTypes.includes(placeType)) return 'restaurant';
-    if (groceryTypes.includes(placeType)) return 'grocery';
-    return 'search-result';
-  };
 
   return {
     searchPlacesByText,
