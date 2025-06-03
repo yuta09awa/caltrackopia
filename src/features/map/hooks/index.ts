@@ -13,3 +13,5 @@ export { useUserLocation } from './useUserLocation';
 export { useMapMarkers } from './useMapMarkers';
 export { useMapOptions } from './useMapOptions';
 export { useMapCamera } from './useMapCamera';
+export { usePlacesApi } from './usePlacesApi';
+export { useMapApi } from './useMapApi';
