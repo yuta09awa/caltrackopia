@@ -10,3 +10,6 @@ export { useEdgeFunctionApi } from './useEdgeFunctionApi';
 export { useSearchState } from './useSearchState';
 export { useMapState } from './useMapState';
 export { useUserLocation } from './useUserLocation';
+export { useMapMarkers } from './useMapMarkers';
+export { useMapOptions } from './useMapOptions';
+export { useMapCamera } from './useMapCamera';
