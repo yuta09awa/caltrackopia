@@ -33,6 +33,7 @@ const MapScreen = () => {
     selectedLocation: state.selectedLocation,
     infoCardPosition: state.infoCardPosition,
     listRef: state.listRef,
+    handleScroll: state.handleScroll,
     ...callbacks
   });
 

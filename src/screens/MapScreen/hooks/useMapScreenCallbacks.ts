@@ -77,7 +77,8 @@ export const useMapScreenCallbacks = ({
   }, [handleViewDetails, stableDependencies, wrappedHandleInfoCardClose]);
 
   const handleMapLoaded = useCallback(async (map: google.maps.Map) => {
-    mapRef.current = map;
+    // Use a type assertion to allow assignment to the ref
+    (mapRef as React.MutableRefObject<google.maps.Map | null>).current = map;
     
     if (!currentSearchQuery) {
       try {
