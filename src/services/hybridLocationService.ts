@@ -1,18 +1,11 @@
+
 import { Location, RestaurantCustomData, MarketCustomData } from "@/models/Location";
 import { locationService } from "./locationService";
-import { databaseService } from "./databaseService";
-import { mockLocations } from "@/features/locations/data/mockLocations";
+import { locationResolverService } from "./locationResolverService";
+import { customDataService } from "./customDataService";
 
 export class HybridLocationService {
   
-  /**
-   * Check if a string is a valid UUID format
-   */
-  private isValidUUID(str: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(str);
-  }
-
   /**
    * Get location with both Google Places data and custom restaurant data
    */
@@ -20,48 +13,7 @@ export class HybridLocationService {
     console.log(`[HybridLocationService] Attempting to get enriched location for ID: ${locationId}`);
     
     try {
-      let baseLocation: Location | null = null;
-      let dbPlace: any = null;
-
-      // Step 1: Check if this is a mock location ID first (non-UUID format)
-      if (!this.isValidUUID(locationId)) {
-        console.log(`[HybridLocationService] Non-UUID ID detected, checking mock data: ${locationId}`);
-        const mockLocation = mockLocations.find(loc => loc.id === locationId);
-        
-        if (mockLocation) {
-          console.log(`[HybridLocationService] Found mock data for ID: ${locationId}`);
-          baseLocation = JSON.parse(JSON.stringify(mockLocation)) as Location;
-        } else {
-          console.log(`[HybridLocationService] Mock location not found for ID: ${locationId}`);
-          return null;
-        }
-      } else {
-        // Step 2: Try to fetch by database UUID (for valid UUIDs)
-        console.log(`[HybridLocationService] UUID format detected, trying database lookup: ${locationId}`);
-        try {
-          dbPlace = await databaseService.getCachedPlaceById(locationId);
-          
-          if (dbPlace) {
-            console.log(`[HybridLocationService] Found DB entry by UUID: ${locationId}`);
-            baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
-          } else {
-            // Step 3: Try to fetch by Google place_id (fallback for legacy data)
-            console.log(`[HybridLocationService] Trying database lookup by place_id: ${locationId}`);
-            dbPlace = await databaseService.getPlaceById(locationId);
-            
-            if (dbPlace) {
-              console.log(`[HybridLocationService] Found DB entry by place_id: ${locationId}`);
-              baseLocation = locationService.mapCachedPlaceToLocation(dbPlace);
-            } else {
-              console.error(`[HybridLocationService] Location not found in database: ${locationId}`);
-              return null;
-            }
-          }
-        } catch (dbError) {
-          console.error(`[HybridLocationService] Database error for UUID ${locationId}:`, dbError);
-          return null;
-        }
-      }
+      const { location: baseLocation, dbPlace } = await locationResolverService.resolveLocation(locationId);
 
       if (!baseLocation) {
         console.error(`[HybridLocationService] Base location is null after all lookups for ID: ${locationId}`);
@@ -76,9 +28,9 @@ export class HybridLocationService {
       let customData: RestaurantCustomData | MarketCustomData | undefined = undefined;
 
       if (isRestaurantType) {
-        customData = await this.getCustomRestaurantData(baseLocation.id, dbPlace);
+        customData = await customDataService.getCustomRestaurantData(baseLocation.id, dbPlace);
       } else if (isGroceryType) {
-        customData = await this.getCustomGroceryData(baseLocation.id, dbPlace);
+        customData = await customDataService.getCustomGroceryData(baseLocation.id, dbPlace);
       }
 
       return {
@@ -88,100 +40,6 @@ export class HybridLocationService {
 
     } catch (error) {
       console.error(`[HybridLocationService] Error getting enriched location for ID ${locationId}:`, error);
-      return null;
-    }
-  }
-
-  /**
-   * SIMPLIFIED: Get custom restaurant data with proper fallback handling
-   */
-  async getCustomRestaurantData(placeId: string, dbPlace: any | null): Promise<RestaurantCustomData | null> {
-    console.log(`[HybridLocationService] Getting custom restaurant data for ID: ${placeId}, from DB: ${!!dbPlace}`);
-    
-    try {
-      if (dbPlace) {
-        // Fetch from database (when tables are available)
-        const menuItems = await databaseService.getMenuItemsByPlaceId(dbPlace.id);
-        // Since tables don't exist yet, this will return empty arrays
-        return {
-          id: placeId,
-          businessOwnerId: "owner_temp",
-          menuItems: [],
-          featuredItems: [],
-          ingredients: [],
-          specialFeatures: ["Outdoor Seating", "WiFi"],
-          deliveryOptions: [
-            { type: "pickup", isAvailable: true, estimatedTime: "15-20 min" },
-            { type: "delivery", isAvailable: true, estimatedTime: "30-45 min", fee: 3.99, radius: 5 }
-          ],
-          loyaltyProgram: { name: "Rewards", type: "points", description: "Earn points", isActive: true },
-          businessHours: [],
-          isVerified: dbPlace.verification_count > 0,
-          lastUpdated: dbPlace.last_updated_at,
-        };
-      } else {
-        // Fallback to mock data
-        const mockRestaurant = mockLocations.find(loc => loc.id === placeId && loc.type === "Restaurant");
-        if (mockRestaurant?.customData) {
-          // Ensure we return only RestaurantCustomData
-          const customData = mockRestaurant.customData;
-          if ('menuItems' in customData) {
-            return customData as RestaurantCustomData;
-          }
-        }
-        return null;
-      }
-    } catch (error) {
-      console.error(`[HybridLocationService] Error fetching custom restaurant data:`, error);
-      return null;
-    }
-  }
-
-  /**
-   * SIMPLIFIED: Get custom grocery data with proper fallback handling  
-   */
-  async getCustomGroceryData(placeId: string, dbPlace: any | null): Promise<MarketCustomData | null> {
-    console.log(`[HybridLocationService] Getting custom grocery data for ID: ${placeId}, from DB: ${!!dbPlace}`);
-    
-    try {
-      if (dbPlace) {
-        // Fetch from database (when tables are available)
-        return {
-          id: placeId,
-          description: dbPlace.custom_notes || dbPlace.name,
-          hours: [],
-          features: ["Parking", "Wheelchair Accessible"],
-          vendors: [],
-          events: [],
-          sections: [
-            { name: "Produce", description: "Fresh fruits and vegetables", popular: ["Apples", "Bananas"] }
-          ],
-          highlights: [],
-          isVerified: dbPlace.verification_count > 0,
-          lastUpdated: dbPlace.last_updated_at,
-        };
-      } else {
-        // Fallback to mock data
-        const mockGrocery = mockLocations.find(loc => loc.id === placeId && loc.type === "Grocery");
-        if (mockGrocery?.customData) {
-          // Create a MarketCustomData from the mock data
-          return {
-            id: placeId,
-            description: mockGrocery.description || mockGrocery.name,
-            hours: [],
-            features: [],
-            vendors: [],
-            events: [],
-            sections: [],
-            highlights: [],
-            isVerified: false,
-            lastUpdated: new Date().toISOString(),
-          };
-        }
-        return null;
-      }
-    } catch (error) {
-      console.error(`[HybridLocationService] Error fetching custom grocery data:`, error);
       return null;
     }
   }
@@ -198,7 +56,7 @@ export class HybridLocationService {
       const enrichedLocations = await Promise.all(
         baseLocations.map(async (location) => {
           if (location.type === "Restaurant") {
-            const customData = await this.getCustomRestaurantData(location.id, null);
+            const customData = await customDataService.getCustomRestaurantData(location.id, null);
             if (customData) {
               location.customData = customData;
             }
@@ -218,14 +76,7 @@ export class HybridLocationService {
    * Update custom restaurant data
    */
   async updateCustomRestaurantData(locationId: string, customData: Partial<RestaurantCustomData>): Promise<boolean> {
-    try {
-      // This would typically update your database
-      console.log('Updating custom restaurant data for:', locationId, customData);
-      return true;
-    } catch (error) {
-      console.error('Error updating custom restaurant data:', error);
-      return false;
-    }
+    return customDataService.updateCustomRestaurantData(locationId, customData);
   }
 
   /**
@@ -241,7 +92,7 @@ export class HybridLocationService {
         allLocations
           .filter(loc => loc.type === "Restaurant")
           .map(async (location) => {
-            const customData = await this.getCustomRestaurantData(location.id, null);
+            const customData = await customDataService.getCustomRestaurantData(location.id, null);
             if (customData?.ingredients.some(ing => 
               ing.name.toLowerCase().includes(ingredientName.toLowerCase())
             )) {
