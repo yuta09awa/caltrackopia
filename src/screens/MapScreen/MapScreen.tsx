@@ -23,19 +23,21 @@ const MapScreen = () => {
     stableDependencies: state.stableDependencies
   });
 
-  const props = useMapScreenProps({
-    displayedSearchQuery: state.displayedSearchQuery,
-    mapHeight: state.mapHeight,
-    selectedIngredient: state.selectedIngredient,
-    currentSearchQuery: state.currentSearchQuery,
-    mapState: state.mapState,
-    showInfoCard: state.showInfoCard,
-    selectedLocation: state.selectedLocation,
-    infoCardPosition: state.infoCardPosition,
-    listRef: state.listRef,
-    handleScroll: state.handleScroll,
-    ...callbacks
-  });
+  const props = useMapScreenProps(
+    {
+      displayedSearchQuery: state.displayedSearchQuery,
+      mapHeight: state.mapHeight,
+      selectedIngredient: state.selectedIngredient,
+      currentSearchQuery: state.currentSearchQuery,
+      mapState: state.mapState,
+      showInfoCard: state.showInfoCard,
+      selectedLocation: state.selectedLocation,
+      infoCardPosition: state.infoCardPosition,
+      listRef: state.listRef,
+      handleScroll: state.handleScroll
+    },
+    callbacks
+  );
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">

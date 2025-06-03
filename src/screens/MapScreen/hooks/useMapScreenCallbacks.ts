@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { LatLng } from '@/features/map/hooks/useMapState';
 import { useMapInitialization } from './useMapInitialization';
-import { useMapEventHandlers } from './useMapEventHandlers';
 import { useSearchActions } from './useSearchActions';
+import { useMapScreenHandlers } from './useMapScreenHandlers';
 
 interface UseMapScreenCallbacksProps {
   mapRef: React.RefObject<google.maps.Map | null>;
@@ -34,7 +34,11 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     updateCenter,
     updateZoom,
     userLocation,
-    stableDependencies
+    stableDependencies,
+    handleLocationSelect: baseHandleLocationSelect,
+    handleMarkerClick: baseHandleMarkerClick,
+    handleInfoCardClose: baseHandleInfoCardClose,
+    handleViewDetails: baseHandleViewDetails
   } = props;
 
   const searchActions = useSearchActions({
@@ -53,9 +57,13 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     onSelectIngredient: searchActions.wrappedHandleSelectIngredient
   });
 
-  const eventHandlers = useMapEventHandlers({
+  const eventHandlers = useMapScreenHandlers({
     updateCenter,
     updateZoom,
+    handleLocationSelect: baseHandleLocationSelect,
+    handleMarkerClick: baseHandleMarkerClick,
+    handleInfoCardClose: baseHandleInfoCardClose,
+    handleViewDetails: baseHandleViewDetails,
     stableDependencies
   });
 
