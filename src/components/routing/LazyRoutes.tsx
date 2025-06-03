@@ -10,7 +10,7 @@ export const LazyMarketDetailPage = lazy(() => import('@/pages/MarketDetailPage'
 export const LazyAuthPage = lazy(() => import('@/pages/AuthPage'));
 export const LazyProfilePage = lazy(() => import('@/pages/ProfilePage'));
 export const LazyNotFound = lazy(() => import('@/pages/NotFound'));
-export const LazyHomePage = lazy(() => import('@/pages/HomePage'));
+export const LazyHomePage = lazy(() => import('@/pages/Index'));
 
 // Loading fallback component
 export const RouteLoadingFallback = () => (
