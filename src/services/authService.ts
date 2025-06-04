@@ -6,7 +6,7 @@ export class AuthService {
   static async transformSupabaseUserToUser(supabaseUser: any, profileData: any = null): Promise<User> {
     // If no profile data provided, try to fetch it
     if (!profileData && supabaseUser?.id) {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('profiles')
         .select('*')
         .eq('id', supabaseUser.id)
@@ -56,7 +56,7 @@ export class AuthService {
   }
 
   static async fetchUserProfile(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('profiles')
       .select('*')
       .eq('id', userId)
