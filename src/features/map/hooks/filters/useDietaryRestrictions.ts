@@ -1,21 +1,35 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { databaseService } from '@/services/databaseService';
+import { supabase } from '@/integrations/supabase/client';
 import { FilterOption } from '@/features/map/config/filterConfig';
+
+interface DietaryRestrictionType {
+  id: string;
+  name: string;
+  description: string;
+}
 
 /**
  * Custom hook to fetch all available dietary restrictions from the database.
- * Uses React Query for caching and state management.
+ * Uses React Query for caching and state management with fallback to static options.
  */
 export function useDietaryRestrictions() {
   return useQuery<FilterOption[], Error>({
     queryKey: ['dietaryRestrictions'],
     queryFn: async () => {
       try {
-        const restrictions = await databaseService.getAllDietaryRestrictions();
+        const { data, error } = await supabase
+          .from('dietary_restriction_types')
+          .select('id, name, description')
+          .order('name');
         
+        if (error) {
+          console.warn('Database query failed, using fallback options:', error);
+          throw error;
+        }
+
         // Transform database results to FilterOption format
-        return restrictions.map(restriction => ({
+        return data.map((restriction: DietaryRestrictionType) => ({
           id: restriction.name.toLowerCase().replace(/\s+/g, '-'),
           label: restriction.name
         }));
@@ -36,6 +50,6 @@ export function useDietaryRestrictions() {
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (replaces cacheTime in newer versions)
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }

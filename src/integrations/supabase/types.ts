@@ -117,6 +117,66 @@ export type Database = {
         }
         Relationships: []
       }
+      dietary_restriction_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          excluded_allergens: string[] | null
+          excluded_ingredients: string[] | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          excluded_allergens?: string[] | null
+          excluded_ingredients?: string[] | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          excluded_allergens?: string[] | null
+          excluded_ingredients?: string[] | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nutrition_goal_types: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          target_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          target_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          target_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       search_areas: {
         Row: {
           center_latitude: number
