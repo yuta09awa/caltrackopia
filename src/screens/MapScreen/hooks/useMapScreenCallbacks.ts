@@ -1,17 +1,15 @@
 
 import React, { useCallback } from 'react';
 import { Ingredient } from '@/models/NutritionalInfo';
-import { useSearchActions } from './useSearchActions';
 import { useMapInitialization } from './useMapInitialization';
-import { useMapScreenHandlers } from './useMapScreenHandlers';
 
 interface UseMapScreenCallbacksProps {
   mapRef: React.RefObject<google.maps.Map | null>;
   mapState: any;
   selectedIngredient: Ingredient | null;
   currentSearchQuery: string;
-  handleSelectIngredient: any;
-  handleSearchReset: any;
+  handleSelectIngredient: (ingredient: Ingredient) => Promise<void>;
+  handleSearchReset: () => void;
   updateCenter: any;
   updateZoom: any;
   userLocation: any;
@@ -40,30 +38,12 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     handleViewDetails
   } = props;
 
-  const searchActions = useSearchActions({
-    mapRef,
-    mapState,
-    stableDependencies: dependencies,
-    handleSelectIngredient,
-    handleSearchReset
-  });
-
   const mapInitialization = useMapInitialization({
     currentSearchQuery,
     selectedIngredient,
     mapState,
     stableDependencies: dependencies,
-    onSelectIngredient: searchActions.wrappedHandleSelectIngredient
-  });
-
-  const eventHandlers = useMapScreenHandlers({
-    updateCenter,
-    updateZoom,
-    handleLocationSelect,
-    handleMarkerClick,
-    handleInfoCardClose,
-    handleViewDetails,
-    stableDependencies: dependencies
+    onSelectIngredient: handleSelectIngredient
   });
 
   // User location effect
@@ -78,14 +58,19 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     handleUserLocationUpdate();
   }, [handleUserLocationUpdate]);
 
+  const handleMapIdle = useCallback((center: any, zoom: number) => {
+    updateCenter(center);
+    updateZoom(zoom);
+  }, [updateCenter, updateZoom]);
+
   return {
-    onSelectIngredient: searchActions.wrappedHandleSelectIngredient,
-    onSearchReset: searchActions.wrappedHandleSearchReset,
-    onLocationSelect: eventHandlers.handleLocationSelect,
-    onMarkerClick: eventHandlers.handleMarkerClick,
-    onInfoCardClose: eventHandlers.handleInfoCardClose,
-    onViewDetails: eventHandlers.handleViewDetails,
+    onSelectIngredient: handleSelectIngredient,
+    onSearchReset: handleSearchReset,
+    onLocationSelect: handleLocationSelect,
+    onMarkerClick: handleMarkerClick,
+    onInfoCardClose: handleInfoCardClose,
+    onViewDetails: handleViewDetails,
     onMapLoaded: mapInitialization.handleMapLoaded,
-    onMapIdle: eventHandlers.handleMapIdle
+    onMapIdle: handleMapIdle
   };
 };

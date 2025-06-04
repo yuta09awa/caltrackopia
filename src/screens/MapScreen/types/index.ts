@@ -27,30 +27,36 @@ export interface MapScreenState {
   handleScroll: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
+export interface HeaderProps {
+  displayedSearchQuery: string;
+  onSelectIngredient: (ingredient: Ingredient) => Promise<void>;
+  onSearchReset: () => void;
+}
+
+export interface ContentProps {
+  mapHeight: string;
+  selectedIngredient: Ingredient | null;
+  currentSearchQuery: string;
+  mapState: MapState;
+  showInfoCard: boolean;
+  selectedLocation: Location | null;
+  infoCardPosition: { x: number; y: number };
+  onLocationSelect: (locationId: string) => void;
+  onMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
+  onMapLoaded: (map: google.maps.Map) => Promise<void>;
+  onMapIdle: (center: LatLng, zoom: number) => void;
+  onInfoCardClose: () => void;
+  onViewDetails: (locationId: string) => void;
+}
+
+export interface ListProps {
+  listRef: React.RefObject<HTMLDivElement>;
+  selectedLocationId: string | null;
+  onScroll: (e: React.UIEvent<HTMLDivElement>) => void;
+}
+
 export interface MapScreenProps {
-  headerProps: {
-    displayedSearchQuery: string;
-    onSelectIngredient: (ingredient: Ingredient) => Promise<void>;
-    onSearchReset: () => void;
-  };
-  contentProps: {
-    mapHeight: string;
-    selectedIngredient: Ingredient | null;
-    currentSearchQuery: string;
-    mapState: MapState;
-    showInfoCard: boolean;
-    selectedLocation: Location | null;
-    infoCardPosition: { x: number; y: number };
-    onLocationSelect: (locationId: string) => void;
-    onMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
-    onMapLoaded: (map: google.maps.Map) => Promise<void>;
-    onMapIdle: (center: LatLng, zoom: number) => void;
-    onInfoCardClose: () => void;
-    onViewDetails: (locationId: string) => void;
-  };
-  listProps: {
-    listRef: React.RefObject<HTMLDivElement>;
-    selectedLocationId: string | null;
-    onScroll: (e: React.UIEvent<HTMLDivElement>) => void;
-  };
+  headerProps: HeaderProps;
+  contentProps: ContentProps;
+  listProps: ListProps;
 }
