@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,16 +15,19 @@ import {
 } from "@/components/ui/form";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services/authService";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm: React.FC = () => {
-  const setIsAuthenticated = useAppStore((state) => state.setIsAuthenticated);
+  const { setUser, setAuthLoading, setAuthError } = useAppStore();
+  const [isResetEmailSent, setIsResetEmailSent] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,18 +37,96 @@ const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log("Login attempt with:", data);
-    
-    // Mock authentication - replace with actual authentication when Supabase is integrated
-    setTimeout(() => {
-      setIsAuthenticated(true);
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      setAuthLoading(true);
+      setAuthError(null);
+
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
-    }, 1000);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (authData.user) {
+        const profileData = await AuthService.fetchUserProfile(authData.user.id);
+        const user = await AuthService.transformSupabaseUserToUser(authData.user, profileData);
+        setUser(user);
+        
+        toast({
+          title: "Login successful!",
+          description: "Welcome back!",
+        });
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setAuthError(err.message || "An unexpected error occurred.");
+      toast({
+        title: "Login failed",
+        description: err.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+      setUser(null);
+    } finally {
+      setAuthLoading(false);
+    }
   };
+
+  const handleForgotPassword = async () => {
+    const email = form.getValues('email');
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email to reset password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?reset_password=true`,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setIsResetEmailSent(true);
+      toast({
+        title: "Password reset email sent!",
+        description: "Check your inbox for reset instructions.",
+      });
+    } catch (err: any) {
+      console.error("Password reset error:", err);
+      toast({
+        title: "Reset failed",
+        description: err.message || "Failed to send reset email.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isResetEmailSent) {
+    return (
+      <div className="text-center space-y-4">
+        <h3 className="text-lg font-semibold">Check your email</h3>
+        <p className="text-sm text-muted-foreground">
+          We've sent you a password reset link. Please check your email and follow the instructions.
+        </p>
+        <Button 
+          variant="outline" 
+          onClick={() => setIsResetEmailSent(false)}
+          className="w-full"
+        >
+          Back to login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -70,12 +151,22 @@ const LoginForm: React.FC = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="******" {...field} />
+                <Input type="password" placeholder="Password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="link"
+            className="px-0 h-auto"
+            onClick={handleForgotPassword}
+          >
+            Forgot password?
+          </Button>
+        </div>
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Logging in..." : "Login"}
         </Button>

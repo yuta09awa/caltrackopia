@@ -1,9 +1,16 @@
 
 import { StateCreator } from 'zustand';
+import { User } from '@/models/User';
 
 export interface AuthSlice {
+  user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  setUser: (user: User | null) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
+  setAuthLoading: (isLoading: boolean) => void;
+  setAuthError: (error: string | null) => void;
 }
 
 export const createAuthSlice: StateCreator<
@@ -12,6 +19,12 @@ export const createAuthSlice: StateCreator<
   [],
   AuthSlice
 > = (set) => ({
+  user: null,
   isAuthenticated: false,
+  isLoading: true,
+  error: null,
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+  setAuthLoading: (isLoading) => set({ isLoading }),
+  setAuthError: (error) => set({ error }),
 });

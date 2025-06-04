@@ -1,15 +1,54 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Container } from "@/components/ui/Container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAppStore } from "@/store/appStore";
+import { toast } from "@/hooks/use-toast";
 
 const AuthPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user, isLoading } = useAppStore();
+
+  useEffect(() => {
+    // Redirect authenticated users
+    if (user) {
+      navigate("/");
+      return;
+    }
+
+    // Check for email verification
+    if (searchParams.get("verified") === "true") {
+      toast({
+        title: "Email verified!",
+        description: "Your account has been verified. You can now log in.",
+      });
+    }
+
+    // Check for password reset
+    if (searchParams.get("reset_password") === "true") {
+      toast({
+        title: "Password reset",
+        description: "Please enter your new password.",
+      });
+    }
+  }, [user, navigate, searchParams]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -47,7 +86,7 @@ const AuthPage: React.FC = () => {
                 <LoginForm />
               </TabsContent>
               <TabsContent value="register">
-                <RegisterForm />
+                <RegisterForm onSuccess={() => setActiveTab("login")} />
               </TabsContent>
             </Tabs>
           </CardContent>

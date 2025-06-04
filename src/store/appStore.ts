@@ -35,20 +35,24 @@ export const useAppStore = create<AppState>()(
       ...createCartSlice(...a),
     }),
     {
-      name: 'cart-storage',
+      name: 'caltrackopia-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        // Persist cart items
         items: state.items,
         activeLocationId: state.activeLocationId,
         conflictMode: state.conflictMode,
         total: state.total,
         itemCount: state.itemCount,
         groupedByLocation: state.groupedByLocation,
+        // Persist user authentication and preferences
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        userPreferences: state.userPreferences,
       }),
       version: 1,
       migrate: (persistedState: any, version: number) => {
         if (version === 0) {
-          // Migration logic for future versions
           return persistedState;
         }
         return persistedState;
