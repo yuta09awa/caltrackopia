@@ -1,40 +1,17 @@
 
 import { useMemo } from 'react';
-import { Ingredient } from '@/models/NutritionalInfo';
-import { Location } from '@/features/locations/types';
-import { MapState } from '@/features/map/hooks/useMapState';
+import { MapScreenState, MapScreenCallbacks, MapScreenProps } from '../types';
 
-interface MapScreenCallbacks {
-  wrappedHandleSelectIngredient: (ingredient: Ingredient) => Promise<void>;
-  wrappedHandleSearchReset: () => void;
-  handleLocationSelect: (locationId: string) => void;
-  handleMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
-  handleInfoCardClose: () => void;
-  handleViewDetails: (locationId: string) => void;
-  handleMapLoaded: (map: google.maps.Map) => Promise<void>;
-  handleMapIdle: (center: { lat: number; lng: number }, zoom: number) => void;
-}
-
-interface MapScreenState {
-  displayedSearchQuery: string;
-  mapHeight: string;
-  selectedIngredient: Ingredient | null;
-  currentSearchQuery: string;
-  mapState: MapState;
-  showInfoCard: boolean;
-  selectedLocation: Location | null;
-  infoCardPosition: { x: number; y: number };
-  listRef: React.RefObject<HTMLDivElement>;
-  handleScroll: (e: React.UIEvent<HTMLDivElement>) => void;
-}
-
-export const useMapScreenProps = (state: MapScreenState, callbacks: MapScreenCallbacks) => {
-  // Memoize props objects to prevent unnecessary re-renders
+export const useMapScreenProps = (
+  state: MapScreenState, 
+  callbacks: MapScreenCallbacks
+): MapScreenProps => {
+  
   const headerProps = useMemo(() => ({
     displayedSearchQuery: state.displayedSearchQuery,
-    onSelectIngredient: callbacks.wrappedHandleSelectIngredient,
-    onSearchReset: callbacks.wrappedHandleSearchReset
-  }), [state.displayedSearchQuery, callbacks.wrappedHandleSelectIngredient, callbacks.wrappedHandleSearchReset]);
+    onSelectIngredient: callbacks.onSelectIngredient,
+    onSearchReset: callbacks.onSearchReset
+  }), [state.displayedSearchQuery, callbacks.onSelectIngredient, callbacks.onSearchReset]);
 
   const contentProps = useMemo(() => ({
     mapHeight: state.mapHeight,
@@ -44,12 +21,12 @@ export const useMapScreenProps = (state: MapScreenState, callbacks: MapScreenCal
     showInfoCard: state.showInfoCard,
     selectedLocation: state.selectedLocation,
     infoCardPosition: state.infoCardPosition,
-    onLocationSelect: callbacks.handleLocationSelect,
-    onMarkerClick: callbacks.handleMarkerClick,
-    onMapLoaded: callbacks.handleMapLoaded,
-    onMapIdle: callbacks.handleMapIdle,
-    onInfoCardClose: callbacks.handleInfoCardClose,
-    onViewDetails: callbacks.handleViewDetails
+    onLocationSelect: callbacks.onLocationSelect,
+    onMarkerClick: callbacks.onMarkerClick,
+    onMapLoaded: callbacks.onMapLoaded,
+    onMapIdle: callbacks.onMapIdle,
+    onInfoCardClose: callbacks.onInfoCardClose,
+    onViewDetails: callbacks.onViewDetails
   }), [
     state.mapHeight,
     state.selectedIngredient,
@@ -58,12 +35,12 @@ export const useMapScreenProps = (state: MapScreenState, callbacks: MapScreenCal
     state.showInfoCard,
     state.selectedLocation,
     state.infoCardPosition,
-    callbacks.handleLocationSelect,
-    callbacks.handleMarkerClick,
-    callbacks.handleMapLoaded,
-    callbacks.handleMapIdle,
-    callbacks.handleInfoCardClose,
-    callbacks.handleViewDetails
+    callbacks.onLocationSelect,
+    callbacks.onMarkerClick,
+    callbacks.onMapLoaded,
+    callbacks.onMapIdle,
+    callbacks.onInfoCardClose,
+    callbacks.onViewDetails
   ]);
 
   const listProps = useMemo(() => ({

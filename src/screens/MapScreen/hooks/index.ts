@@ -9,3 +9,4 @@ export { useMapScreenCore } from './useMapScreenCore';
 export { useMapScreenSearch } from './useMapScreenSearch';
 export { useMapScreenUI } from './useMapScreenUI';
 export { useMapScreenHandlers } from './useMapScreenHandlers';
+export { useMapScreenDependencies } from './useMapScreenDependencies';

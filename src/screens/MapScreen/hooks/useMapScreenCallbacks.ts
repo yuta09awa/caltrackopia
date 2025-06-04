@@ -1,9 +1,8 @@
 
-import { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { Ingredient } from '@/models/NutritionalInfo';
-import { LatLng } from '@/features/map/hooks/useMapState';
-import { useMapInitialization } from './useMapInitialization';
 import { useSearchActions } from './useSearchActions';
+import { useMapInitialization } from './useMapInitialization';
 import { useMapScreenHandlers } from './useMapScreenHandlers';
 
 interface UseMapScreenCallbacksProps {
@@ -13,14 +12,14 @@ interface UseMapScreenCallbacksProps {
   currentSearchQuery: string;
   handleSelectIngredient: any;
   handleSearchReset: any;
+  updateCenter: any;
+  updateZoom: any;
+  userLocation: any;
+  dependencies: any;
   handleLocationSelect: any;
   handleMarkerClick: any;
   handleInfoCardClose: any;
   handleViewDetails: any;
-  updateCenter: (center: LatLng) => void;
-  updateZoom: (zoom: number) => void;
-  userLocation: LatLng | null;
-  stableDependencies: any;
 }
 
 export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
@@ -34,17 +33,17 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     updateCenter,
     updateZoom,
     userLocation,
-    stableDependencies,
-    handleLocationSelect: baseHandleLocationSelect,
-    handleMarkerClick: baseHandleMarkerClick,
-    handleInfoCardClose: baseHandleInfoCardClose,
-    handleViewDetails: baseHandleViewDetails
+    dependencies,
+    handleLocationSelect,
+    handleMarkerClick,
+    handleInfoCardClose,
+    handleViewDetails
   } = props;
 
   const searchActions = useSearchActions({
     mapRef,
     mapState,
-    stableDependencies,
+    stableDependencies: dependencies,
     handleSelectIngredient,
     handleSearchReset
   });
@@ -53,29 +52,40 @@ export const useMapScreenCallbacks = (props: UseMapScreenCallbacksProps) => {
     currentSearchQuery,
     selectedIngredient,
     mapState,
-    stableDependencies,
+    stableDependencies: dependencies,
     onSelectIngredient: searchActions.wrappedHandleSelectIngredient
   });
 
   const eventHandlers = useMapScreenHandlers({
     updateCenter,
     updateZoom,
-    handleLocationSelect: baseHandleLocationSelect,
-    handleMarkerClick: baseHandleMarkerClick,
-    handleInfoCardClose: baseHandleInfoCardClose,
-    handleViewDetails: baseHandleViewDetails,
-    stableDependencies
+    handleLocationSelect,
+    handleMarkerClick,
+    handleInfoCardClose,
+    handleViewDetails,
+    stableDependencies: dependencies
   });
 
-  useEffect(() => {
+  // User location effect
+  const handleUserLocationUpdate = useCallback(() => {
     if (userLocation) {
       updateCenter(userLocation);
     }
   }, [userLocation, updateCenter]);
 
+  // Auto-update center when user location changes
+  React.useEffect(() => {
+    handleUserLocationUpdate();
+  }, [handleUserLocationUpdate]);
+
   return {
-    ...searchActions,
-    ...eventHandlers,
-    handleMapLoaded: mapInitialization.handleMapLoaded
+    onSelectIngredient: searchActions.wrappedHandleSelectIngredient,
+    onSearchReset: searchActions.wrappedHandleSearchReset,
+    onLocationSelect: eventHandlers.handleLocationSelect,
+    onMarkerClick: eventHandlers.handleMarkerClick,
+    onInfoCardClose: eventHandlers.handleInfoCardClose,
+    onViewDetails: eventHandlers.handleViewDetails,
+    onMapLoaded: mapInitialization.handleMapLoaded,
+    onMapIdle: eventHandlers.handleMapIdle
   };
 };

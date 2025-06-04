@@ -13,14 +13,14 @@ const MapScreen = () => {
     currentSearchQuery: state.currentSearchQuery,
     handleSelectIngredient: state.handleSelectIngredient,
     handleSearchReset: state.handleSearchReset,
-    handleLocationSelect: state.handleLocationSelect,
-    handleMarkerClick: state.handleMarkerClick,
-    handleInfoCardClose: state.handleInfoCardClose,
-    handleViewDetails: state.handleViewDetails,
     updateCenter: state.updateCenter,
     updateZoom: state.updateZoom,
     userLocation: state.userLocation,
-    stableDependencies: state.stableDependencies
+    dependencies: state.dependencies,
+    handleLocationSelect: state.handleLocationSelect,
+    handleMarkerClick: state.handleMarkerClick,
+    handleInfoCardClose: state.handleInfoCardClose,
+    handleViewDetails: state.handleViewDetails
   });
 
   const props = useMapScreenProps(
