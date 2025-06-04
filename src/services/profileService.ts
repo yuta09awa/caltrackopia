@@ -25,6 +25,29 @@ export interface GeocodeResult {
   formatted_address: string;
 }
 
+// Type for the profiles table (since it's not in the generated types yet)
+interface ProfileRow {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  display_name?: string;
+  avatar_url?: string;
+  phone?: string;
+  date_of_birth?: string;
+  location?: any; // PostGIS geometry type
+  location_address?: string;
+  dietary_restrictions?: string[];
+  nutrition_goals?: string[];
+  privacy_share_location?: boolean;
+  privacy_public_profile?: boolean;
+  notification_email?: boolean;
+  notification_push?: boolean;
+  notification_marketing?: boolean;
+  onboarding_completed?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 class ProfileService {
   private googleMapsApiKey: string | null = null;
 
@@ -91,7 +114,8 @@ class ProfileService {
         updateData.location_address = updates.location_address;
       }
 
-      const { data, error } = await supabase
+      // Use type assertion to work around missing types
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .update(updateData)
         .eq('id', userId)
@@ -137,8 +161,8 @@ class ProfileService {
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Update profile with new avatar URL
-      const { error: updateError } = await supabase
+      // Update profile with new avatar URL using type assertion
+      const { error: updateError } = await (supabase as any)
         .from('profiles')
         .update({ avatar_url: data.publicUrl })
         .eq('id', userId);
@@ -209,7 +233,8 @@ class ProfileService {
   }
 
   async markOnboardingComplete(userId: string): Promise<void> {
-    const { error } = await supabase
+    // Use type assertion to work around missing types
+    const { error } = await (supabase as any)
       .from('profiles')
       .update({ onboarding_completed: true })
       .eq('id', userId);

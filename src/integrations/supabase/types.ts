@@ -177,6 +177,72 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          date_of_birth: string | null
+          dietary_restrictions: string[] | null
+          display_name: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          location: unknown | null
+          location_address: string | null
+          notification_email: boolean | null
+          notification_marketing: boolean | null
+          notification_push: boolean | null
+          nutrition_goals: string[] | null
+          onboarding_completed: boolean | null
+          phone: string | null
+          privacy_public_profile: boolean | null
+          privacy_share_location: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary_restrictions?: string[] | null
+          display_name?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          location?: unknown | null
+          location_address?: string | null
+          notification_email?: boolean | null
+          notification_marketing?: boolean | null
+          notification_push?: boolean | null
+          nutrition_goals?: string[] | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          privacy_public_profile?: boolean | null
+          privacy_share_location?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary_restrictions?: string[] | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          location?: unknown | null
+          location_address?: string | null
+          notification_email?: boolean | null
+          notification_marketing?: boolean | null
+          notification_push?: boolean | null
+          nutrition_goals?: string[] | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          privacy_public_profile?: boolean | null
+          privacy_share_location?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       search_areas: {
         Row: {
           center_latitude: number
