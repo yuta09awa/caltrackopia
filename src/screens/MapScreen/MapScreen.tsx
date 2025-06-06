@@ -11,7 +11,7 @@ const MapScreenLayout: React.FC = () => {
   const mapState = useMapState();
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-background">
+    <div className="flex flex-col min-h-screen w-full bg-background pt-16">
       <MapScreenHeader 
         displayedSearchQuery={searchState.displayedSearchQuery}
         onSelectIngredient={searchState.handleSelectIngredient}
