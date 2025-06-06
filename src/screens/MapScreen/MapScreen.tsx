@@ -18,7 +18,7 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={searchState.handleSearchReset}
       />
       
-      <main className="flex-1 flex flex-col relative w-full">
+      <main className="flex-1 flex flex-col relative w-full mt-16">
         <MapScreenContent
           mapHeight={uiState.mapHeight}
           selectedIngredient={searchState.selectedIngredient}
