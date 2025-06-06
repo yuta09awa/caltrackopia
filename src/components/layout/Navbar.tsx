@@ -41,7 +41,7 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-3",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-2",
         isScrolled
           ? "glass shadow-sm border-b border-gray-200/10"
           : "bg-transparent"
