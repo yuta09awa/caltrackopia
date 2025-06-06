@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
@@ -18,7 +19,7 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={searchState.handleSearchReset}
       />
       
-      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '24px' }}>
+      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '32px' }}>
         <MapScreenContent
           mapHeight={uiState.mapHeight}
           selectedIngredient={searchState.selectedIngredient}
@@ -53,3 +54,4 @@ const MapScreen = () => {
 };
 
 export default MapScreen;
+
