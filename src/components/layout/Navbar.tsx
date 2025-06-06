@@ -1,25 +1,35 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { MapPin, Utensils, User, ShoppingCart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { MapPin, Utensils, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAppStore } from "@/store/appStore";
-import { Button } from "../ui/button";
+import NavItem from "./NavItem";
+import NavButton from "./NavButton";
 
-const Navbar = ({ children }: { children?: React.ReactNode }) => {
+interface MenuItem {
+  name: string;
+  path: string;
+  icon: typeof MapPin;
+}
+
+const menuItems: MenuItem[] = [
+  { name: "Map", path: "/map", icon: MapPin },
+  { name: "Shopping List", path: "/shopping", icon: ShoppingCart },
+  { name: "Nutrition", path: "/nutrition", icon: Utensils },
+];
+
+interface NavbarProps {
+  children?: React.ReactNode;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isAuthenticated, itemCount } = useAppStore();
-
-  const menuItems = [
-    { name: "Map", path: "/map", icon: MapPin },
-    { name: "Shopping List", path: "/shopping", icon: ShoppingCart },
-    { name: "Nutrition", path: "/nutrition", icon: Utensils },
-  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,14 +51,14 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-2 pb-4",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-2 pb-3",
         isScrolled
-          ? "glass shadow-sm border-b border-gray-200/10"
+          ? "glass shadow-sm border-b border-border/10"
           : "bg-transparent"
       )}
     >
       <Container>
-        <nav className="flex items-center justify-between gap-4">
+        <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
           <Link
             to="/"
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
@@ -63,39 +73,20 @@ const Navbar = ({ children }: { children?: React.ReactNode }) => {
 
           {children}
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4" role="group" aria-label="Navigation menu">
             {menuItems.map((item) => (
-              <Link
+              <NavItem
                 key={item.name}
-                to={item.path}
-                className={`flex items-center justify-center w-10 h-10 rounded-full relative ${
-                  location.pathname === item.path
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-gray-100 text-gray-700"
-                } transition-colors`}
-                title={item.name}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.path === "/shopping" && itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {itemCount > 9 ? '9+' : itemCount}
-                  </span>
-                )}
-              </Link>
+                name={item.name}
+                path={item.path}
+                icon={item.icon}
+                badge={item.path === "/shopping" ? itemCount : undefined}
+              />
             ))}
-            <Button
+            <NavButton
+              isAuthenticated={isAuthenticated}
               onClick={handleAuthNavigation}
-              className={`flex items-center justify-center rounded-full w-10 h-10 ${
-                isAuthenticated || location.pathname === '/auth' || location.pathname === '/profile'
-                  ? "bg-primary/10 text-primary hover:bg-primary/20"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              } transition-colors`}
-              variant="ghost"
-              size="icon"
-              title={isAuthenticated ? "My Profile" : "Login / Register"}
-            >
-              <User className="w-5 h-5" />
-            </Button>
+            />
           </div>
         </nav>
       </Container>

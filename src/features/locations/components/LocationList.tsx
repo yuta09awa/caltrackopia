@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { LocationErrorBoundary } from './LocationErrorBoundary';
@@ -69,7 +68,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   return (
     <LocationErrorBoundary>
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 bg-background z-10 border-b">
+        <div className="sticky top-0 bg-background z-10 border-b px-4">
           <LocationListHeader
             totalCount={displayLocations.length}
             sortOption={sortOption}
@@ -86,7 +85,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
         
         <div 
           ref={listContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4"
+          className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
         >
           {loading ? (
             <LoadingSkeleton 
