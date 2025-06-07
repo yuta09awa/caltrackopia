@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen } from "lucide-react";
@@ -18,20 +17,16 @@ interface LocationCardProps {
 }
 
 const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHighlighted = false }) => {
-  // Memoize the detail link calculation
   const detailLink = useMemo(() => {
-    // Only route to markets page for specific grocery subtypes that have market-specific features
     if (location.type.toLowerCase() === "grocery" && 
         location.subType && 
         ["farmers market", "food festival", "convenience store"].includes(location.subType.toLowerCase())) {
       return `/markets/${location.id}`;
     } else {
-      // All restaurants and other location types go to location detail page
       return `/location/${location.id}`;
     }
   }, [location.type, location.subType, location.id]);
 
-  // Memoize highlights check
   const hasHighlights = useMemo(() => {
     if (location.customData && 'highlights' in location.customData) {
       return location.customData.highlights && location.customData.highlights.length > 0;
@@ -39,7 +34,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     return false;
   }, [location.customData]);
 
-  // Memoize highlight types
   const highlightTypes = useMemo(() => {
     if (location.customData && 'highlights' in location.customData && location.customData.highlights) {
       const types = new Set(location.customData.highlights.map(h => h.type));
@@ -48,7 +42,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     return [];
   }, [location.customData]);
 
-  // Memoize highlight badges rendering
   const highlightBadges = useMemo(() => {
     if (highlightTypes.length === 0) return null;
     
@@ -76,7 +69,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     );
   }, [highlightTypes]);
 
-  // Memoize dietary options rendering
   const dietaryOptionsElements = useMemo(() => {
     if (!location.dietaryOptions) return null;
     
@@ -88,7 +80,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   }, [location.dietaryOptions]);
 
   const handleCardClick = useCallback((e: React.MouseEvent) => {
-    // Prevent navigation if clicking on carousel controls or buttons
     const target = e.target as HTMLElement;
     const button = target.closest('button');
     
@@ -105,12 +96,10 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   }, []);
 
   return (
-    <div 
-      className={`block border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative py-1.5 ${
-        isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
-      }`}
-    >
-      {/* Hazy overlay for closed locations - reduced opacity */}
+    <div className={`border-b border-border hover:bg-muted/20 transition-colors cursor-pointer relative ${
+      isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
+    }`}>
+      {/* Hazy overlay for closed locations */}
       {!location.openNow && (
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10" />
       )}
@@ -118,11 +107,11 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
       <Link 
         key={location.id}
         to={detailLink}
-        className="flex"
+        className="flex p-4"
         onClick={handleCardClick}
       >
-        {/* Image Carousel with floating controls - maximized with less spacing */}
-        <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden">
+        {/* Image Carousel */}
+        <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden flex-shrink-0">
           <Carousel className="w-full h-full">
             <CarouselContent className="h-full">
               {location.images.map((image, index) => (
@@ -138,7 +127,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {/* Floating overlay navigation buttons with higher z-index and event prevention */}
             <CarouselPrevious 
               className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
               onClick={handleCarouselClick}
@@ -151,9 +139,9 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
         </div>
         
         {/* Location Details */}
-        <div className="flex-1 min-w-0 p-3 pl-3 sm:p-4 sm:pl-4">
+        <div className="flex-1 min-w-0 ml-4">
           <div className="flex justify-between items-start">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="font-medium text-sm sm:text-base truncate pr-2">{location.name}</h4>
               <div className="flex items-center flex-wrap gap-1 text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                 <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded-full text-xs whitespace-nowrap">
@@ -174,7 +162,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               {/* Show highlight badges if any */}
               {highlightBadges}
             </div>
-            <div className="flex items-center gap-0.5 sm:gap-1 ml-1 flex-shrink-0">
+            <div className="flex items-center gap-0.5 sm:gap-1 ml-2 flex-shrink-0">
               <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500 fill-yellow-500" />
               <span className="font-medium text-xs sm:text-sm">{location.rating}</span>
             </div>

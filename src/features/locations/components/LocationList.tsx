@@ -29,12 +29,10 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
   const listContainerRef = useRef<HTMLDivElement>(null);
   
-  // Memoize display locations calculation
   const displayLocations = useMemo(() => {
     return activeSpoof ? getFilteredLocations() : locations;
   }, [activeSpoof, getFilteredLocations, locations]);
 
-  // Memoize scroll to selected location function
   const scrollToSelectedLocation = useCallback((locationId: string) => {
     if (!listContainerRef.current) return;
     
@@ -45,7 +43,6 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
         block: 'center' 
       });
       
-      // Add a temporary highlight effect
       locationElement.classList.add('bg-primary/10', 'border-primary/20');
       const timeoutId = setTimeout(() => {
         locationElement.classList.remove('bg-primary/10', 'border-primary/20');
@@ -55,14 +52,12 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     }
   }, []);
 
-  // Scroll to selected location when selectedLocationId changes
   useEffect(() => {
     if (selectedLocationId) {
       scrollToSelectedLocation(selectedLocationId);
     }
   }, [selectedLocationId, scrollToSelectedLocation]);
 
-  // Memoize loading skeleton count
   const skeletonCount = useMemo(() => 6, []);
 
   return (
@@ -85,41 +80,49 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
         
         <div 
           ref={listContainerRef}
-          className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+          className="flex-1 overflow-y-auto"
         >
           {loading ? (
-            <LoadingSkeleton 
-              variant="location-card" 
-              count={skeletonCount}
-              className="space-y-4"
-            />
+            <div className="px-4 py-4">
+              <LoadingSkeleton 
+                variant="location-card" 
+                count={skeletonCount}
+                className="space-y-4"
+              />
+            </div>
           ) : error ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-destructive mb-2">Error loading locations</p>
-                <p className="text-muted-foreground text-sm">{error}</p>
-              </CardContent>
-            </Card>
+            <div className="px-4 py-4">
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <p className="text-destructive mb-2">Error loading locations</p>
+                  <p className="text-muted-foreground text-sm">{error}</p>
+                </CardContent>
+              </Card>
+            </div>
           ) : displayLocations.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">
-                  No locations found matching your criteria.
-                  {activeSpoof && ` Try a different region or filter.`}
-                </p>
-              </CardContent>
-            </Card>
+            <div className="px-4 py-4">
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <p className="text-muted-foreground">
+                    No locations found matching your criteria.
+                    {activeSpoof && ` Try a different region or filter.`}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           ) : (
-            displayLocations.map((location) => (
-              <LocationErrorBoundary key={location.id}>
-                <div id={`location-${location.id}`} className="transition-colors duration-300">
-                  <LocationCard 
-                    location={location} 
-                    isHighlighted={selectedLocationId === location.id}
-                  />
-                </div>
-              </LocationErrorBoundary>
-            ))
+            <div className="divide-y divide-border">
+              {displayLocations.map((location) => (
+                <LocationErrorBoundary key={location.id}>
+                  <div id={`location-${location.id}`} className="transition-colors duration-300">
+                    <LocationCard 
+                      location={location} 
+                      isHighlighted={selectedLocationId === location.id}
+                    />
+                  </div>
+                </LocationErrorBoundary>
+              ))}
+            </div>
           )}
         </div>
       </div>
