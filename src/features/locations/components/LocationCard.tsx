@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock, Navigation } from "lucide-react";
@@ -187,25 +186,25 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
           {/* Location Details */}
           <div className="flex-1 min-w-0">
             {/* Header Section */}
-            <div className="relative mb-2">
-              <div className="pr-12">
-                <h4 className="font-semibold text-base sm:text-lg truncate">{location.name}</h4>
+            <div className="flex justify-between items-start mb-2">
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-base sm:text-lg truncate pr-2">{location.name}</h4>
+                <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mt-1">
+                  <Badge variant="default" className="text-xs">
+                    {location.type}
+                  </Badge>
+                  {location.subType && (
+                    <Badge variant="outline" className="text-xs">
+                      {location.subType}
+                    </Badge>
+                  )}
+                  <span className="text-xs">{location.price}</span>
+                  <span className="text-xs">{location.distance}</span>
+                </div>
               </div>
-              <div className="absolute top-0 right-0 flex items-center gap-1">
+              <div className="flex items-center gap-1 ml-2 flex-shrink-0">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="font-medium text-sm">{location.rating}</span>
-              </div>
-              <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mt-1">
-                <Badge variant="default" className="text-xs">
-                  {location.type}
-                </Badge>
-                {location.subType && (
-                  <Badge variant="outline" className="text-xs">
-                    {location.subType}
-                  </Badge>
-                )}
-                <span className="text-xs">{location.price}</span>
-                <span className="text-xs">{location.distance}</span>
               </div>
             </div>
 
