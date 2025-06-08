@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import MapLoadingState from './MapLoadingState';
 import MapView from './MapView';
@@ -31,6 +31,9 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
   onMapLoaded,
   onMapIdle
 }) => {
+  const [placesReady, setPlacesReady] = useState(false);
+  const [initializationError, setInitializationError] = useState<string | null>(null);
+
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
     libraries,
@@ -38,10 +41,38 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     preventGoogleFontsLoading: true,
   });
 
+  // Wait for Places API to be fully ready
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const checkPlacesApi = async () => {
+      const maxAttempts = 20;
+      let attempts = 0;
+      
+      const checkInterval = setInterval(() => {
+        attempts++;
+        
+        if (window.google?.maps?.places?.PlacesService) {
+          console.log('Places API is ready');
+          setPlacesReady(true);
+          clearInterval(checkInterval);
+        } else if (attempts >= maxAttempts) {
+          console.error('Places API failed to load after maximum attempts');
+          setInitializationError('Places API failed to initialize');
+          clearInterval(checkInterval);
+        }
+      }, 100);
+    };
+
+    checkPlacesApi();
+  }, [isLoaded]);
+
   console.log('GoogleMapsLoader state:', { 
     apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
     isLoaded, 
+    placesReady,
     loadError: loadError?.message,
+    initializationError,
     markersCount: mapState.markers.length,
     searchQuery,
     googleMapsAvailable: typeof window !== 'undefined' && 'google' in window,
@@ -67,13 +98,30 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     );
   }
 
+  // Show error if initialization failed
+  if (initializationError) {
+    return (
+      <MapLoadingState 
+        height={height} 
+        type="error" 
+        errorMessage={initializationError} 
+      />
+    );
+  }
+
   // Wait for script to load
   if (!isLoaded) {
     console.log('Waiting for Google Maps script to load...');
     return <MapLoadingState height={height} type="initializing" />;
   }
 
-  console.log('Google Maps successfully loaded, rendering MapView with markers:', mapState.markers);
+  // Wait for Places API to be ready
+  if (!placesReady) {
+    console.log('Waiting for Places API to be ready...');
+    return <MapLoadingState height={height} type="initializing" />;
+  }
+
+  console.log('Google Maps and Places API successfully loaded, rendering MapView with markers:', mapState.markers);
 
   return (
     <MapView

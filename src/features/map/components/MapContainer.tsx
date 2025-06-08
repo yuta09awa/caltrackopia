@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useApiKeyLoader } from './ApiKeyLoader';
+import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
 import GoogleMapsLoader from './GoogleMapsLoader';
 import { Ingredient } from '@/models/NutritionalInfo';
@@ -28,32 +29,54 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onMapIdle,
   onLocationSelect
 }) => {
-  const { apiKey, error, loading } = useApiKeyLoader();
+  const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
+
+  // Use unified loading state to coordinate all dependencies
+  const loadingState = useMapLoadingState({
+    apiKeyLoading,
+    apiKeyError,
+    apiKey,
+    googleMapsLoaded: false, // This will be managed by GoogleMapsLoader
+    googleMapsError: null
+  });
 
   console.log('MapContainer render state:', { 
-    loading, 
-    error, 
+    loadingState,
     apiKey: apiKey ? 'present' : 'missing', 
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
     searchQuery,
+    retryCount,
     currentUrl: window.location.href
   });
 
-  // Show loading while fetching API key
-  if (loading) {
-    return <MapLoadingState height={height} type="loading" />;
+  // Show loading while in loading states
+  if (loadingState.isLoading) {
+    const loadingMessage = loadingState.stage === 'api-key' 
+      ? retryCount > 0 
+        ? `Loading API key (attempt ${retryCount + 1})...`
+        : 'Loading API key...'
+      : loadingState.stage === 'google-maps'
+        ? 'Loading Google Maps...'
+        : 'Initializing map...';
+
+    return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
 
-  // Show error if API key fetch failed
-  if (error) {
-    console.error('Map error details:', { error });
+  // Show error if any dependency failed
+  if (loadingState.error) {
+    console.error('Map loading error:', { 
+      error: loadingState.error,
+      stage: loadingState.stage,
+      retryCount 
+    });
+    
     return (
       <MapLoadingState 
         height={height} 
         type="error" 
-        errorMessage={error} 
+        errorMessage={loadingState.error} 
       />
     );
   }
