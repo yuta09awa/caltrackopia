@@ -26,14 +26,9 @@ export class EnhancedNutritionService {
     try {
       // First, search local database
       const localResults = await nutritionService.searchIngredients(query, 10);
-      const enhancedResults: EnhancedIngredient[] = localResults.map(ingredient => ({
-        ...ingredient,
-        nutritionSource: {
-          source: 'local',
-          confidence: 0.9,
-          lastUpdated: new Date()
-        }
-      }));
+      const enhancedResults: EnhancedIngredient[] = localResults.map(ingredient => 
+        this.transformLocalToEnhanced(ingredient)
+      );
 
       // If we have enough local results or external search is disabled, return them
       if (enhancedResults.length >= 5 || !includeExternal) {
@@ -66,14 +61,7 @@ export class EnhancedNutritionService {
       const localIngredient = await nutritionService.getIngredientNutrition(ingredientId);
       
       if (localIngredient && !forceRefresh) {
-        return {
-          ...this.transformLocalToEnhanced(localIngredient),
-          nutritionSource: {
-            source: 'local',
-            confidence: 0.9,
-            lastUpdated: new Date()
-          }
-        };
+        return this.transformLocalToEnhanced(localIngredient);
       }
 
       // If not found locally or refresh requested, try external APIs
@@ -159,7 +147,12 @@ export class EnhancedNutritionService {
       isSeasonal: localIngredient.isInSeason,
       allergens: localIngredient.allergens,
       dietaryRestrictions: localIngredient.dietaryFlags,
-      locations: []
+      locations: [],
+      nutritionSource: {
+        source: 'local',
+        confidence: 0.9,
+        lastUpdated: new Date()
+      }
     };
   }
 
