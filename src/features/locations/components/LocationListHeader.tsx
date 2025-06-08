@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SortOption } from '../types';
 
 interface LocationListHeaderProps {
   totalCount: number;
-  sortOption: string;
-  setSortOption: (value: string) => void;
+  sortOption: SortOption;
+  setSortOption: (value: SortOption) => void;
 }
 
 const LocationListHeader: React.FC<LocationListHeaderProps> = ({
