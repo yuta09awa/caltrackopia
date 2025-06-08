@@ -1,14 +1,11 @@
 
-import React from "react";
-import LocationTabs from "./LocationTabs";
-import LocationFilters from "./LocationFilters";
-import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
-import { LocationType, SortOption } from "../types";
+import React from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface LocationListHeaderProps {
   totalCount: number;
-  sortOption: SortOption;
-  setSortOption: (option: SortOption) => void;
+  sortOption: string;
+  setSortOption: (value: string) => void;
 }
 
 const LocationListHeader: React.FC<LocationListHeaderProps> = ({
@@ -17,27 +14,22 @@ const LocationListHeader: React.FC<LocationListHeaderProps> = ({
   setSortOption
 }) => {
   return (
-    <div className="flex items-center justify-between p-3 border-b border-border">
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">
-          {totalCount} {totalCount === 1 ? 'Location' : 'Locations'}
-        </h2>
-      </div>
+    <div className="flex items-center justify-between py-2">
+      <h3 className="text-lg font-semibold">
+        {totalCount} Location{totalCount !== 1 ? 's' : ''}
+      </h3>
       
-      <div className="flex items-center gap-3">
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value as SortOption)}
-          className="text-sm border rounded px-2 py-1"
-        >
-          <option value="default">Default</option>
-          <option value="rating-high">Highest Rated</option>
-          <option value="rating-low">Lowest Rated</option>
-          <option value="distance-near">Closest First</option>
-          <option value="distance-far">Farthest First</option>
-          <option value="open-first">Open Now</option>
-        </select>
-      </div>
+      <Select value={sortOption} onValueChange={setSortOption}>
+        <SelectTrigger className="w-32">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="default">Default</SelectItem>
+          <SelectItem value="distance">Distance</SelectItem>
+          <SelectItem value="rating">Rating</SelectItem>
+          <SelectItem value="price">Price</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };

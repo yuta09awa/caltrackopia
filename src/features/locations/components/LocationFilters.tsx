@@ -21,7 +21,7 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({
   setIsOpenNow
 }) => {
   return (
-    <div className="p-3 border-b border-border">
+    <div className="py-2 border-b border-border">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <LocationTabs activeTab={activeTab} onTabChange={onTabChange} />
