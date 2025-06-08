@@ -373,17 +373,17 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       
       <div className="flex items-center gap-2 text-sm">
         <Clock className="w-4 h-4 flex-shrink-0" />
-        {/* Updated line: Display currentHours or a fallback, with dynamic color */}
+        {/* Updated to show actual hours when available */}
         <span
           className={`font-medium text-sm ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
-          role="status" // Added for accessibility
-          aria-label={ // Added for accessibility
+          role="status"
+          aria-label={
             location.openNow
               ? `Open today ${currentHours ? `from ${currentHours}` : ''}`.trim()
               : 'Closed today'
           }
         >
-          {currentHours ? currentHours : (location.openNow ? 'Open' : 'Closed Today')}
+          {currentHours || (location.openNow ? 'Open' : 'Closed Today')}
         </span>
       </div>
     </div>
