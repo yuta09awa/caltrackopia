@@ -1,3 +1,4 @@
+
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock } from "lucide-react";
@@ -10,8 +11,9 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Location, HighlightItem, MenuItem as LocationMenuItem, FeaturedItem as LocationFeaturedItem } from "@/models/Location";
+import { Location, HighlightItem, MenuItem as LocationMenuItem, FeaturedItem as LocationFeaturedItem, Promotion } from "@/models/Location";
 import { toast } from "sonner";
+import LocationCardPopularHighlights from './LocationCardPopularHighlights';
 
 interface LocationCardProps {
   location: Location;
@@ -54,6 +56,7 @@ const useLocationCardData = (location: Location | null | undefined) => {
       highlightBadges: null,
       dietaryOptionsElements: null,
       popularItems: [],
+      promotions: [],
       currentHours: null
     };
   }
@@ -132,7 +135,16 @@ const useLocationCardData = (location: Location | null | undefined) => {
   const popularItems = useMemo(() => {
     // Safely access featuredItems; default to empty array if not present.
     if ('featuredItems' in customData && Array.isArray(customData.featuredItems)) {
-      return customData.featuredItems.slice(0, 2);
+      // Ensure we only take items with images if we want to display them visually
+      return customData.featuredItems.filter(item => item.imageUrl || item.image).slice(0, 2);
+    }
+    return [];
+  }, [customData]);
+
+  // NEW: Extract promotions from customData
+  const promotions = useMemo(() => {
+    if ('promotions' in customData && Array.isArray(customData.promotions)) {
+      return customData.promotions.filter(promo => promo.imageUrl).slice(0, 1); // Maybe just one prominent promotion
     }
     return [];
   }, [customData]);
@@ -169,6 +181,7 @@ const useLocationCardData = (location: Location | null | undefined) => {
     highlightBadges,
     dietaryOptionsElements,
     popularItems,
+    promotions,
     currentHours
   };
 };
@@ -399,12 +412,12 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       </div>
     </div>
 
-    {/* Popular Items */}
+    {/* Popular Items - Now only shows text-based items */}
     {popularItems.length > 0 && (
       <div className="mb-3">
         <p className="text-xs font-medium text-muted-foreground mb-1">Popular:</p>
         <div className="flex flex-wrap gap-1">
-          {popularItems.map((item, idx) => (
+          {popularItems.slice(0, 2).map((item, idx) => (
             <span key={idx} className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
               {item.name}
             </span>
@@ -475,7 +488,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   const locationNavigation = useLocationCardNavigation(location);
 
   // Destructure values from the hooks
-  const { highlightBadges, dietaryOptionsElements, popularItems, currentHours } = locationData;
+  const { highlightBadges, dietaryOptionsElements, popularItems, promotions, currentHours } = locationData;
   const { handleCardClick, handleCarouselClick, handleCallClick, handleAddressClick } = locationHandlers;
   const { detailLink } = locationNavigation;
 
@@ -495,19 +508,19 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
         className="block p-4"
         onClick={handleCardClick}
       >
-        <div className="flex gap-4">
-          {/* Image Carousel Sub-component */}
+        {/* Changed from flex to grid for a 3-column layout */}
+        <div className="grid grid-cols-[auto_1fr_auto] gap-4">
+          {/* Left Column: Image Carousel Sub-component */}
           <LocationCardImage 
             images={location.images} 
             name={location.name} 
             handleCarouselClick={handleCarouselClick} 
           />
           
+          {/* Middle Column: Details Section Sub-component */}
           <div className="flex-1 min-w-0">
-            {/* Header Section Sub-component */}
             <LocationCardHeader location={location} />
             
-            {/* Details Section Sub-component */}
             <LocationCardDetails 
               location={location}
               currentHours={currentHours}
@@ -517,12 +530,17 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               highlightBadges={highlightBadges}
             />
 
-            {/* Actions Section Sub-component */}
             <LocationCardActions 
               location={location} 
               handleCallClick={handleCallClick}
             />
           </div>
+
+          {/* Right Column: NEW Popular Items/Promotions Sub-component */}
+          <LocationCardPopularHighlights
+            popularItems={popularItems}
+            promotions={promotions}
+          />
         </div>
       </Link>
     </div>

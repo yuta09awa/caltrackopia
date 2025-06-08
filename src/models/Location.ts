@@ -75,6 +75,7 @@ export interface RestaurantCustomData {
   businessHours?: CustomBusinessHours[]; // More detailed custom hours
   isVerified: boolean; // Derived from verification_count
   lastUpdated: string; // From cached_places.last_updated_at
+  promotions?: Promotion[]; // NEW: For specific promotional offers
 }
 
 // New interface for Market specific custom data (e.g., Farmers Markets, Convenience Stores)
@@ -91,7 +92,18 @@ export interface MarketCustomData {
   lastUpdated: string;
   // Adding featuredItems to MarketCustomData for consistency with RestaurantCustomData
   // This allows MarketDetails to display featured items if applicable.
-  featuredItems?: FeaturedItem[]; 
+  featuredItems?: FeaturedItem[];
+  promotions?: Promotion[]; // NEW: For specific promotional offers
+}
+
+// New interface for dedicated promotions
+export interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string; // Optional image for the promotion itself
+  discount?: string;
+  validUntil?: string;
 }
 
 export interface IngredientInfo {
@@ -136,6 +148,7 @@ export interface MenuItem {
   price: string; // Formatted price from menu_items.price
   description?: string; // From menu_items.description
   image: string; // From menu_items.image_url
+  imageUrl?: string; // Ensure this is present for compatibility
   dietaryTags?: string[]; // From menu_items.dietary_tags
   rating?: number; // From menu_items.rating
   category?: string; // From menu_items.category
@@ -169,6 +182,7 @@ export interface FeaturedItem {
   price: string;
   description?: string;
   image: string;
+  imageUrl?: string; // Ensure this is present for compatibility
   dietaryTags?: string[];
   rating?: number;
   category?: string;
