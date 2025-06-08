@@ -12,13 +12,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Location, HighlightItem, MenuItem as LocationMenuItem, FeaturedItem as LocationFeaturedItem } from "@/models/Location";
-import { openDirections } from "@/utils/directionsUtils";
 import { toast } from "sonner";
 
 interface LocationCardProps {
   location: Location;
   isHighlighted?: boolean;
 }
+
+// Helper function for opening directions, inlined to resolve import issues.
+const openDirections = (lat: number, lng: number) => {
+  const isApple = /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  let url = '';
+  if (isApple) {
+    url = `maps://maps.apple.com/?daddr=${lat},${lng}`;
+  } else if (isAndroid) {
+    url = `geo:${lat},${lng}?q=${lat},${lng}`;
+  } else {
+    // Fallback for desktop or other devices
+    url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  }
+  window.open(url, '_blank');
+};
 
 // -----------------------------------------------------------------------------
 // Custom Hooks for Data, Handlers, and Navigation
@@ -30,20 +46,35 @@ interface LocationCardProps {
  * that are used in different parts of the card, improving readability and reusability.
  * @param {Location} location - The location object to process.
  */
-const useLocationCardData = (location: Location) => {
+const useLocationCardData = (location: Location | null | undefined) => {
+  // Add an early return if location prop itself is null or undefined
+  if (!location) {
+    return {
+      hasHighlights: false,
+      highlightTypes: [],
+      highlightBadges: null,
+      dietaryOptionsElements: null,
+      popularItems: [],
+      currentHours: null
+    };
+  }
+
+  // Ensure customData is safely accessed. Default to an empty object if undefined/null.
+  const customData = location.customData || {};
+
   // Determine if the location has any highlights to display.
   const hasHighlights = useMemo(() => {
-    return !!(location.customData && 'highlights' in location.customData && location.customData.highlights && location.customData.highlights.length > 0);
-  }, [location.customData]);
+    // Access highlights property safely using optional chaining
+    return !!(customData.highlights?.length > 0);
+  }, [customData]);
 
   // Extract unique highlight types (e.g., "new", "popular", "seasonal").
   const highlightTypes = useMemo(() => {
-    if (location.customData && 'highlights' in location.customData && location.customData.highlights) {
-      const types = new Set(location.customData.highlights.map(h => h.type));
-      return Array.from(types);
-    }
-    return [];
-  }, [location.customData]);
+    // Safely access highlights; default to empty array if not present.
+    const highlights = (customData as any)?.highlights || []; // Cast to any because customData is generic
+    const types = new Set(highlights.map((h: HighlightItem) => h.type));
+    return Array.from(types);
+  }, [customData]);
 
   // Generate JSX for highlight badges based on detected types.
   const highlightBadges = useMemo(() => {
@@ -95,19 +126,22 @@ const useLocationCardData = (location: Location) => {
 
   // Extract popular items from custom data, limited to the first two.
   const popularItems = useMemo(() => {
-    if (location.customData && 'featuredItems' in location.customData && location.customData.featuredItems) {
-      return location.customData.featuredItems.slice(0, 2);
-    }
-    return [];
-  }, [location.customData]);
+    // Safely access featuredItems; default to empty array if not present.
+    const featuredItems = (customData as any)?.featuredItems || []; // Cast to any
+    return featuredItems.slice(0, 2);
+  }, [customData]);
 
-  // Determine and format the current opening hours for the location.
+  // Determine and format the current opening hours for the location, including "24 Hours"
   const currentHours = useMemo(() => {
     if (!location.hours || location.hours.length === 0) return null;
     
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
     const todayHours = location.hours.find(h => h.day.toLowerCase() === today.toLowerCase());
     
+    // Check for "24 hours" pattern
+    if (todayHours?.hours === "12:00 AM - 12:00 AM") {
+      return "24 Hours";
+    }
     return todayHours?.hours || null;
   }, [location.hours]);
 
@@ -126,7 +160,17 @@ const useLocationCardData = (location: Location) => {
  * Encapsulates event handling logic for various interactive elements.
  * @param {Location} location - The location object relevant to the handlers.
  */
-const useLocationCardHandlers = (location: Location) => {
+const useLocationCardHandlers = (location: Location | null | undefined) => { // Accept null/undefined location
+  // Add an early return if location prop itself is null or undefined
+  if (!location) {
+    return {
+      handleCardClick: () => false, // Return dummy handlers
+      handleCarouselClick: () => {},
+      handleCallClick: () => {},
+      handleAddressClick: () => {}
+    };
+  }
+
   // Prevents the main card link from navigating if an internal button or specific link is clicked.
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -134,12 +178,13 @@ const useLocationCardHandlers = (location: Location) => {
     const link = target.closest('a');
     
     // Check if the clicked element is a button OR if it's a link whose href is NOT the detail page
-    if (button || (link && link.getAttribute('href') !== `/location/${location.id}` && link.getAttribute('href') !== `/markets/${location.id}`)) {
+    // Access location.id safely
+    if (button || (link && location.id && (link.getAttribute('href') !== `/location/${location.id}` && link.getAttribute('href') !== `/markets/${location.id}`))) {
       e.preventDefault();
       e.stopPropagation();
       return false; // Prevent default link behavior
     }
-  }, [location.id]);
+  }, [location?.id]); // Safely access id in dependency array
 
   // Prevents carousel navigation from bubbling up and triggering card click.
   const handleCarouselClick = useCallback((e: React.MouseEvent) => {
@@ -155,7 +200,7 @@ const useLocationCardHandlers = (location: Location) => {
       window.open(`tel:${location.phone}`, '_self');
       toast.info(`Calling ${location.name}`);
     }
-  }, [location.phone, location.name]);
+  }, [location?.phone, location?.name]); // Safely access phone and name in dependency array
 
   // Handles click on the address to open directions.
   const handleAddressClick = useCallback((e: React.MouseEvent) => {
@@ -165,7 +210,7 @@ const useLocationCardHandlers = (location: Location) => {
       openDirections(location.coordinates.lat, location.coordinates.lng);
       toast.info(`Getting directions to ${location.name}`);
     }
-  }, [location.coordinates, location.name]);
+  }, [location?.coordinates, location?.name]); // Safely access coordinates and name in dependency array
 
   return {
     handleCardClick,
@@ -180,16 +225,23 @@ const useLocationCardHandlers = (location: Location) => {
  * Centralizes the logic for generating dynamic detail page links.
  * @param {Location} location - The location object to generate a link for.
  */
-const useLocationCardNavigation = (location: Location) => {
+const useLocationCardNavigation = (location: Location | null | undefined) => { // Accept null/undefined location
+  // Add an early return if location prop itself is null or undefined
+  if (!location) {
+    return {
+      detailLink: '#' // Return a safe fallback link
+    };
+  }
+
   const detailLink = useMemo(() => {
-    if (location.type.toLowerCase() === "grocery" && 
+    if (location.type?.toLowerCase() === "grocery" && // Safely access type
         location.subType && 
         ["farmers market", "food festival", "convenience store"].includes(location.subType.toLowerCase())) {
       return `/markets/${location.id}`;
     } else {
       return `/location/${location.id}`;
     }
-  }, [location.type, location.subType, location.id]);
+  }, [location?.type, location?.subType, location?.id]); // Safely access properties in dependency array
 
   return { detailLink };
 };
@@ -315,15 +367,18 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       
       <div className="flex items-center gap-2 text-sm">
         <Clock className="w-4 h-4 flex-shrink-0" />
-        <span className={`font-medium ${location.openNow ? 'text-green-600' : 'text-red-600'}`}>
-          {location.openNow ? 'Open' : 'Closed'}
+        {/* Updated line: Display currentHours or a fallback, with dynamic color */}
+        <span
+          className={`font-medium text-sm ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
+          role="status" // Added for accessibility
+          aria-label={ // Added for accessibility
+            location.openNow
+              ? `Open today ${currentHours ? `from ${currentHours}` : ''}`.trim()
+              : 'Closed today'
+          }
+        >
+          {currentHours ? currentHours : (location.openNow ? 'Open' : 'Closed Today')}
         </span>
-        {currentHours && (
-          <>
-            <span className="text-muted-foreground">•</span>
-            <span className="text-muted-foreground text-xs">{currentHours}</span>
-          </>
-        )}
       </div>
     </div>
 
@@ -390,10 +445,22 @@ LocationCardActions.displayName = 'LocationCardActions';
  * It combines all the pieces to render a complete location card.
  */
 const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHighlighted = false }) => {
+  // If location itself is null or undefined, render nothing or a loading state
+  // This check is crucial and happens before any hooks are called with 'location'
+  if (!location) {
+    return null; // Or a skeleton loader if preferred
+  }
+
   // Use custom hooks for data, handlers, and navigation logic
-  const { highlightBadges, dietaryOptionsElements, popularItems, currentHours } = useLocationCardData(location);
-  const { handleCardClick, handleCarouselClick, handleCallClick, handleAddressClick } = useLocationCardHandlers(location);
-  const { detailLink } = useLocationCardNavigation(location);
+  // Pass potentially null/undefined location to the hooks
+  const locationData = useLocationCardData(location);
+  const locationHandlers = useLocationCardHandlers(location);
+  const locationNavigation = useLocationCardNavigation(location);
+
+  // Destructure values from the hooks
+  const { highlightBadges, dietaryOptionsElements, popularItems, currentHours } = locationData;
+  const { handleCardClick, handleCarouselClick, handleCallClick, handleAddressClick } = locationHandlers;
+  const { detailLink } = locationNavigation;
 
   return (
     <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative ${
