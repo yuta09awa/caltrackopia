@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock } from "lucide-react";
@@ -64,16 +63,21 @@ const useLocationCardData = (location: Location | null | undefined) => {
 
   // Determine if the location has any highlights to display.
   const hasHighlights = useMemo(() => {
-    // Access highlights property safely using optional chaining
-    return !!(customData.highlights?.length > 0);
+    // Safely check if highlights exists and has length
+    if ('highlights' in customData && Array.isArray(customData.highlights)) {
+      return customData.highlights.length > 0;
+    }
+    return false;
   }, [customData]);
 
   // Extract unique highlight types (e.g., "new", "popular", "seasonal").
   const highlightTypes = useMemo(() => {
     // Safely access highlights; default to empty array if not present.
-    const highlights = (customData as any)?.highlights || []; // Cast to any because customData is generic
-    const types = new Set(highlights.map((h: HighlightItem) => h.type));
-    return Array.from(types);
+    if ('highlights' in customData && Array.isArray(customData.highlights)) {
+      const types = new Set(customData.highlights.map((h: HighlightItem) => h.type));
+      return Array.from(types);
+    }
+    return [];
   }, [customData]);
 
   // Generate JSX for highlight badges based on detected types.
@@ -127,8 +131,10 @@ const useLocationCardData = (location: Location | null | undefined) => {
   // Extract popular items from custom data, limited to the first two.
   const popularItems = useMemo(() => {
     // Safely access featuredItems; default to empty array if not present.
-    const featuredItems = (customData as any)?.featuredItems || []; // Cast to any
-    return featuredItems.slice(0, 2);
+    if ('featuredItems' in customData && Array.isArray(customData.featuredItems)) {
+      return customData.featuredItems.slice(0, 2);
+    }
+    return [];
   }, [customData]);
 
   // Determine and format the current opening hours for the location, including "24 Hours"
