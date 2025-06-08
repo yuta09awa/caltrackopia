@@ -16,6 +16,28 @@ const LocationCardPopularHighlights: React.FC<LocationCardPopularHighlightsProps
     return null; // Don't render if no items/promotions to show
   }
 
+  // Helper function to get the display name for any item type
+  const getItemName = (item: MenuItem | FeaturedItem | Promotion): string => {
+    if ('name' in item) {
+      return item.name;
+    }
+    if ('title' in item) {
+      return item.title;
+    }
+    return 'Untitled';
+  };
+
+  // Helper function to get the image URL for any item type
+  const getItemImage = (item: MenuItem | FeaturedItem | Promotion): string => {
+    if ('imageUrl' in item && item.imageUrl) {
+      return item.imageUrl;
+    }
+    if ('image' in item && item.image) {
+      return item.image;
+    }
+    return '';
+  };
+
   return (
     <div className="flex-shrink-0 w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 overflow-hidden rounded-lg bg-muted/10 p-2">
       <h5 className="text-xs font-semibold text-muted-foreground mb-1">Highlights</h5>
@@ -26,10 +48,10 @@ const LocationCardPopularHighlights: React.FC<LocationCardPopularHighlightsProps
               <CarouselItem key={item.id || index} className="pl-2 basis-full h-full">
                 <Card className="h-full w-full border-none shadow-none bg-transparent">
                   <CardContent className="flex flex-col items-center justify-center p-0 h-full">
-                    {(item.imageUrl || ('image' in item && item.image)) ? (
+                    {getItemImage(item) ? (
                       <img
-                        src={item.imageUrl || ('image' in item ? item.image : '')}
-                        alt={item.name || ('title' in item ? item.title : '')}
+                        src={getItemImage(item)}
+                        alt={getItemName(item)}
                         className="w-full flex-1 object-cover rounded-md mb-1"
                         loading="lazy"
                       />
@@ -40,7 +62,7 @@ const LocationCardPopularHighlights: React.FC<LocationCardPopularHighlightsProps
                     )}
                     <div className="w-full">
                       <p className="text-xs font-medium text-center truncate w-full">
-                        {item.name || ('title' in item ? item.title : '')}
+                        {getItemName(item)}
                       </p>
                       {'price' in item && item.price && (
                         <p className="text-xs text-muted-foreground text-center">{item.price}</p>

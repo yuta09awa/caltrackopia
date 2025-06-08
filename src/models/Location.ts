@@ -8,6 +8,24 @@ export type SortOption = 'default' | 'rating-high' | 'rating-low' | 'distance-ne
 // Define the PlaceType enum directly from Supabase types for consistency
 export type PlaceType = Database['public']['Enums']['place_type'];
 
+// NEW: Dual rating system interface
+export interface DualRating {
+  google?: {
+    rating: number;
+    reviewCount?: number;
+    lastUpdated?: string;
+  };
+  yelp?: {
+    rating: number;
+    reviewCount?: number;
+    lastUpdated?: string;
+  };
+  composite?: {
+    rating: number; // Weighted average of available ratings
+    confidence: number; // 0-1 confidence based on review counts
+  };
+}
+
 export interface Location {
   id: string; // UUID from cached_places
   place_id?: string; // Google Place ID, now stored in DB
@@ -30,7 +48,10 @@ export interface Location {
   freshnessStatus?: Database['public']['Enums']['freshness_status']; // From DB: freshness_status
   searchVector?: string; // Not directly used on frontend, but good to know it exists
 
-  rating: number;
+  // UPDATED: Replace single rating with dual rating system
+  rating: number; // Legacy field for backward compatibility (will use composite rating)
+  ratings?: DualRating; // NEW: Comprehensive rating system
+  
   distance: string; // Calculated distance, not directly from DB
   address: string;
   phone?: string;
@@ -116,6 +137,18 @@ export interface IngredientInfo {
   availability: "always" | "seasonal" | "limited" | "unknown"; // Derived from place_ingredients.is_available and ingredients.is_seasonal
   lastRestocked?: string; // From place_ingredients.last_restocked
   description?: string; // From ingredients.common_names or a dedicated description field
+  // NEW: Enhanced nutritional information
+  nutritionalInfo?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fiber?: number;
+    sugar?: number;
+    sodium?: number;
+    vitamins?: Record<string, number>;
+    minerals?: Record<string, number>;
+  };
 }
 
 export interface DeliveryOption {
@@ -161,6 +194,12 @@ export interface MenuItem {
   // Frontend specific:
   thumbsUp?: number; 
   thumbsDown?: number;
+  // NEW: Enhanced nutritional data from external APIs
+  externalNutritionData?: {
+    source: 'usda' | 'fatsecret' | 'local';
+    lastUpdated: string;
+    confidence: number;
+  };
 }
 
 export interface NutritionInfo {
