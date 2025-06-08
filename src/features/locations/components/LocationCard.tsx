@@ -139,17 +139,29 @@ const useLocationCardData = (location: Location | null | undefined) => {
 
   // Determine and format the current opening hours for the location, including "24 Hours"
   const currentHours = useMemo(() => {
-    if (!location.hours || location.hours.length === 0) return null;
+    console.log(`[LocationCard] Processing hours for ${location.name}:`, location.hours);
+    
+    if (!location.hours || location.hours.length === 0) {
+      console.log(`[LocationCard] No hours data available for ${location.name}`);
+      return null;
+    }
     
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    console.log(`[LocationCard] Today is: ${today}`);
+    
     const todayHours = location.hours.find(h => h.day.toLowerCase() === today.toLowerCase());
+    console.log(`[LocationCard] Found today's hours for ${location.name}:`, todayHours);
     
     // Check for "24 hours" pattern
     if (todayHours?.hours === "12:00 AM - 12:00 AM") {
+      console.log(`[LocationCard] ${location.name} is open 24 hours`);
       return "24 Hours";
     }
-    return todayHours?.hours || null;
-  }, [location.hours]);
+    
+    const result = todayHours?.hours || null;
+    console.log(`[LocationCard] Final hours result for ${location.name}:`, result);
+    return result;
+  }, [location.hours, location.name]);
 
   return {
     hasHighlights,
@@ -373,7 +385,6 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       
       <div className="flex items-center gap-2 text-sm">
         <Clock className="w-4 h-4 flex-shrink-0" />
-        {/* Updated to show actual hours when available */}
         <span
           className={`font-medium text-sm ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
           role="status"
