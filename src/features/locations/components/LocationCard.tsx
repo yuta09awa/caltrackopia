@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Location, HighlightItem } from "@/models/Location";
 import { Market } from "@/models/Location";
+import { openDirections } from "@/utils/directionsUtils";
 
 interface LocationCardProps {
   location: Location;
@@ -110,8 +111,9 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     const button = target.closest('button');
+    const link = target.closest('a');
     
-    if (button) {
+    if (button || link) {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -135,8 +137,15 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     e.preventDefault();
     e.stopPropagation();
     if (location.coordinates) {
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${location.coordinates.lat},${location.coordinates.lng}`;
-      window.open(url, '_blank');
+      openDirections(location.coordinates.lat, location.coordinates.lng);
+    }
+  }, [location.coordinates]);
+
+  const handleAddressClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (location.coordinates) {
+      openDirections(location.coordinates.lat, location.coordinates.lng);
     }
   }, [location.coordinates]);
 
@@ -186,15 +195,15 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
           
           {/* Location Details */}
           <div className="flex-1 min-w-0">
-            {/* Header Section - Restructured for true left alignment */}
-            <div className="relative mb-2">
-              {/* Title - Left aligned without flex container */}
-              <h4 className="font-semibold text-base sm:text-lg truncate pr-16">{location.name}</h4>
-              
-              {/* Rating - Absolute positioned in top right */}
-              <div className="absolute top-0 right-0 flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="font-medium text-sm">{location.rating}</span>
+            {/* Header Section - Fixed left alignment */}
+            <div className="mb-2">
+              {/* Rating positioned absolutely in top right */}
+              <div className="relative">
+                <h4 className="font-semibold text-base sm:text-lg truncate">{location.name}</h4>
+                <div className="absolute top-0 right-0 flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-medium text-sm">{location.rating}</span>
+                </div>
               </div>
               
               {/* Badges and meta info - Left aligned */}
@@ -212,11 +221,25 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               </div>
             </div>
 
-            {/* Address and Hours */}
+            {/* Address and Hours with Directions */}
             <div className="space-y-1 mb-3">
-              <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span className="truncate">{location.address}</span>
+              <div className="flex items-start justify-between">
+                <button
+                  onClick={handleAddressClick}
+                  className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors text-left flex-1 min-w-0"
+                >
+                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span className="truncate">{location.address}</span>
+                </button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs ml-2 flex-shrink-0"
+                  onClick={handleDirectionsClick}
+                >
+                  <Navigation className="w-3 h-3 mr-1" />
+                  Directions
+                </Button>
               </div>
               
               <div className="flex items-center gap-2 text-sm">
@@ -253,7 +276,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
             {/* Highlight Badges */}
             {highlightBadges}
 
-            {/* Quick Actions */}
+            {/* Quick Actions - Only Call button now */}
             <div className="flex gap-2 mt-3">
               {location.phone && (
                 <Button
@@ -266,15 +289,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
                   Call
                 </Button>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-3 text-xs"
-                onClick={handleDirectionsClick}
-              >
-                <Navigation className="w-3 h-3 mr-1" />
-                Directions
-              </Button>
             </div>
           </div>
         </div>
