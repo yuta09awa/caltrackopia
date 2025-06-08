@@ -1,3 +1,4 @@
+
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock } from "lucide-react";
@@ -58,19 +59,19 @@ const useLocationCardData = (location: Location | null | undefined) => {
     };
   }
 
-  // Safely access customData and handle undefined case
-  const customData = location.customData;
+  // Ensure customData is safely accessed. Default to an empty object if undefined/null.
+  const customData = location.customData || {};
 
   // Determine if the location has any highlights to display.
   const hasHighlights = useMemo(() => {
     // Access highlights property safely using optional chaining
-    return !!(customData && 'highlights' in customData && customData.highlights?.length > 0);
+    return !!(customData.highlights?.length > 0);
   }, [customData]);
 
   // Extract unique highlight types (e.g., "new", "popular", "seasonal").
   const highlightTypes = useMemo(() => {
     // Safely access highlights; default to empty array if not present.
-    const highlights = (customData && 'highlights' in customData && customData.highlights) || [];
+    const highlights = (customData as any)?.highlights || []; // Cast to any because customData is generic
     const types = new Set(highlights.map((h: HighlightItem) => h.type));
     return Array.from(types);
   }, [customData]);
@@ -126,7 +127,7 @@ const useLocationCardData = (location: Location | null | undefined) => {
   // Extract popular items from custom data, limited to the first two.
   const popularItems = useMemo(() => {
     // Safely access featuredItems; default to empty array if not present.
-    const featuredItems = (customData && 'featuredItems' in customData && customData.featuredItems) || [];
+    const featuredItems = (customData as any)?.featuredItems || []; // Cast to any
     return featuredItems.slice(0, 2);
   }, [customData]);
 
@@ -154,6 +155,11 @@ const useLocationCardData = (location: Location | null | undefined) => {
   };
 };
 
+/**
+ * Hook to manage click handlers for the LocationCard.
+ * Encapsulates event handling logic for various interactive elements.
+ * @param {Location} location - The location object relevant to the handlers.
+ */
 const useLocationCardHandlers = (location: Location | null | undefined) => { // Accept null/undefined location
   // Add an early return if location prop itself is null or undefined
   if (!location) {
@@ -214,6 +220,11 @@ const useLocationCardHandlers = (location: Location | null | undefined) => { // 
   };
 };
 
+/**
+ * Hook to determine the navigation path for the LocationCard.
+ * Centralizes the logic for generating dynamic detail page links.
+ * @param {Location} location - The location object to generate a link for.
+ */
 const useLocationCardNavigation = (location: Location | null | undefined) => { // Accept null/undefined location
   // Add an early return if location prop itself is null or undefined
   if (!location) {
@@ -235,12 +246,23 @@ const useLocationCardNavigation = (location: Location | null | undefined) => { /
   return { detailLink };
 };
 
+// -----------------------------------------------------------------------------
+// Sub-Components for LocationCard UI
+// -----------------------------------------------------------------------------
+
 interface LocationCardHeaderProps {
   location: Location;
 }
 
+/**
+ * Renders the header section of the location card, including title, rating, and basic badges.
+ * The title and rating are intentionally grouped without flex-1 or flex-shrink-0
+ * to ensure they remain left-aligned together, as per the refactor plan.
+ */
 const LocationCardHeader: React.FC<LocationCardHeaderProps> = React.memo(({ location }) => (
   <div className="flex flex-col mb-2">
+    {/* Title and Rating aligned together on the left */}
+    {/* Removed flex-1 from h4 and flex-shrink-0 from rating div to ensure left-alignment */}
     <div className="flex items-center gap-2 mb-1">
       <h4 className="font-semibold text-base sm:text-lg truncate">{location.name}</h4>
       <div className="flex items-center gap-1">
@@ -249,6 +271,7 @@ const LocationCardHeader: React.FC<LocationCardHeaderProps> = React.memo(({ loca
       </div>
     </div>
     
+    {/* Badges and meta info - Left aligned */}
     <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
       <Badge variant="default" className="text-xs">
         {location.type}
@@ -272,6 +295,9 @@ interface LocationCardImageProps {
   handleCarouselClick: (e: React.MouseEvent) => void;
 }
 
+/**
+ * Renders the image carousel for the location card.
+ */
 const LocationCardImage: React.FC<LocationCardImageProps> = React.memo(({ images, name, handleCarouselClick }) => (
   <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden flex-shrink-0 rounded-lg">
     <Carousel className="w-full h-full">
@@ -289,6 +315,7 @@ const LocationCardImage: React.FC<LocationCardImageProps> = React.memo(({ images
           </CarouselItem>
         ))}
       </CarouselContent>
+      {/* Carousel navigation buttons, click handlers prevent propagation */}
       <CarouselPrevious 
         className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
         onClick={handleCarouselClick}
@@ -312,6 +339,11 @@ interface LocationCardDetailsProps {
   highlightBadges: React.ReactNode;
 }
 
+/**
+ * Renders the detailed information section of the location card,
+ * including address (clickable for directions), hours, popular items,
+ * dietary options, and highlight badges.
+ */
 const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({ 
   location, 
   currentHours, 
@@ -321,7 +353,9 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
   highlightBadges
 }) => (
   <div className="flex-1 min-w-0">
+    {/* Address and Hours */}
     <div className="space-y-1 mb-3">
+      {/* Address is now the primary clickable element for directions */}
       <button
         onClick={handleAddressClick}
         className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors text-left w-full"
@@ -333,10 +367,11 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       
       <div className="flex items-center gap-2 text-sm">
         <Clock className="w-4 h-4 flex-shrink-0" />
+        {/* Updated line: Display currentHours or a fallback, with dynamic color */}
         <span
           className={`font-medium text-sm ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
-          role="status"
-          aria-label={
+          role="status" // Added for accessibility
+          aria-label={ // Added for accessibility
             location.openNow
               ? `Open today ${currentHours ? `from ${currentHours}` : ''}`.trim()
               : 'Closed today'
@@ -347,6 +382,7 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       </div>
     </div>
 
+    {/* Popular Items */}
     {popularItems.length > 0 && (
       <div className="mb-3">
         <p className="text-xs font-medium text-muted-foreground mb-1">Popular:</p>
@@ -360,7 +396,10 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
       </div>
     )}
 
+    {/* Dietary Options */}
     {dietaryOptionsElements}
+
+    {/* Highlight Badges */}
     {highlightBadges}
   </div>
 ));
@@ -372,6 +411,11 @@ interface LocationCardActionsProps {
   handleCallClick: (e: React.MouseEvent) => void;
 }
 
+/**
+ * Renders action buttons for the location card.
+ * As per feedback, the "Directions" button is removed, and directions
+ * are handled by clicking the address.
+ */
 const LocationCardActions: React.FC<LocationCardActionsProps> = React.memo(({ location, handleCallClick }) => (
   <div className="flex gap-2 mt-3">
     {location.phone && (
@@ -385,20 +429,35 @@ const LocationCardActions: React.FC<LocationCardActionsProps> = React.memo(({ lo
         Call
       </Button>
     )}
+    {/* The directions button is intentionally removed as the address click now handles it. */}
   </div>
 ));
 
 LocationCardActions.displayName = 'LocationCardActions';
 
+// -----------------------------------------------------------------------------
+// Main LocationCard Component
+// -----------------------------------------------------------------------------
+
+/**
+ * The main LocationCard component, now refactored into smaller,
+ * more manageable sub-components and custom hooks.
+ * It combines all the pieces to render a complete location card.
+ */
 const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHighlighted = false }) => {
+  // If location itself is null or undefined, render nothing or a loading state
+  // This check is crucial and happens before any hooks are called with 'location'
   if (!location) {
-    return null;
+    return null; // Or a skeleton loader if preferred
   }
 
+  // Use custom hooks for data, handlers, and navigation logic
+  // Pass potentially null/undefined location to the hooks
   const locationData = useLocationCardData(location);
   const locationHandlers = useLocationCardHandlers(location);
   const locationNavigation = useLocationCardNavigation(location);
 
+  // Destructure values from the hooks
   const { highlightBadges, dietaryOptionsElements, popularItems, currentHours } = locationData;
   const { handleCardClick, handleCarouselClick, handleCallClick, handleAddressClick } = locationHandlers;
   const { detailLink } = locationNavigation;
@@ -407,10 +466,12 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative ${
       isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
     }`}>
+      {/* Hazy overlay for closed locations */}
       {!location.openNow && (
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[0.5px] z-10" />
       )}
       
+      {/* Main clickable area of the card, navigates to detail page */}
       <Link 
         key={location.id}
         to={detailLink}
@@ -418,6 +479,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
         onClick={handleCardClick}
       >
         <div className="flex gap-4">
+          {/* Image Carousel Sub-component */}
           <LocationCardImage 
             images={location.images} 
             name={location.name} 
@@ -425,8 +487,10 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
           />
           
           <div className="flex-1 min-w-0">
+            {/* Header Section Sub-component */}
             <LocationCardHeader location={location} />
             
+            {/* Details Section Sub-component */}
             <LocationCardDetails 
               location={location}
               currentHours={currentHours}
@@ -436,6 +500,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               highlightBadges={highlightBadges}
             />
 
+            {/* Actions Section Sub-component */}
             <LocationCardActions 
               location={location} 
               handleCallClick={handleCallClick}
