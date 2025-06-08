@@ -1,7 +1,7 @@
 
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock, Navigation } from "lucide-react";
+import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -133,14 +133,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
     }
   }, [location.phone]);
 
-  const handleDirectionsClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (location.coordinates) {
-      openDirections(location.coordinates.lat, location.coordinates.lng);
-    }
-  }, [location.coordinates]);
-
   const handleAddressClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -195,19 +187,18 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
           
           {/* Location Details */}
           <div className="flex-1 min-w-0">
-            {/* Header Section - Fixed left alignment */}
+            {/* Header Section - Title and Rating on the Left */}
             <div className="mb-2">
-              {/* Rating positioned absolutely in top right */}
-              <div className="relative">
-                <h4 className="font-semibold text-base sm:text-lg truncate">{location.name}</h4>
-                <div className="absolute top-0 right-0 flex items-center gap-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold text-base sm:text-lg truncate flex-1 min-w-0">{location.name}</h4>
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   <span className="font-medium text-sm">{location.rating}</span>
                 </div>
               </div>
               
               {/* Badges and meta info - Left aligned */}
-              <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mt-1">
+              <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
                 <Badge variant="default" className="text-xs">
                   {location.type}
                 </Badge>
@@ -221,26 +212,15 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               </div>
             </div>
 
-            {/* Address and Hours with Directions */}
+            {/* Address and Hours */}
             <div className="space-y-1 mb-3">
-              <div className="flex items-start justify-between">
-                <button
-                  onClick={handleAddressClick}
-                  className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors text-left flex-1 min-w-0"
-                >
-                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <span className="truncate">{location.address}</span>
-                </button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs ml-2 flex-shrink-0"
-                  onClick={handleDirectionsClick}
-                >
-                  <Navigation className="w-3 h-3 mr-1" />
-                  Directions
-                </Button>
-              </div>
+              <button
+                onClick={handleAddressClick}
+                className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors text-left w-full"
+              >
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span className="truncate">{location.address}</span>
+              </button>
               
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="w-4 h-4 flex-shrink-0" />
