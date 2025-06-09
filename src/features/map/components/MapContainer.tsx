@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useApiKeyLoader } from './ApiKeyLoader';
 import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
@@ -30,19 +30,22 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onLocationSelect
 }) => {
   const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  const [googleMapsError, setGoogleMapsError] = useState<any>(null);
 
   // Use unified loading state to coordinate all dependencies
   const loadingState = useMapLoadingState({
     apiKeyLoading,
     apiKeyError,
     apiKey,
-    googleMapsLoaded: false, // This will be managed by GoogleMapsLoader
-    googleMapsError: null
+    googleMapsLoaded,
+    googleMapsError
   });
 
   console.log('MapContainer render state:', { 
     loadingState,
     apiKey: apiKey ? 'present' : 'missing', 
+    googleMapsLoaded,
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
@@ -50,6 +53,18 @@ const MapContainer: React.FC<MapContainerProps> = ({
     retryCount,
     currentUrl: window.location.href
   });
+
+  const handleGoogleMapsLoad = useCallback(() => {
+    console.log('Google Maps successfully loaded');
+    setGoogleMapsLoaded(true);
+    setGoogleMapsError(null);
+  }, []);
+
+  const handleGoogleMapsError = useCallback((error: any) => {
+    console.error('Google Maps loading error:', error);
+    setGoogleMapsError(error);
+    setGoogleMapsLoaded(false);
+  }, []);
 
   // Show loading while in loading states
   if (loadingState.isLoading) {
@@ -100,6 +115,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
         searchQuery={searchQuery}
         onMapLoaded={onMapLoaded}
         onMapIdle={onMapIdle}
+        onGoogleMapsLoad={handleGoogleMapsLoad}
+        onGoogleMapsError={handleGoogleMapsError}
       />
     </div>
   );

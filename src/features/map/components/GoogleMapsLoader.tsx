@@ -15,6 +15,8 @@ interface GoogleMapsLoaderProps {
   searchQuery?: string;
   onMapLoaded?: (map: google.maps.Map) => void;
   onMapIdle?: (center: LatLng, zoom: number) => void;
+  onGoogleMapsLoad?: () => void;
+  onGoogleMapsError?: (error: any) => void;
 }
 
 // Include places library to fix the Places API error
@@ -29,7 +31,9 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
   height,
   searchQuery,
   onMapLoaded,
-  onMapIdle
+  onMapIdle,
+  onGoogleMapsLoad,
+  onGoogleMapsError
 }) => {
   const [placesReady, setPlacesReady] = useState(false);
   const [initializationError, setInitializationError] = useState<string | null>(null);
@@ -56,16 +60,31 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
           console.log('Places API is ready');
           setPlacesReady(true);
           clearInterval(checkInterval);
+          // Notify parent that Google Maps is fully loaded
+          if (onGoogleMapsLoad) {
+            onGoogleMapsLoad();
+          }
         } else if (attempts >= maxAttempts) {
           console.error('Places API failed to load after maximum attempts');
+          const error = new Error('Places API failed to initialize');
           setInitializationError('Places API failed to initialize');
+          if (onGoogleMapsError) {
+            onGoogleMapsError(error);
+          }
           clearInterval(checkInterval);
         }
       }, 100);
     };
 
     checkPlacesApi();
-  }, [isLoaded]);
+  }, [isLoaded, onGoogleMapsLoad, onGoogleMapsError]);
+
+  // Handle load errors
+  useEffect(() => {
+    if (loadError && onGoogleMapsError) {
+      onGoogleMapsError(loadError);
+    }
+  }, [loadError, onGoogleMapsError]);
 
   console.log('GoogleMapsLoader state:', { 
     apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
