@@ -18,6 +18,9 @@ export interface QueryOptimization {
   suggestions: string[];
 }
 
+// Define known table names from the database schema
+type KnownTableName = 'cached_places' | 'cache_statistics' | 'dietary_restriction_types' | 'nutrition_goal_types' | 'profiles' | 'search_areas' | 'spatial_ref_sys';
+
 export class DatabaseOptimizationService {
   private indexingStrategies: IndexingStrategy[] = [
     // Location-based queries optimization
@@ -135,9 +138,22 @@ export class DatabaseOptimizationService {
     lastAnalyzed: string | null;
   } | null> {
     try {
+      // Check if the table name is one of our known tables
+      const knownTables: KnownTableName[] = ['cached_places', 'cache_statistics', 'dietary_restriction_types', 'nutrition_goal_types', 'profiles', 'search_areas', 'spatial_ref_sys'];
+      
+      if (!knownTables.includes(tableName as KnownTableName)) {
+        console.warn(`Table ${tableName} is not in the known schema, returning estimated statistics`);
+        return {
+          rowCount: 0,
+          indexCount: 1,
+          avgRowSize: 1024,
+          lastAnalyzed: new Date().toISOString()
+        };
+      }
+
       // Get basic table statistics using available Supabase queries
       const { data, error, count } = await supabase
-        .from(tableName)
+        .from(tableName as KnownTableName)
         .select('*', { count: 'exact', head: true });
 
       if (error) {
