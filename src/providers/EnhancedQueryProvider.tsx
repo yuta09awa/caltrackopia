@@ -3,28 +3,28 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 interface QueryCacheConfig {
-  places: { staleTime: number; cacheTime: number };
-  nutrition: { staleTime: number; cacheTime: number };
-  user: { staleTime: number; cacheTime: number };
-  realtime: { staleTime: number; cacheTime: number };
+  places: { staleTime: number; gcTime: number };
+  nutrition: { staleTime: number; gcTime: number };
+  user: { staleTime: number; gcTime: number };
+  realtime: { staleTime: number; gcTime: number };
 }
 
 const CACHE_CONFIG: QueryCacheConfig = {
   places: {
     staleTime: 1000 * 60 * 15, // 15 minutes - places don't change often
-    cacheTime: 1000 * 60 * 60 * 24 // 24 hours
+    gcTime: 1000 * 60 * 60 * 24 // 24 hours
   },
   nutrition: {
     staleTime: 1000 * 60 * 60 * 2, // 2 hours - nutrition data is fairly static
-    cacheTime: 1000 * 60 * 60 * 24 * 7 // 7 days
+    gcTime: 1000 * 60 * 60 * 24 * 7 // 7 days
   },
   user: {
     staleTime: 1000 * 60 * 5, // 5 minutes - user data changes more frequently
-    cacheTime: 1000 * 60 * 30 // 30 minutes
+    gcTime: 1000 * 60 * 30 // 30 minutes
   },
   realtime: {
     staleTime: 1000 * 30, // 30 seconds - for real-time features
-    cacheTime: 1000 * 60 * 5 // 5 minutes
+    gcTime: 1000 * 60 * 5 // 5 minutes
   }
 };
 
@@ -34,7 +34,7 @@ const createOptimizedQueryClient = (): QueryClient => {
     defaultOptions: {
       queries: {
         staleTime: CACHE_CONFIG.places.staleTime,
-        cacheTime: CACHE_CONFIG.places.cacheTime,
+        gcTime: CACHE_CONFIG.places.gcTime,
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         retry: (failureCount, error: any) => {
@@ -83,25 +83,25 @@ export const createQueryOptions = {
     queryKey: key,
     queryFn,
     staleTime: CACHE_CONFIG.places.staleTime,
-    cacheTime: CACHE_CONFIG.places.cacheTime,
+    gcTime: CACHE_CONFIG.places.gcTime,
   }),
   nutrition: (key: any[], queryFn: () => Promise<any>) => ({
     queryKey: key,
     queryFn,
     staleTime: CACHE_CONFIG.nutrition.staleTime,
-    cacheTime: CACHE_CONFIG.nutrition.cacheTime,
+    gcTime: CACHE_CONFIG.nutrition.gcTime,
   }),
   user: (key: any[], queryFn: () => Promise<any>) => ({
     queryKey: key,
     queryFn,
     staleTime: CACHE_CONFIG.user.staleTime,
-    cacheTime: CACHE_CONFIG.user.cacheTime,
+    gcTime: CACHE_CONFIG.user.gcTime,
   }),
   realtime: (key: any[], queryFn: () => Promise<any>) => ({
     queryKey: key,
     queryFn,
     staleTime: CACHE_CONFIG.realtime.staleTime,
-    cacheTime: CACHE_CONFIG.realtime.cacheTime,
+    gcTime: CACHE_CONFIG.realtime.gcTime,
   }),
 };
 
