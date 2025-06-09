@@ -35,6 +35,7 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
   onGoogleMapsLoad,
   onGoogleMapsError
 }) => {
+  const [mapReady, setMapReady] = useState(false);
   const [placesReady, setPlacesReady] = useState(false);
   const [initializationError, setInitializationError] = useState<string | null>(null);
 
@@ -45,50 +46,86 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     preventGoogleFontsLoading: true,
   });
 
-  // Wait for Places API to be fully ready
+  // Handle Google Maps core loading
   useEffect(() => {
     if (!isLoaded) return;
 
-    const checkPlacesApi = async () => {
-      const maxAttempts = 20;
+    console.log('Google Maps script loaded, checking core APIs...');
+    
+    // Check if core Google Maps API is available
+    if (window.google?.maps?.Map) {
+      console.log('Google Maps core API is available');
+      setMapReady(true);
+      
+      // Notify parent that core Google Maps is ready
+      if (onGoogleMapsLoad) {
+        console.log('Notifying parent that Google Maps core is loaded');
+        onGoogleMapsLoad();
+      }
+    } else {
+      console.error('Google Maps core API not available after script load');
+      const error = new Error('Google Maps core API not available');
+      setInitializationError('Google Maps core API failed to initialize');
+      if (onGoogleMapsError) {
+        onGoogleMapsError(error);
+      }
+    }
+  }, [isLoaded, onGoogleMapsLoad, onGoogleMapsError]);
+
+  // Handle Places API loading separately (with timeout and fallback)
+  useEffect(() => {
+    if (!mapReady) return;
+
+    console.log('Checking Places API availability...');
+    
+    const checkPlacesApi = () => {
+      const maxAttempts = 15; // Reduced attempts but with better fallback
+      const timeoutMs = 3000; // 3 second timeout
       let attempts = 0;
       
       const checkInterval = setInterval(() => {
         attempts++;
+        console.log(`Places API check attempt ${attempts}/${maxAttempts}`);
         
         if (window.google?.maps?.places?.PlacesService) {
           console.log('Places API is ready');
           setPlacesReady(true);
           clearInterval(checkInterval);
-          // Notify parent that Google Maps is fully loaded
-          if (onGoogleMapsLoad) {
-            onGoogleMapsLoad();
-          }
         } else if (attempts >= maxAttempts) {
-          console.error('Places API failed to load after maximum attempts');
-          const error = new Error('Places API failed to initialize');
-          setInitializationError('Places API failed to initialize');
-          if (onGoogleMapsError) {
-            onGoogleMapsError(error);
-          }
+          console.warn('Places API not available after maximum attempts, proceeding without it');
+          // Don't treat this as an error - just proceed without Places API
+          setPlacesReady(true); // Allow map to render without Places API
           clearInterval(checkInterval);
         }
-      }, 100);
+      }, timeoutMs / maxAttempts);
+
+      // Global timeout fallback
+      setTimeout(() => {
+        if (!placesReady) {
+          console.warn('Places API timeout reached, proceeding without Places API');
+          clearInterval(checkInterval);
+          setPlacesReady(true); // Allow map to render
+        }
+      }, timeoutMs);
     };
 
     checkPlacesApi();
-  }, [isLoaded, onGoogleMapsLoad, onGoogleMapsError]);
+  }, [mapReady, placesReady]);
 
   // Handle load errors
   useEffect(() => {
-    if (loadError && onGoogleMapsError) {
-      onGoogleMapsError(loadError);
+    if (loadError) {
+      console.error('Google Maps script load error:', loadError);
+      if (onGoogleMapsError) {
+        onGoogleMapsError(loadError);
+      }
     }
   }, [loadError, onGoogleMapsError]);
 
   console.log('GoogleMapsLoader state:', { 
     apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
     isLoaded, 
+    mapReady,
     placesReady,
     loadError: loadError?.message,
     initializationError,
@@ -134,13 +171,19 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     return <MapLoadingState height={height} type="initializing" />;
   }
 
-  // Wait for Places API to be ready
+  // Wait for core Maps API to be ready
+  if (!mapReady) {
+    console.log('Waiting for Google Maps core API to be ready...');
+    return <MapLoadingState height={height} type="initializing" />;
+  }
+
+  // Wait for Places API (with reasonable timeout)
   if (!placesReady) {
     console.log('Waiting for Places API to be ready...');
     return <MapLoadingState height={height} type="initializing" />;
   }
 
-  console.log('Google Maps and Places API successfully loaded, rendering MapView with markers:', mapState.markers);
+  console.log('Google Maps fully loaded, rendering MapView with markers:', mapState.markers.length);
 
   return (
     <MapView
