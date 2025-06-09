@@ -31,16 +31,13 @@ export const useMapLoadingState = ({
   });
 
   useEffect(() => {
-    // Handle API key loading
-    if (apiKeyLoading) {
-      setState({
-        isReady: false,
-        isLoading: true,
-        error: null,
-        stage: 'api-key'
-      });
-      return;
-    }
+    console.log('useMapLoadingState update:', {
+      apiKeyLoading,
+      apiKeyError,
+      apiKey: apiKey ? 'present' : 'missing',
+      googleMapsLoaded,
+      googleMapsError
+    });
 
     // Handle API key error
     if (apiKeyError) {
@@ -53,13 +50,13 @@ export const useMapLoadingState = ({
       return;
     }
 
-    // Handle Google Maps loading
-    if (apiKey && !googleMapsLoaded) {
+    // Handle API key loading
+    if (apiKeyLoading) {
       setState({
         isReady: false,
         isLoading: true,
         error: null,
-        stage: 'google-maps'
+        stage: 'api-key'
       });
       return;
     }
@@ -75,6 +72,17 @@ export const useMapLoadingState = ({
       return;
     }
 
+    // API key loaded, now wait for Google Maps
+    if (apiKey && !googleMapsLoaded) {
+      setState({
+        isReady: false,
+        isLoading: true,
+        error: null,
+        stage: 'google-maps'
+      });
+      return;
+    }
+
     // All dependencies loaded successfully
     if (apiKey && googleMapsLoaded) {
       setState({
@@ -82,6 +90,17 @@ export const useMapLoadingState = ({
         isLoading: false,
         error: null,
         stage: 'ready'
+      });
+      return;
+    }
+
+    // Default case - still loading API key
+    if (!apiKey) {
+      setState({
+        isReady: false,
+        isLoading: true,
+        error: null,
+        stage: 'api-key'
       });
     }
   }, [apiKeyLoading, apiKeyError, apiKey, googleMapsLoaded, googleMapsError]);

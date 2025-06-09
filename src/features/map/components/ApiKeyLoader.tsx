@@ -13,9 +13,9 @@ export const useApiKeyLoader = () => {
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
 
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 1000; // 1 second
-  const TIMEOUT_MS = 10000; // 10 seconds
+  const MAX_RETRIES = 1; // Reduced from 3
+  const RETRY_DELAY = 1000; // Reduced delay
+  const TIMEOUT_MS = 5000; // Reduced from 10 seconds
 
   useEffect(() => {
     const fetchApiKeyWithRetry = async () => {
@@ -39,6 +39,7 @@ export const useApiKeyLoader = () => {
           console.log('Successfully retrieved API key');
           setApiKey(data.apiKey);
           setError(null);
+          setLoading(false);
         } else {
           throw new Error('Google Maps API key not found in response');
         }
@@ -46,20 +47,16 @@ export const useApiKeyLoader = () => {
         console.error(`API key fetch attempt ${retryCount + 1} failed:`, e);
         
         if (retryCount < MAX_RETRIES) {
-          // Retry with exponential backoff
-          const delay = RETRY_DELAY * Math.pow(2, retryCount);
+          // Retry with delay
           setTimeout(() => {
             setRetryCount(prev => prev + 1);
-          }, delay);
+          }, RETRY_DELAY);
           return;
         }
         
         // All retries exhausted
         setError(`Failed to load API key after ${MAX_RETRIES + 1} attempts: ${e.message}`);
-      } finally {
-        if (retryCount >= MAX_RETRIES || apiKey || error) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
