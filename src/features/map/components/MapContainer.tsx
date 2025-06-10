@@ -1,7 +1,6 @@
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { useApiKeyLoader } from './ApiKeyLoader';
-import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
 import GoogleMapsLoader from './GoogleMapsLoader';
 import { Ingredient } from '@/models/NutritionalInfo';
@@ -30,87 +29,44 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onLocationSelect
 }) => {
   const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
-  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
-  const [googleMapsError, setGoogleMapsError] = useState<any>(null);
-
-  // Use unified loading state to coordinate all dependencies
-  const loadingState = useMapLoadingState({
-    apiKeyLoading,
-    apiKeyError,
-    apiKey,
-    googleMapsLoaded,
-    googleMapsError
-  });
 
   console.log('🏗️ MapContainer render:', { 
-    loadingState: {
-      stage: loadingState.stage,
-      isReady: loadingState.isReady,
-      isLoading: loadingState.isLoading,
-      error: loadingState.error
-    },
     apiKey: apiKey ? 'present' : 'missing', 
-    googleMapsLoaded,
-    googleMapsError: googleMapsError?.message,
+    apiKeyLoading,
+    apiKeyError,
     markersCount: mapState.markers.length,
     retryCount
   });
 
-  const handleGoogleMapsLoad = useCallback(() => {
-    console.log('📢 MapContainer received Google Maps ready signal');
-    setGoogleMapsLoaded(true);
-    setGoogleMapsError(null);
-  }, []);
-
-  const handleGoogleMapsError = useCallback((error: any) => {
-    console.error('💥 MapContainer received Google Maps error:', error);
-    setGoogleMapsError(error);
-    setGoogleMapsLoaded(false);
-  }, []);
-
-  // Show loading while in loading states
-  if (loadingState.isLoading) {
-    const loadingMessage = loadingState.stage === 'api-key' 
-      ? retryCount > 0 
-        ? `Loading API key (attempt ${retryCount + 1})...`
-        : 'Loading API key...'
-      : loadingState.stage === 'google-maps'
-        ? 'Loading Google Maps...'
-        : 'Initializing map...';
-
-    console.log('⏳ MapContainer showing loading:', { stage: loadingState.stage, message: loadingMessage });
+  // Show loading while API key loads
+  if (apiKeyLoading) {
+    const loadingMessage = retryCount > 0 
+      ? `Loading API key (attempt ${retryCount + 1})...`
+      : 'Loading API key...';
+    
+    console.log('⏳ MapContainer: Loading API key');
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
 
-  // Show error if any dependency failed
-  if (loadingState.error) {
-    console.error('💥 MapContainer showing error:', { 
-      error: loadingState.error,
-      stage: loadingState.stage,
-      retryCount 
-    });
-    
+  // Show error if API key failed
+  if (apiKeyError) {
+    console.error('💥 MapContainer: API key error:', apiKeyError);
     return (
       <MapLoadingState 
         height={height} 
         type="error" 
-        errorMessage={loadingState.error} 
+        errorMessage={apiKeyError} 
       />
     );
   }
 
-  // Double check we have what we need before rendering
+  // Check we have API key
   if (!apiKey) {
     console.log('⚠️ MapContainer: No API key available');
     return <MapLoadingState height={height} type="loading" errorMessage="Waiting for API key..." />;
   }
 
-  if (!loadingState.isReady) {
-    console.log('⚠️ MapContainer: Loading state says not ready');
-    return <MapLoadingState height={height} type="loading" errorMessage="Preparing map..." />;
-  }
-
-  console.log('🚀 MapContainer: All ready, rendering GoogleMapsLoader');
+  console.log('🚀 MapContainer: API key ready, rendering GoogleMapsLoader');
 
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
@@ -124,8 +80,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
         searchQuery={searchQuery}
         onMapLoaded={onMapLoaded}
         onMapIdle={onMapIdle}
-        onGoogleMapsLoad={handleGoogleMapsLoad}
-        onGoogleMapsError={handleGoogleMapsError}
       />
     </div>
   );
