@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import MapLoadingState from './MapLoadingState';
 import MapView from './MapView';
@@ -19,7 +19,6 @@ interface GoogleMapsLoaderProps {
   onGoogleMapsError?: (error: any) => void;
 }
 
-// Include places library to fix the Places API error
 const libraries: ("places" | "marker")[] = ['places', 'marker'];
 
 const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({ 
@@ -35,9 +34,7 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
   onGoogleMapsLoad,
   onGoogleMapsError
 }) => {
-  const [mapReady, setMapReady] = useState(false);
-  const [placesReady, setPlacesReady] = useState(false);
-  const [initializationError, setInitializationError] = useState<string | null>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -46,144 +43,86 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     preventGoogleFontsLoading: true,
   });
 
-  // Handle Google Maps core loading
-  useEffect(() => {
-    if (!isLoaded) return;
+  // Handle the loading state and notify parent when ready
+  const handleGoogleMapsReady = useCallback(() => {
+    console.log('🎉 Google Maps is fully ready');
+    setIsMapReady(true);
+    if (onGoogleMapsLoad) {
+      console.log('📢 Notifying parent that Google Maps is ready');
+      onGoogleMapsLoad();
+    }
+  }, [onGoogleMapsLoad]);
 
-    console.log('Google Maps script loaded, checking core APIs...');
+  // Check Google Maps readiness when script loads
+  useEffect(() => {
+    if (!isLoaded) {
+      console.log('⏳ Waiting for Google Maps script to load...');
+      return;
+    }
+
+    console.log('📝 Google Maps script loaded, checking API availability...');
     
-    // Check if core Google Maps API is available
+    // Check if Google Maps API is available
     if (window.google?.maps?.Map) {
-      console.log('Google Maps core API is available');
-      setMapReady(true);
-      
-      // Notify parent that core Google Maps is ready
-      if (onGoogleMapsLoad) {
-        console.log('Notifying parent that Google Maps core is loaded');
-        onGoogleMapsLoad();
-      }
+      console.log('✅ Google Maps core API confirmed available');
+      handleGoogleMapsReady();
     } else {
-      console.error('Google Maps core API not available after script load');
+      console.error('❌ Google Maps core API not available after script load');
       const error = new Error('Google Maps core API not available');
-      setInitializationError('Google Maps core API failed to initialize');
       if (onGoogleMapsError) {
         onGoogleMapsError(error);
       }
     }
-  }, [isLoaded, onGoogleMapsLoad, onGoogleMapsError]);
-
-  // Handle Places API loading separately (with timeout and fallback)
-  useEffect(() => {
-    if (!mapReady) return;
-
-    console.log('Checking Places API availability...');
-    
-    const checkPlacesApi = () => {
-      const maxAttempts = 15; // Reduced attempts but with better fallback
-      const timeoutMs = 3000; // 3 second timeout
-      let attempts = 0;
-      
-      const checkInterval = setInterval(() => {
-        attempts++;
-        console.log(`Places API check attempt ${attempts}/${maxAttempts}`);
-        
-        if (window.google?.maps?.places?.PlacesService) {
-          console.log('Places API is ready');
-          setPlacesReady(true);
-          clearInterval(checkInterval);
-        } else if (attempts >= maxAttempts) {
-          console.warn('Places API not available after maximum attempts, proceeding without it');
-          // Don't treat this as an error - just proceed without Places API
-          setPlacesReady(true); // Allow map to render without Places API
-          clearInterval(checkInterval);
-        }
-      }, timeoutMs / maxAttempts);
-
-      // Global timeout fallback
-      setTimeout(() => {
-        if (!placesReady) {
-          console.warn('Places API timeout reached, proceeding without Places API');
-          clearInterval(checkInterval);
-          setPlacesReady(true); // Allow map to render
-        }
-      }, timeoutMs);
-    };
-
-    checkPlacesApi();
-  }, [mapReady, placesReady]);
+  }, [isLoaded, handleGoogleMapsReady, onGoogleMapsError]);
 
   // Handle load errors
   useEffect(() => {
     if (loadError) {
-      console.error('Google Maps script load error:', loadError);
+      console.error('❌ Google Maps script load error:', loadError);
       if (onGoogleMapsError) {
         onGoogleMapsError(loadError);
       }
     }
   }, [loadError, onGoogleMapsError]);
 
-  console.log('GoogleMapsLoader state:', { 
+  console.log('🔍 GoogleMapsLoader state:', { 
     apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
     isLoaded, 
-    mapReady,
-    placesReady,
+    isMapReady,
     loadError: loadError?.message,
-    initializationError,
     markersCount: mapState.markers.length,
-    searchQuery,
-    googleMapsAvailable: typeof window !== 'undefined' && 'google' in window,
-    placesAvailable: typeof window !== 'undefined' && window.google?.maps?.places
+    windowGoogleAvailable: typeof window !== 'undefined' && 'google' in window
   });
 
   // Show error if Google Maps failed to load
   if (loadError) {
-    console.error('Google Maps load error details:', {
+    console.error('💥 Google Maps load error details:', {
       message: loadError.message,
-      stack: loadError.stack,
-      apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
-      currentDomain: window.location.hostname,
-      fullUrl: window.location.href
+      apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing'
     });
     
     return (
       <MapLoadingState 
         height={height} 
         type="error" 
-        errorMessage={`Google Maps Error: ${loadError.message}. Check console for details.`} 
-      />
-    );
-  }
-
-  // Show error if initialization failed
-  if (initializationError) {
-    return (
-      <MapLoadingState 
-        height={height} 
-        type="error" 
-        errorMessage={initializationError} 
+        errorMessage={`Google Maps Error: ${loadError.message}`} 
       />
     );
   }
 
   // Wait for script to load
   if (!isLoaded) {
-    console.log('Waiting for Google Maps script to load...');
-    return <MapLoadingState height={height} type="initializing" />;
+    console.log('⏳ GoogleMapsLoader: Waiting for script...');
+    return <MapLoadingState height={height} type="loading" errorMessage="Loading Google Maps script..." />;
   }
 
-  // Wait for core Maps API to be ready
-  if (!mapReady) {
-    console.log('Waiting for Google Maps core API to be ready...');
-    return <MapLoadingState height={height} type="initializing" />;
+  // Wait for map to be ready
+  if (!isMapReady) {
+    console.log('⏳ GoogleMapsLoader: Waiting for map to be ready...');
+    return <MapLoadingState height={height} type="loading" errorMessage="Initializing Google Maps..." />;
   }
 
-  // Wait for Places API (with reasonable timeout)
-  if (!placesReady) {
-    console.log('Waiting for Places API to be ready...');
-    return <MapLoadingState height={height} type="initializing" />;
-  }
-
-  console.log('Google Maps fully loaded, rendering MapView with markers:', mapState.markers.length);
+  console.log('🚀 GoogleMapsLoader: Rendering MapView');
 
   return (
     <MapView

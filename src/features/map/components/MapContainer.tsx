@@ -42,27 +42,28 @@ const MapContainer: React.FC<MapContainerProps> = ({
     googleMapsError
   });
 
-  console.log('MapContainer render state:', { 
-    loadingState,
+  console.log('🏗️ MapContainer render:', { 
+    loadingState: {
+      stage: loadingState.stage,
+      isReady: loadingState.isReady,
+      isLoading: loadingState.isLoading,
+      error: loadingState.error
+    },
     apiKey: apiKey ? 'present' : 'missing', 
     googleMapsLoaded,
     googleMapsError: googleMapsError?.message,
     markersCount: mapState.markers.length,
-    center: mapState.center,
-    zoom: mapState.zoom,
-    searchQuery,
-    retryCount,
-    currentUrl: window.location.href
+    retryCount
   });
 
   const handleGoogleMapsLoad = useCallback(() => {
-    console.log('Google Maps successfully loaded in MapContainer');
+    console.log('📢 MapContainer received Google Maps ready signal');
     setGoogleMapsLoaded(true);
     setGoogleMapsError(null);
   }, []);
 
   const handleGoogleMapsError = useCallback((error: any) => {
-    console.error('Google Maps loading error in MapContainer:', error);
+    console.error('💥 MapContainer received Google Maps error:', error);
     setGoogleMapsError(error);
     setGoogleMapsLoaded(false);
   }, []);
@@ -77,13 +78,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
         ? 'Loading Google Maps...'
         : 'Initializing map...';
 
-    console.log('MapContainer showing loading state:', { stage: loadingState.stage, message: loadingMessage });
+    console.log('⏳ MapContainer showing loading:', { stage: loadingState.stage, message: loadingMessage });
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
 
   // Show error if any dependency failed
   if (loadingState.error) {
-    console.error('Map loading error in MapContainer:', { 
+    console.error('💥 MapContainer showing error:', { 
       error: loadingState.error,
       stage: loadingState.stage,
       retryCount 
@@ -98,15 +99,19 @@ const MapContainer: React.FC<MapContainerProps> = ({
     );
   }
 
-  // Don't render map component until we have API key
+  // Double check we have what we need before rendering
   if (!apiKey) {
-    console.log('Waiting for API key in MapContainer...');
-    return <MapLoadingState height={height} type="initializing" />;
+    console.log('⚠️ MapContainer: No API key available');
+    return <MapLoadingState height={height} type="loading" errorMessage="Waiting for API key..." />;
   }
 
-  console.log('MapContainer ready to render GoogleMapsLoader');
+  if (!loadingState.isReady) {
+    console.log('⚠️ MapContainer: Loading state says not ready');
+    return <MapLoadingState height={height} type="loading" errorMessage="Preparing map..." />;
+  }
 
-  // Now we can safely render the map with the API key
+  console.log('🚀 MapContainer: All ready, rendering GoogleMapsLoader');
+
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
       <GoogleMapsLoader
