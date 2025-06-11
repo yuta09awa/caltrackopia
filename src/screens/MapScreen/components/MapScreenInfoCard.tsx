@@ -136,3 +136,5 @@ export const MapInfoCard: React.FC = () => {
     </Card>
   );
 };
+
+export default MapInfoCard;
