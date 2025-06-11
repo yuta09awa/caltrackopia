@@ -1,6 +1,17 @@
 
 import { create } from 'zustand';
-import { LatLng, MarkerData } from '@/features/map/hooks/useMapState';
+
+// Define our own LatLng interface since @react-google-maps/api doesn't export it directly
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+export interface MarkerData {
+  position: LatLng;
+  locationId: string;
+  type: string;
+}
 
 export interface Place {
   id: string;
@@ -124,18 +135,23 @@ export const useMapStore = create<MapState>((set, get) => ({
   
   // Complex actions
   handleMarkerClick: (locationId, position) => {
+    console.log('🎯 Marker clicked:', locationId, position);
     const state = get();
     const place = state.searchResults.find(p => p.id === locationId);
     if (place) {
+      console.log('✅ Found place for marker:', place.name);
       set({
         selectedPlace: place,
         showInfoCard: true,
         infoCardPosition: position
       });
+    } else {
+      console.warn('⚠️ No place found for locationId:', locationId);
     }
   },
   
   handleMapClick: () => {
+    console.log('🗺️ Map clicked - clearing selection');
     set({
       selectedPlace: null,
       showInfoCard: false
@@ -143,6 +159,7 @@ export const useMapStore = create<MapState>((set, get) => ({
   },
   
   resetSearch: () => {
+    console.log('🔄 Resetting search');
     set({
       searchQuery: '',
       searchResults: [],

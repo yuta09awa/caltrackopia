@@ -32,7 +32,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ height }) => {
     apiKey: apiKey ? 'present' : 'missing', 
     isLoaded,
     loadError,
-    markersCount: markers.length
+    markersCount: markers.length,
+    center,
+    zoom
   });
 
   // Show loading while API key loads
@@ -61,24 +63,16 @@ const MapComponent: React.FC<MapComponentProps> = ({ height }) => {
 
   console.log('🚀 MapComponent: Ready to render map');
 
-  const handleCameraChanged = () => {
-    // Debounced camera change handler would go here
-    // For now, we'll use the existing onMapIdle logic
-  };
-
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
       <GoogleMap
         onLoad={onMapLoad}
         zoom={zoom}
         center={center}
-        onCenterChanged={handleCameraChanged}
-        onZoomChanged={handleCameraChanged}
         onIdle={() => {
-          const map = onMapLoad as any; // Type assertion for now
-          if (map && map.current) {
-            const newCenter = map.current.getCenter();
-            const newZoom = map.current.getZoom();
+          if (mapRef.current) {
+            const newCenter = mapRef.current.getCenter();
+            const newZoom = mapRef.current.getZoom();
             if (newCenter && newZoom !== undefined) {
               onMapIdle(
                 { lat: newCenter.lat(), lng: newCenter.lng() },

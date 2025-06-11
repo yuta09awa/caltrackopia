@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { useMapStore, Place } from '@/store/mapStore';
 import { supabase } from '@/integrations/supabase/client';
-import { LatLng, MarkerData } from './useMapState';
+import { LatLng, MarkerData } from '../types';
 
 const libraries: ("places" | "marker")[] = ['places', 'marker'];
 
@@ -57,18 +57,18 @@ export const useMapController = () => {
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
-        console.log('Fetching Google Maps API key...');
+        console.log('🔑 Fetching Google Maps API key...');
         const { data, error } = await supabase.functions.invoke('get-google-maps-api-key');
         
         if (error) throw error;
         if (data?.apiKey) {
-          console.log('Successfully retrieved API key');
+          console.log('✅ Successfully retrieved API key');
           setApiKey(data.apiKey);
         } else {
           throw new Error('No API key in response');
         }
       } catch (error: any) {
-        console.error('Failed to load API key:', error);
+        console.error('❌ Failed to load API key:', error);
         setLoadError(`Failed to load API key: ${error.message}`);
       }
     };
@@ -81,9 +81,11 @@ export const useMapController = () => {
   // Update loaded state when Google Maps script loads
   useEffect(() => {
     if (scriptError) {
+      console.error('❌ Google Maps Script Error:', scriptError);
       setLoadError(`Google Maps Error: ${scriptError.message}`);
       setIsLoaded(false);
     } else if (scriptLoaded && apiKey) {
+      console.log('✅ Google Maps loaded successfully');
       setIsLoaded(true);
       setLoadError(null);
     } else {
@@ -94,11 +96,12 @@ export const useMapController = () => {
   // Handle map load
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-    console.log('Map loaded successfully');
+    console.log('🗺️ Map loaded successfully');
   }, []);
 
   // Handle map idle (camera movement finished)
   const onMapIdle = useCallback((newCenter: LatLng, newZoom: number) => {
+    console.log('🎯 Map idle - Center:', newCenter, 'Zoom:', newZoom);
     setCenter(newCenter);
     setZoom(newZoom);
   }, [setCenter, setZoom]);
@@ -110,13 +113,11 @@ export const useMapController = () => {
       return;
     }
 
+    console.log('🔍 Searching for places:', query);
     setIsSearching(true);
     setSearchQuery(query);
     
     try {
-      // Mock search implementation - replace with actual API call
-      console.log('Searching for places:', query);
-      
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -159,7 +160,7 @@ export const useMapController = () => {
       setMarkers(newMarkers);
       
     } catch (error: any) {
-      console.error('Search failed:', error);
+      console.error('❌ Search failed:', error);
       setLoadError(`Search failed: ${error.message}`);
     } finally {
       setIsSearching(false);
@@ -168,8 +169,7 @@ export const useMapController = () => {
 
   // Apply filters to current results
   const applyFilters = useCallback(() => {
-    // Filter logic would go here
-    console.log('Applying filters:', filters);
+    console.log('🔧 Applying filters:', filters);
     // For now, just keep existing results
   }, [filters]);
 
@@ -182,11 +182,12 @@ export const useMapController = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          console.log('📍 User location found:', newCenter);
           setCenter(newCenter);
           setZoom(14);
         },
         (error) => {
-          console.error('Geolocation error:', error);
+          console.error('❌ Geolocation error:', error);
         }
       );
     }
