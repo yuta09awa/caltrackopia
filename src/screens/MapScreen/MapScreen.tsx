@@ -1,7 +1,7 @@
 
 import React from 'react';
 import MapComponent from '@/features/map/components/MapComponent';
-import { MapInfoCard } from '@/screens/MapScreen/components/MapScreenInfoCard';
+import MapScreenInfoCard from '@/screens/MapScreen/components/MapScreenInfoCard';
 import MapScreenList from '@/screens/MapScreen/components/MapScreenList';
 import MapScreenHeader from '@/screens/MapScreen/components/MapScreenHeader';
 import { useMapController } from '@/features/map/hooks/useMapController';
@@ -34,7 +34,7 @@ const MapScreen: React.FC = () => {
         {/* Map Section - Dynamic height based on scroll */}
         <div className="relative" style={{ height: mapHeight }}>
           <MapComponent height="100%" />
-          {showInfoCard && <MapInfoCard />}
+          {showInfoCard && <MapScreenInfoCard />}
         </div>
         
         {/* Location List Section - Scrollable section that can scroll up over map */}
