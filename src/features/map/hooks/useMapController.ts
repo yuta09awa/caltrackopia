@@ -93,6 +93,69 @@ export const useMapController = () => {
     }
   }, [scriptLoaded, scriptError, apiKey, setIsLoaded, setLoadError]);
 
+  // Load initial markers when map is ready
+  useEffect(() => {
+    if (googleMapsLoaded && markers.length === 0) {
+      console.log('🎯 Loading initial markers for map');
+      loadInitialMarkers();
+    }
+  }, [googleMapsLoaded, markers.length]);
+
+  // Load initial markers function
+  const loadInitialMarkers = useCallback(() => {
+    console.log('📍 Loading initial test markers');
+    
+    // Create some test places and markers around the current center
+    const testPlaces: Place[] = [
+      {
+        id: '1',
+        name: 'Downtown Restaurant',
+        address: '123 Main St, Portland, OR',
+        latitude: center.lat + 0.01,
+        longitude: center.lng + 0.01,
+        category: 'restaurant',
+        rating: 4.2,
+        user_ratings_total: 150,
+        price_level: 2,
+        open_now: true
+      },
+      {
+        id: '2',
+        name: 'Local Market',
+        address: '456 Oak Ave, Portland, OR',
+        latitude: center.lat - 0.01,
+        longitude: center.lng - 0.01,
+        category: 'grocery_store',
+        rating: 4.0,
+        user_ratings_total: 89,
+        price_level: 1,
+        open_now: false
+      },
+      {
+        id: '3',
+        name: 'Coffee Shop',
+        address: '789 Pine St, Portland, OR',
+        latitude: center.lat + 0.005,
+        longitude: center.lng - 0.005,
+        category: 'cafe',
+        rating: 4.5,
+        user_ratings_total: 203,
+        price_level: 1,
+        open_now: true
+      }
+    ];
+
+    const testMarkers: MarkerData[] = testPlaces.map(place => ({
+      position: { lat: place.latitude, lng: place.longitude },
+      locationId: place.id,
+      type: place.category === 'restaurant' ? 'restaurant' : place.category === 'cafe' ? 'restaurant' : 'grocery'
+    }));
+
+    setSearchResults(testPlaces);
+    setMarkers(testMarkers);
+    console.log(`✅ Loaded ${testMarkers.length} initial markers`);
+  }, [center, setSearchResults, setMarkers]);
+
   // Handle map load
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
