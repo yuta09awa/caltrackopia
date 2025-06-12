@@ -23,7 +23,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ height }) => {
     handleMarkerClick,
     handleMapClick,
     onMapLoad,
-    onMapIdle
+    onMapIdle,
+    mapRef
   } = useMapController();
 
   const { mapOptions } = useMapOptions();
