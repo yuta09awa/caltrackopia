@@ -13,12 +13,16 @@ const MapScreen: React.FC = () => {
     showInfoCard, 
     selectedPlace, 
     searchQuery, 
-    resetSearch,
-    isLoaded,
-    loadError,
-    apiKey
+    resetSearch
   } = useMapController();
   const { mapHeight, handleScroll } = useMapUI();
+
+  console.log('🏗️ MapScreen render:', { 
+    showInfoCard, 
+    selectedPlace: selectedPlace?.name, 
+    mapHeight,
+    searchQuery 
+  });
 
   const handleSelectIngredient = (ingredient: Ingredient) => {
     console.log('Selected ingredient:', ingredient);
@@ -28,33 +32,6 @@ const MapScreen: React.FC = () => {
   const handleSearchReset = () => {
     resetSearch();
   };
-
-  // Show loading or error states if map is not ready
-  if (!apiKey && !loadError) {
-    return (
-      <div className="flex flex-col h-screen w-full bg-background">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading map...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (loadError) {
-    return (
-      <div className="flex flex-col h-screen w-full bg-background">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-destructive mb-2">Error loading map</p>
-            <p className="text-muted-foreground text-sm">{loadError}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen w-full bg-background">
