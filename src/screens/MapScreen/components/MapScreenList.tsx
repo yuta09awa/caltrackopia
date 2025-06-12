@@ -4,26 +4,16 @@ import LocationList from "@/features/locations/components/LocationList";
 import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
 
 interface MapScreenListProps {
-  listRef: React.RefObject<HTMLDivElement>;
   selectedLocationId: string | null;
   onScroll: () => void;
 }
 
 const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
-  listRef,
   selectedLocationId,
   onScroll
 }) => {
-  const handleScrollEvent = (e: React.UIEvent<HTMLDivElement>) => {
-    onScroll();
-  };
-
   return (
-    <div 
-      ref={listRef}
-      className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10 overflow-y-auto"
-      onScroll={handleScrollEvent}
-    >
+    <div className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10">
       <div className="w-full flex justify-center py-2">
         <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
       </div>
@@ -32,7 +22,10 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
         <CacheStatusIndicator cacheHitRate={null} />
       </div>
       
-      <LocationList selectedLocationId={selectedLocationId} />
+      <LocationList 
+        selectedLocationId={selectedLocationId} 
+        onScroll={onScroll}
+      />
     </div>
   );
 });
