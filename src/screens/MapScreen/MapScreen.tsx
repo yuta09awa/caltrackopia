@@ -10,19 +10,21 @@ const MapScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-background">
-      <main className="flex-1 flex flex-col relative w-full">
-        {/* Map Section */}
-        <div className="flex-1 relative">
+      <main className="flex-1 flex flex-col relative w-full overflow-hidden">
+        {/* Map Section - Fixed height for proper Google Maps initialization */}
+        <div className="h-[60vh] relative">
           <MapComponent height="100%" />
           {showInfoCard && <MapInfoCard />}
         </div>
         
-        {/* Location List Section - Below the map */}
-        <div className="bg-background border-t border-border max-h-64 overflow-hidden">
-          <div className="w-full flex justify-center py-2">
+        {/* Location List Section - Scrollable bottom section */}
+        <div className="flex-1 bg-background border-t border-border overflow-hidden flex flex-col">
+          <div className="w-full flex justify-center py-2 bg-background border-b border-border">
             <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
           </div>
-          <LocationList selectedLocationId={selectedPlace?.id || null} />
+          <div className="flex-1 overflow-hidden">
+            <LocationList selectedLocationId={selectedPlace?.id || null} />
+          </div>
         </div>
       </main>
     </div>
