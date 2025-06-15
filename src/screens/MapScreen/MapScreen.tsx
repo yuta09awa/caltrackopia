@@ -59,14 +59,14 @@ const MapScreenLayout: React.FC = () => {
     <div className="flex flex-col min-h-screen w-full bg-background">
       <MapScreenHeader {...headerProps} />
       
-      <main className="w-full pt-16">
-        {/* Full-width map */}
+      <main className="w-full">
+        {/* Full-width map - flush with navbar */}
         <div className="w-full">
           <MapScreenContent {...staticContentProps} />
         </div>
 
-        {/* Full-width listing with horizontal padding and max width */}
-        <div className="w-full px-2 sm:px-4 max-w-screen-xl mx-auto">
+        {/* Full-width listing - no max width constraints */}
+        <div className="w-full">
           <MapScreenList {...staticListProps} />
         </div>
       </main>

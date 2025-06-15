@@ -17,7 +17,7 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   return (
     <div 
       ref={listRef}
-      className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10 px-1 sm:px-2"
+      className="flex-1 bg-background rounded-t-xl shadow-lg relative z-10 px-2 sm:px-4"
       onScroll={onScroll}
     >
       <div className="w-full flex justify-center py-2">
