@@ -1,5 +1,5 @@
 
-export { useMapContext, useMapState, useMapActions, useMapSearch, useMapUI } from './useMapContext';
+export { useMapState, useMapActions, useMapSearch, useMapUI } from './useMapContext';
 
 // Legacy exports for backward compatibility - can be removed after migration
 export { useMapScreenState } from './useMapScreenState';
