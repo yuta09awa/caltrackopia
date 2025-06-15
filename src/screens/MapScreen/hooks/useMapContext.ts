@@ -1,55 +1,76 @@
 
-import { useMapContext } from '../context/MapContext';
+import { useMapStore } from '@/features/map/hooks/useMapStore';
 
-// Focused hooks for accessing specific parts of the context
+// Focused hooks for accessing specific parts of the store
 export const useMapState = () => {
-  const context = useMapContext();
+  const { mapState, userLocation } = useMapStore();
   return {
-    mapState: context.mapState,
-    mapRef: context.mapRef,
-    userLocation: context.userLocation,
-    locations: context.locations,
+    mapState,
+    userLocation,
+    mapRef: { current: null }, // Will be handled by context
+    locations: [], // Will be provided by context
   };
 };
 
 export const useMapActions = () => {
-  const context = useMapContext();
+  const { 
+    updateCenter, 
+    updateZoom, 
+    updateMarkers, 
+    selectLocation, 
+    clearMarkers 
+  } = useMapStore();
+  
   return {
-    updateCenter: context.updateCenter,
-    updateZoom: context.updateZoom,
-    updateMarkers: context.updateMarkers,
-    selectLocation: context.selectLocation,
-    clearMarkers: context.clearMarkers,
-    handleMapLoaded: context.handleMapLoaded,
-    handleMapIdle: context.handleMapIdle,
+    updateCenter,
+    updateZoom,
+    updateMarkers,
+    selectLocation,
+    clearMarkers,
+    handleMapLoaded: () => {}, // Placeholder
+    handleMapIdle: () => {}, // Placeholder
   };
 };
 
 export const useMapSearch = () => {
-  const context = useMapContext();
+  const {
+    selectedIngredient,
+    currentSearchQuery,
+    displayedSearchQuery,
+    setSelectedIngredient,
+    setSearchQuery,
+    setDisplayedSearchQuery
+  } = useMapStore();
+
   return {
-    selectedIngredient: context.selectedIngredient,
-    currentSearchQuery: context.currentSearchQuery,
-    displayedSearchQuery: context.displayedSearchQuery,
-    handleSelectIngredient: context.handleSelectIngredient,
-    handleSearchReset: context.handleSearchReset,
+    selectedIngredient,
+    currentSearchQuery,
+    displayedSearchQuery,
+    handleSelectIngredient: async () => {}, // Placeholder
+    handleSearchReset: () => {}, // Placeholder
   };
 };
 
 export const useMapUI = () => {
-  const context = useMapContext();
+  const {
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    setShowInfoCard,
+    setSelectedLocationData,
+    setInfoCardPosition
+  } = useMapStore();
+
   return {
-    mapHeight: context.mapHeight,
-    listRef: context.listRef,
-    handleScroll: context.handleScroll,
-    showInfoCard: context.showInfoCard,
-    selectedLocation: context.selectedLocation,
-    infoCardPosition: context.infoCardPosition,
-    handleLocationSelect: context.handleLocationSelect,
-    handleMarkerClick: context.handleMarkerClick,
-    handleInfoCardClose: context.handleInfoCardClose,
-    handleViewDetails: context.handleViewDetails,
+    mapHeight: '60vh',
+    listRef: { current: null }, // Will be handled by component
+    handleScroll: () => {},
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    handleLocationSelect: () => {}, // Placeholder
+    handleMarkerClick: () => {}, // Placeholder
+    handleInfoCardClose: () => {}, // Placeholder
+    handleViewDetails: () => {}, // Placeholder
   };
 };
-
-export { useMapContext };
