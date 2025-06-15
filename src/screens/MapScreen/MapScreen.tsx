@@ -1,32 +1,53 @@
-
 import React from 'react';
-import MapComponent from '@/features/map/components/MapComponent';
-import { MapInfoCard } from '@/screens/MapScreen/components/MapScreenInfoCard';
-import MapScreenList from '@/screens/MapScreen/components/MapScreenList';
-import { useMapController } from '@/features/map/hooks/useMapController';
-import { useMapUI } from '@/features/map/hooks/useMapUI';
+import { MapProvider } from './context/MapProvider';
+import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
+import { useMapSearch, useMapActions, useMapUI, useMapState } from './hooks/useMapContext';
 
-const MapScreen: React.FC = () => {
-  const { showInfoCard, selectedPlace } = useMapController();
-  const { mapHeight, listRef, handleScroll } = useMapUI();
+const MapScreenLayout: React.FC = () => {
+  const searchState = useMapSearch();
+  const mapActions = useMapActions();
+  const uiState = useMapUI();
+  const mapState = useMapState();
 
   return (
-    <div className="flex flex-col h-screen w-full bg-background">
-      <main className="flex-1 flex flex-col relative w-full overflow-hidden">
-        {/* Map Section - Dynamic height based on scroll */}
-        <div className="relative" style={{ height: mapHeight }}>
-          <MapComponent height="100%" />
-          {showInfoCard && <MapInfoCard />}
-        </div>
-        
-        {/* Location List Section - Scrollable section that can scroll up over map */}
-        <MapScreenList
-          listRef={listRef}
-          selectedLocationId={selectedPlace?.id || null}
-          onScroll={handleScroll}
+    <div className="flex flex-col min-h-screen w-full bg-background">
+      <MapScreenHeader 
+        displayedSearchQuery={searchState.displayedSearchQuery}
+        onSelectIngredient={searchState.handleSelectIngredient}
+        onSearchReset={searchState.handleSearchReset}
+      />
+      
+      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
+        <MapScreenContent
+          mapHeight={uiState.mapHeight}
+          selectedIngredient={searchState.selectedIngredient}
+          currentSearchQuery={searchState.currentSearchQuery}
+          mapState={mapState.mapState}
+          showInfoCard={uiState.showInfoCard}
+          selectedLocation={uiState.selectedLocation}
+          infoCardPosition={uiState.infoCardPosition}
+          onLocationSelect={uiState.handleLocationSelect}
+          onMarkerClick={uiState.handleMarkerClick}
+          onMapLoaded={mapActions.handleMapLoaded}
+          onMapIdle={mapActions.handleMapIdle}
+          onInfoCardClose={uiState.handleInfoCardClose}
+          onViewDetails={uiState.handleViewDetails}
+        />
+        <MapScreenList 
+          listRef={uiState.listRef}
+          selectedLocationId={mapState.mapState.selectedLocationId}
+          onScroll={uiState.handleScroll}
         />
       </main>
     </div>
+  );
+};
+
+const MapScreen = () => {
+  return (
+    <MapProvider>
+      <MapScreenLayout />
+    </MapProvider>
   );
 };
 

@@ -13,7 +13,7 @@ interface MapLoadingState {
   isReady: boolean;
   isLoading: boolean;
   error: string | null;
-  stage: 'api-key' | 'google-maps' | 'ready' | 'error';
+  stage: 'api-key' | 'google-maps' | 'places-api' | 'ready' | 'error';
 }
 
 export const useMapLoadingState = ({
@@ -31,41 +31,8 @@ export const useMapLoadingState = ({
   });
 
   useEffect(() => {
-    console.log('🔄 useMapLoadingState evaluation:', {
-      apiKeyLoading,
-      apiKeyError,
-      apiKey: apiKey ? 'present' : 'missing',
-      googleMapsLoaded,
-      googleMapsError,
-      currentStage: state.stage
-    });
-
-    // Handle errors first
-    if (apiKeyError) {
-      console.log('❌ API key error detected');
-      setState({
-        isReady: false,
-        isLoading: false,
-        error: apiKeyError,
-        stage: 'error'
-      });
-      return;
-    }
-
-    if (googleMapsError) {
-      console.log('❌ Google Maps error detected');
-      setState({
-        isReady: false,
-        isLoading: false,
-        error: `Google Maps Error: ${googleMapsError.message}`,
-        stage: 'error'
-      });
-      return;
-    }
-
-    // Step 1: Loading API key
-    if (apiKeyLoading || !apiKey) {
-      console.log('🔑 Loading API key...');
+    // Handle API key loading
+    if (apiKeyLoading) {
       setState({
         isReady: false,
         isLoading: true,
@@ -75,9 +42,19 @@ export const useMapLoadingState = ({
       return;
     }
 
-    // Step 2: API key loaded, waiting for Google Maps
+    // Handle API key error
+    if (apiKeyError) {
+      setState({
+        isReady: false,
+        isLoading: false,
+        error: apiKeyError,
+        stage: 'error'
+      });
+      return;
+    }
+
+    // Handle Google Maps loading
     if (apiKey && !googleMapsLoaded) {
-      console.log('🗺️ API key ready, loading Google Maps...');
       setState({
         isReady: false,
         isLoading: true,
@@ -87,28 +64,27 @@ export const useMapLoadingState = ({
       return;
     }
 
-    // Step 3: Everything is ready
+    // Handle Google Maps error
+    if (googleMapsError) {
+      setState({
+        isReady: false,
+        isLoading: false,
+        error: `Google Maps Error: ${googleMapsError.message}`,
+        stage: 'error'
+      });
+      return;
+    }
+
+    // All dependencies loaded successfully
     if (apiKey && googleMapsLoaded) {
-      console.log('✅ All dependencies ready, map should render');
       setState({
         isReady: true,
         isLoading: false,
         error: null,
         stage: 'ready'
       });
-      return;
     }
-
-    // Fallback - shouldn't reach here
-    console.warn('⚠️ Unexpected loading state combination');
   }, [apiKeyLoading, apiKeyError, apiKey, googleMapsLoaded, googleMapsError]);
-
-  console.log('📊 useMapLoadingState result:', {
-    isReady: state.isReady,
-    isLoading: state.isLoading,
-    error: state.error,
-    stage: state.stage
-  });
 
   return state;
 };
