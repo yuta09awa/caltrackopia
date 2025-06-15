@@ -9,17 +9,12 @@ import FilterChips from '@/components/search/FilterChips';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
-import { useLocationListScroll } from '../hooks/useLocationListScroll';
 
 interface LocationListProps {
   selectedLocationId?: string | null;
-  onScroll?: () => void;
 }
 
-const LocationList: React.FC<LocationListProps> = React.memo(({ 
-  selectedLocationId,
-  onScroll 
-}) => {
+const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId }) => {
   const { 
     locations, 
     activeTab, 
@@ -33,15 +28,14 @@ const LocationList: React.FC<LocationListProps> = React.memo(({
   } = useLocations();
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
-  const { listRef, handleScroll } = useLocationListScroll(onScroll);
-  const selectedLocationRef = useRef<HTMLDivElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
   
   const displayLocations = useMemo(() => {
     return activeSpoof ? getFilteredLocations() : locations;
   }, [activeSpoof, getFilteredLocations, locations]);
 
   const scrollToSelectedLocation = useCallback((locationId: string) => {
-    if (!listRef.current) return;
+    if (!listContainerRef.current) return;
     
     const locationElement = document.getElementById(`location-${locationId}`);
     if (locationElement) {
@@ -57,7 +51,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({
       
       return () => clearTimeout(timeoutId);
     }
-  }, [listRef]);
+  }, []);
 
   useEffect(() => {
     if (selectedLocationId) {
@@ -67,17 +61,9 @@ const LocationList: React.FC<LocationListProps> = React.memo(({
 
   const skeletonCount = useMemo(() => 6, []);
 
-  const handleScrollEvent = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    handleScroll();
-  }, [handleScroll]);
-
   return (
     <LocationErrorBoundary>
-      <div 
-        ref={listRef}
-        className="flex flex-col h-full overflow-y-auto"
-        onScroll={handleScrollEvent}
-      >
+      <div className="flex flex-col h-full">
         <div className="sticky top-0 bg-background z-10 border-b px-3">
           <LocationListHeader
             totalCount={displayLocations.length}
@@ -93,7 +79,10 @@ const LocationList: React.FC<LocationListProps> = React.memo(({
           <FilterChips />
         </div>
         
-        <div className="flex-1">
+        <div 
+          ref={listContainerRef}
+          className="flex-1 overflow-y-auto"
+        >
           {loading ? (
             <div className="px-3 py-3">
               <LoadingSkeleton 

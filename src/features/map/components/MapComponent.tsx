@@ -29,14 +29,13 @@ const MapComponent: React.FC<MapComponentProps> = ({ height }) => {
 
   const { mapOptions } = useMapOptions();
 
-  console.log('🗺️ MapComponent render:', { 
+  console.log('🏗️ MapComponent render:', { 
     apiKey: apiKey ? 'present' : 'missing', 
     isLoaded,
     loadError,
     markersCount: markers.length,
     center,
-    zoom,
-    height
+    zoom
   });
 
   // Show loading while API key loads
@@ -63,7 +62,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ height }) => {
     return <MapLoadingState height={height} type="loading" errorMessage="Loading Google Maps..." />;
   }
 
-  console.log('🚀 MapComponent: Ready to render map with height:', height);
+  console.log('🚀 MapComponent: Ready to render map');
 
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
