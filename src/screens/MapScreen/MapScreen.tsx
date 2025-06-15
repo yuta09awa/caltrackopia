@@ -1,16 +1,56 @@
 
-import React from 'react';
-import { MapProvider } from './context/MapProvider';
+import React, { useRef } from 'react';
+import { MapProvider, useMapContext } from './context';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import Container from '@/components/ui/Container';
-import { useMapContext } from './context/useMapContext';
 
 const MapScreenLayout: React.FC = () => {
+  const listRef = useRef<HTMLDivElement>(null);
   const {
-    headerProps,
-    contentProps,
-    listProps
+    displayedSearchQuery,
+    handleSelectIngredient,
+    handleSearchReset,
+    mapState,
+    selectedIngredient,
+    currentSearchQuery,
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    handleLocationSelect,
+    handleMarkerClick,
+    handleMapLoaded,
+    handleMapIdle,
+    handleInfoCardClose,
+    handleViewDetails,
+    handleScroll,
   } = useMapContext();
+
+  const headerProps = {
+    displayedSearchQuery,
+    onSelectIngredient: handleSelectIngredient,
+    onSearchReset: handleSearchReset,
+  };
+
+  const contentProps = {
+    mapState,
+    selectedIngredient,
+    currentSearchQuery,
+    showInfoCard,
+    selectedLocation,
+    infoCardPosition,
+    onLocationSelect: handleLocationSelect,
+    onMarkerClick: handleMarkerClick,
+    onMapLoaded: handleMapLoaded,
+    onMapIdle: handleMapIdle,
+    onInfoCardClose: handleInfoCardClose,
+    onViewDetails: handleViewDetails,
+  };
+  
+  const listProps = {
+    listRef,
+    selectedLocationId: mapState.selectedLocationId,
+    onScroll: handleScroll,
+  };
 
   // Override dynamic map height with a fixed value for a standard scroll experience.
   // The interactive shrinking is disabled in favor of the map scrolling out of view.
