@@ -63,9 +63,12 @@ const MapScreenLayout: React.FC = () => {
     <div className="flex flex-col min-h-screen w-full bg-background">
       <MapScreenHeader {...headerProps} />
       
-      <main className="w-full pt-20">
+      <main className="w-full pt-16">
+        {/* Map is rendered outside the container to be full-width */}
+        <MapScreenContent {...staticContentProps} />
+
+        {/* List remains inside a container for a centered, max-width layout */}
         <Container>
-          <MapScreenContent {...staticContentProps} />
           <MapScreenList {...staticListProps} />
         </Container>
       </main>
