@@ -6,7 +6,7 @@ import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator
 interface MapScreenListProps {
   listRef: React.RefObject<HTMLDivElement>;
   selectedLocationId: string | null;
-  onScroll?: (e: React.UIEvent<HTMLDivElement>) => void; // Made onScroll optional
+  onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
 const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
@@ -17,7 +17,7 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   return (
     <div 
       ref={listRef}
-      className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10" // Removed overflow-y-auto
+      className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10 px-1 sm:px-2"
       onScroll={onScroll}
     >
       <div className="w-full flex justify-center py-2">

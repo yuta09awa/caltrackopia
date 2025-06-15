@@ -2,7 +2,6 @@
 import React, { useRef } from 'react';
 import { MapProvider, useMapContext } from './context';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
-import Container from '@/components/ui/Container';
 
 const MapScreenLayout: React.FC = () => {
   const listRef = useRef<HTMLDivElement>(null);
@@ -52,11 +51,8 @@ const MapScreenLayout: React.FC = () => {
     onScroll: handleScroll,
   };
 
-  // Override dynamic map height with a fixed value for a standard scroll experience.
-  // The interactive shrinking is disabled in favor of the map scrolling out of view.
+  // Fixed value for a standard scroll experience
   const staticContentProps = { ...contentProps, mapHeight: '60vh' };
-  
-  // The onScroll handler is not needed on the list component when the whole page scrolls.
   const staticListProps = { ...listProps, onScroll: undefined };
 
   return (
@@ -64,13 +60,15 @@ const MapScreenLayout: React.FC = () => {
       <MapScreenHeader {...headerProps} />
       
       <main className="w-full pt-16">
-        {/* Map is rendered outside the container to be full-width */}
-        <MapScreenContent {...staticContentProps} />
+        {/* Full-width map */}
+        <div className="w-full">
+          <MapScreenContent {...staticContentProps} />
+        </div>
 
-        {/* List remains inside a container for a centered, max-width layout */}
-        <Container>
+        {/* Full-width listing with horizontal padding and max width */}
+        <div className="w-full px-2 sm:px-4 max-w-screen-xl mx-auto">
           <MapScreenList {...staticListProps} />
-        </Container>
+        </div>
       </main>
     </div>
   );
