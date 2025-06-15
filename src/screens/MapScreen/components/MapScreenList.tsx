@@ -24,7 +24,7 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
         <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
       </div>
       
-      <div className="sm:hidden px-4 pb-2">
+      <div className="sm:hidden pb-2">
         <CacheStatusIndicator cacheHitRate={null} />
       </div>
       
