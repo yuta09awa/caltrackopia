@@ -6,8 +6,7 @@ interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
   as?: React.ElementType;
-  size?: "sm" | "md" | "lg" | "xl" | "full";
-  fullWidth?: boolean;
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 export const Container = ({
@@ -15,7 +14,6 @@ export const Container = ({
   className,
   as: Component = "div",
   size = "xl",
-  fullWidth = false,
   ...props
 }: ContainerProps) => {
   const maxWidthClass = size === "sm" 
@@ -24,17 +22,13 @@ export const Container = ({
     ? "max-w-screen-md" 
     : size === "lg" 
     ? "max-w-screen-lg" 
-    : size === "xl" 
-    ? "max-w-screen-xl" 
-    : "max-w-none";
+    : "max-w-screen-xl";
 
   return (
     <Component
       className={cn(
-        "mx-auto w-full",
-        !fullWidth && "px-4 sm:px-6 md:px-8",
-        !fullWidth && maxWidthClass,
-        fullWidth && "max-w-none",
+        "mx-auto w-full px-2 sm:px-4",
+        maxWidthClass,
         className
       )}
       {...props}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Utensils, ShoppingCart } from "lucide-react";
@@ -57,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           : "bg-transparent"
       )}
     >
-      <Container className="px-4 sm:px-6 md:px-8">
+      <Container>
         <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
           <Link
             to="/"

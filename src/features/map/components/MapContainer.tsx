@@ -1,9 +1,10 @@
 
 import React from 'react';
+import { useJsApiLoader } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
 import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
-import GoogleMapsLoader from './GoogleMapsLoader';
+import MapView from './MapView';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
@@ -31,72 +32,67 @@ const MapContainer: React.FC<MapContainerProps> = ({
 }) => {
   const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
 
+  const { isLoaded: googleMapsLoaded, loadError: googleMapsError } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: apiKey!,
+    libraries: ['places'],
+    preventGoogleFontsLoading: true,
+    // Only attempt to load the script once we have an API key
+    disabled: !apiKey,
+  });
+
   // Use unified loading state to coordinate all dependencies
   const loadingState = useMapLoadingState({
     apiKeyLoading,
     apiKeyError,
     apiKey,
-    googleMapsLoaded: false, // This will be managed by GoogleMapsLoader
-    googleMapsError: null
+    googleMapsLoaded,
+    googleMapsError
   });
 
   console.log('MapContainer render state:', { 
     loadingState,
-    apiKey: apiKey ? 'present' : 'missing', 
+    apiKey: apiKey ? 'present' : 'missing',
+    googleMapsLoaded,
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
-    searchQuery,
-    retryCount,
-    currentUrl: window.location.href
+    retryCount
   });
 
-  // Show loading while in loading states
-  if (loadingState.isLoading) {
-    const loadingMessage = loadingState.stage === 'api-key' 
-      ? retryCount > 0 
-        ? `Loading API key (attempt ${retryCount + 1})...`
-        : 'Loading API key...'
-      : loadingState.stage === 'google-maps'
-        ? 'Loading Google Maps...'
-        : 'Initializing map...';
+  // Show loading or error states
+  if (!loadingState.isReady) {
+    let loadingMessage = 'Initializing map...';
+    if (loadingState.isLoading) {
+      if (loadingState.stage === 'api-key') {
+        loadingMessage = retryCount > 0 
+          ? `Loading API key (attempt ${retryCount + 1})...`
+          : 'Loading API key...';
+      } else if (loadingState.stage === 'google-maps') {
+        loadingMessage = 'Loading Google Maps...';
+      }
+    }
+
+    if (loadingState.error) {
+      console.error('Map loading error:', { 
+        error: loadingState.error,
+        stage: loadingState.stage,
+        retryCount 
+      });
+      return <MapLoadingState height={height} type="error" errorMessage={loadingState.error} />;
+    }
 
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
-
-  // Show error if any dependency failed
-  if (loadingState.error) {
-    console.error('Map loading error:', { 
-      error: loadingState.error,
-      stage: loadingState.stage,
-      retryCount 
-    });
-    
-    return (
-      <MapLoadingState 
-        height={height} 
-        type="error" 
-        errorMessage={loadingState.error} 
-      />
-    );
-  }
-
-  // Don't render map component until we have API key
-  if (!apiKey) {
-    console.log('Waiting for API key...');
-    return <MapLoadingState height={height} type="initializing" />;
-  }
-
-  // Now we can safely render the map with the API key
+  
+  // Now we can safely render the map
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
-      <GoogleMapsLoader
-        apiKey={apiKey}
+      <MapView
         mapState={mapState}
         selectedLocationId={selectedLocationId}
         onMarkerClick={onMarkerClick}
         onLocationSelect={onLocationSelect}
-        height={height}
         searchQuery={searchQuery}
         onMapLoaded={onMapLoaded}
         onMapIdle={onMapIdle}

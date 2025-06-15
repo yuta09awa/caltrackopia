@@ -15,7 +15,7 @@ export const useApiKeyLoader = () => {
 
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 1000; // 1 second
-  const TIMEOUT_MS = 10000; // 10 seconds
+  const TIMEOUT_MS = 5000; // 5 seconds, reduced from 10
 
   useEffect(() => {
     const fetchApiKeyWithRetry = async () => {

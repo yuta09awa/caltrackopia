@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import { useMapStore } from '@/features/map/hooks/useMapStore';
+import Container from '@/components/ui/Container';
 
 const MapScreenLayout: React.FC = () => {
   const listRef = useRef<HTMLDivElement>(null);
@@ -44,11 +45,13 @@ const MapScreenLayout: React.FC = () => {
           onInfoCardClose={() => {}} // Will be handled by context
           onViewDetails={() => {}} // Will be handled by context
         />
-        <MapScreenList 
-          listRef={listRef}
-          selectedLocationId={mapState.selectedLocationId}
-          onScroll={handleScroll}
-        />
+        <Container>
+          <MapScreenList 
+            listRef={listRef}
+            selectedLocationId={mapState.selectedLocationId}
+            onScroll={handleScroll}
+          />
+        </Container>
       </main>
     </div>
   );

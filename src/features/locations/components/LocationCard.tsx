@@ -504,7 +504,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
       <Link 
         key={location.id}
         to={detailLink}
-        className="block py-4 px-4"
+        className="block py-4 px-2 sm:px-4"
         onClick={handleCardClick}
       >
         {/* Changed from flex to grid for a 3-column layout */}
