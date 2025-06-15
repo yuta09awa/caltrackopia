@@ -198,6 +198,7 @@ export type Database = {
           privacy_public_profile: boolean | null
           privacy_share_location: boolean | null
           updated_at: string
+          user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
           avatar_url?: string | null
@@ -219,6 +220,7 @@ export type Database = {
           privacy_public_profile?: boolean | null
           privacy_share_location?: boolean | null
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
           avatar_url?: string | null
@@ -240,8 +242,80 @@ export type Database = {
           privacy_public_profile?: boolean | null
           privacy_share_location?: boolean | null
           updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Relationships: []
+      }
+      restaurants: {
+        Row: {
+          address: string
+          business_email: string | null
+          business_license: string | null
+          business_name: string
+          business_phone: string | null
+          city: string
+          created_at: string | null
+          cuisine_type: string[] | null
+          description: string | null
+          id: string
+          operating_hours: Json | null
+          owner_id: string | null
+          state: string
+          updated_at: string | null
+          verification_documents: string[] | null
+          verification_status: string | null
+          website: string | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          business_email?: string | null
+          business_license?: string | null
+          business_name: string
+          business_phone?: string | null
+          city: string
+          created_at?: string | null
+          cuisine_type?: string[] | null
+          description?: string | null
+          id?: string
+          operating_hours?: Json | null
+          owner_id?: string | null
+          state: string
+          updated_at?: string | null
+          verification_documents?: string[] | null
+          verification_status?: string | null
+          website?: string | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          business_email?: string | null
+          business_license?: string | null
+          business_name?: string
+          business_phone?: string | null
+          city?: string
+          created_at?: string | null
+          cuisine_type?: string[] | null
+          description?: string | null
+          id?: string
+          operating_hours?: Json | null
+          owner_id?: string | null
+          state?: string
+          updated_at?: string | null
+          verification_documents?: string[] | null
+          verification_status?: string | null
+          website?: string | null
+          zip_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       search_areas: {
         Row: {
@@ -2142,6 +2216,7 @@ export type Database = {
         | "pharmacy"
         | "shopping_mall"
         | "other"
+      user_type: "customer" | "restaurant_owner" | "admin"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -2275,6 +2350,7 @@ export const Constants = {
         "shopping_mall",
         "other",
       ],
+      user_type: ["customer", "restaurant_owner", "admin"],
     },
   },
 } as const

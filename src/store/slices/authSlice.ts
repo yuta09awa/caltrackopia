@@ -11,6 +11,9 @@ export interface AuthSlice {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   setAuthLoading: (isLoading: boolean) => void;
   setAuthError: (error: string | null) => void;
+  getUserType: () => 'customer' | 'restaurant_owner' | 'admin' | null;
+  isRestaurantOwner: () => boolean;
+  isCustomer: () => boolean;
 }
 
 export const createAuthSlice: StateCreator<
@@ -18,7 +21,7 @@ export const createAuthSlice: StateCreator<
   [],
   [],
   AuthSlice
-> = (set) => ({
+> = (set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -27,4 +30,16 @@ export const createAuthSlice: StateCreator<
   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
   setAuthLoading: (isLoading) => set({ isLoading }),
   setAuthError: (error) => set({ error }),
+  getUserType: () => {
+    const { user } = get();
+    return user?.userType || null;
+  },
+  isRestaurantOwner: () => {
+    const { user } = get();
+    return user?.userType === 'restaurant_owner';
+  },
+  isCustomer: () => {
+    const { user } = get();
+    return user?.userType === 'customer';
+  },
 });

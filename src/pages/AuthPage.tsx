@@ -5,12 +5,18 @@ import { Container } from "@/components/ui/Container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
+import UserTypeSelection from "@/components/auth/UserTypeSelection";
+import CustomerRegisterForm from "@/components/auth/CustomerRegisterForm";
+import RestaurantRegisterForm from "@/components/auth/RestaurantRegisterForm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "@/hooks/use-toast";
 
+type UserType = 'customer' | 'restaurant_owner';
+
 const AuthPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
+  const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, isLoading } = useAppStore();
@@ -39,6 +45,21 @@ const AuthPage: React.FC = () => {
     }
   }, [user, navigate, searchParams]);
 
+  const handleUserTypeSelection = (type: UserType) => {
+    setSelectedUserType(type);
+    setActiveTab("register");
+  };
+
+  const handleRegistrationSuccess = () => {
+    setActiveTab("login");
+    setSelectedUserType(null);
+  };
+
+  const handleBackToUserTypeSelection = () => {
+    setSelectedUserType(null);
+    setActiveTab("register");
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -52,7 +73,7 @@ const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Container size="sm" className="max-w-md w-full">
+      <Container size="sm" className="max-w-2xl w-full">
         <div className="text-center mb-8">
           <Link 
             to="/" 
@@ -65,10 +86,14 @@ const AuthPage: React.FC = () => {
               className="h-16 w-auto mx-auto mb-4" 
             />
           </Link>
-          <h2 className="text-3xl font-extrabold text-gray-900">Welcome</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account or create a new one
-          </p>
+          {activeTab === "login" && (
+            <>
+              <h2 className="text-3xl font-extrabold text-gray-900">Welcome Back</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Sign in to your account
+              </p>
+            </>
+          )}
         </div>
 
         <Card>
@@ -86,7 +111,19 @@ const AuthPage: React.FC = () => {
                 <LoginForm />
               </TabsContent>
               <TabsContent value="register">
-                <RegisterForm onSuccess={() => setActiveTab("login")} />
+                {!selectedUserType ? (
+                  <UserTypeSelection onSelectType={handleUserTypeSelection} />
+                ) : selectedUserType === 'customer' ? (
+                  <CustomerRegisterForm 
+                    onSuccess={handleRegistrationSuccess}
+                    onBack={handleBackToUserTypeSelection}
+                  />
+                ) : (
+                  <RestaurantRegisterForm 
+                    onSuccess={handleRegistrationSuccess}
+                    onBack={handleBackToUserTypeSelection}
+                  />
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>
