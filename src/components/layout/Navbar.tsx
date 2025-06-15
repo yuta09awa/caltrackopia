@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Utensils, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAppStore } from "@/store/appStore";
 import NavItem from "./NavItem";
@@ -56,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           : "bg-transparent"
       )}
     >
-      <div className="mx-auto w-full px-2 sm:px-4">
+      <Container>
         <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
           <Link
             to="/"
@@ -88,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
             />
           </div>
         </nav>
-      </div>
+      </Container>
     </header>
   );
 };

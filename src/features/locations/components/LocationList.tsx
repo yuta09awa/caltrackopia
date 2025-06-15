@@ -64,21 +64,19 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   return (
     <LocationErrorBoundary>
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 bg-background z-10 border-b">
-          <div className="px-1">
-            <LocationListHeader
-              totalCount={displayLocations.length}
-              sortOption={sortOption}
-              setSortOption={setSortOption}
-            />
-            <LocationFilters
-              activeTab={activeTab}
-              onTabChange={filterByType}
-              isOpenNow={isOpenNow}
-              setIsOpenNow={setIsOpenNow}
-            />
-            <FilterChips />
-          </div>
+        <div className="sticky top-0 bg-background z-10 border-b px-3">
+          <LocationListHeader
+            totalCount={displayLocations.length}
+            sortOption={sortOption}
+            setSortOption={setSortOption}
+          />
+          <LocationFilters
+            activeTab={activeTab}
+            onTabChange={filterByType}
+            isOpenNow={isOpenNow}
+            setIsOpenNow={setIsOpenNow}
+          />
+          <FilterChips />
         </div>
         
         <div 
@@ -86,7 +84,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
           className="flex-1 overflow-y-auto"
         >
           {loading ? (
-            <div className="py-3">
+            <div className="px-3 py-3">
               <LoadingSkeleton 
                 variant="location-card" 
                 count={skeletonCount}
@@ -94,28 +92,24 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
               />
             </div>
           ) : error ? (
-            <div className="py-3">
-              <div className="px-1">
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <p className="text-destructive mb-2">Error loading locations</p>
-                    <p className="text-muted-foreground text-sm">{error}</p>
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="px-3 py-3">
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <p className="text-destructive mb-2">Error loading locations</p>
+                  <p className="text-muted-foreground text-sm">{error}</p>
+                </CardContent>
+              </Card>
             </div>
           ) : displayLocations.length === 0 ? (
-            <div className="py-3">
-              <div className="px-1">
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <p className="text-muted-foreground">
-                      No locations found matching your criteria.
-                      {activeSpoof && ` Try a different region or filter.`}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="px-3 py-3">
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <p className="text-muted-foreground">
+                    No locations found matching your criteria.
+                    {activeSpoof && ` Try a different region or filter.`}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           ) : (
             <div className="divide-y divide-border">

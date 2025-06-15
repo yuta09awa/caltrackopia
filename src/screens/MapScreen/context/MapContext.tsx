@@ -2,9 +2,9 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { Location } from '@/features/locations/types';
-import { MapState, LatLng } from '@/store/slices/mapSlice';
+import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
-// Simplified context interfaces
+// Context interfaces
 export interface MapContextState {
   // Map state
   mapState: MapState;
@@ -16,6 +16,8 @@ export interface MapContextState {
   displayedSearchQuery: string;
   
   // UI state
+  mapHeight: string;
+  listRef: React.RefObject<HTMLDivElement>;
   showInfoCard: boolean;
   selectedLocation: Location | null;
   infoCardPosition: { x: number; y: number };

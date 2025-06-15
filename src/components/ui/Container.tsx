@@ -16,22 +16,20 @@ export const Container = ({
   size = "xl",
   ...props
 }: ContainerProps) => {
-  const isFullWidth = size === "full";
-  const maxWidthClass = isFullWidth
-    ? "max-w-none"
-    : size === "sm" 
+  const maxWidthClass = size === "sm" 
     ? "max-w-screen-sm" 
     : size === "md" 
     ? "max-w-screen-md" 
     : size === "lg" 
     ? "max-w-screen-lg" 
-    : "max-w-screen-xl";
+    : size === "xl" 
+    ? "max-w-screen-xl" 
+    : "max-w-none";
 
   return (
     <Component
       className={cn(
-        "mx-auto w-full",
-        !isFullWidth && "px-2 sm:px-4", // Minimal responsive padding
+        "mx-auto w-full px-4 sm:px-6 md:px-8",
         maxWidthClass,
         className
       )}

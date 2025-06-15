@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { useJsApiLoader } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
 import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
-import MapView from './MapView';
+import GoogleMapsLoader from './GoogleMapsLoader';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
@@ -20,9 +19,8 @@ interface MapContainerProps {
   onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
-const LoadedMap: React.FC<MapContainerProps & { apiKey: string }> = ({
-  apiKey,
-  height,
+const MapContainer: React.FC<MapContainerProps> = ({ 
+  height, 
   selectedLocationId,
   onMarkerClick,
   mapState,
@@ -31,81 +29,80 @@ const LoadedMap: React.FC<MapContainerProps & { apiKey: string }> = ({
   onMapIdle,
   onLocationSelect
 }) => {
-  const { isLoaded: googleMapsLoaded, loadError: googleMapsError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: apiKey,
-    libraries: ['places'],
-    preventGoogleFontsLoading: true,
-  });
+  const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
 
+  // Use unified loading state to coordinate all dependencies
   const loadingState = useMapLoadingState({
-    apiKeyLoading: false, // API key is already loaded at this point
-    apiKeyError: null,
+    apiKeyLoading,
+    apiKeyError,
     apiKey,
-    googleMapsLoaded,
-    googleMapsError
+    googleMapsLoaded: false, // This will be managed by GoogleMapsLoader
+    googleMapsError: null
   });
 
-  console.log('LoadedMap render state:', { 
+  console.log('MapContainer render state:', { 
     loadingState,
-    googleMapsLoaded,
+    apiKey: apiKey ? 'present' : 'missing', 
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
+    searchQuery,
+    retryCount,
+    currentUrl: window.location.href
   });
 
-  if (!loadingState.isReady) {
-    let loadingMessage = 'Initializing map...';
-    if (loadingState.isLoading) {
-      if (loadingState.stage === 'google-maps') {
-        loadingMessage = 'Loading Google Maps...';
-      }
-    }
-
-    if (loadingState.error) {
-      console.error('Map loading error:', { 
-        error: loadingState.error,
-        stage: loadingState.stage,
-      });
-      return <MapLoadingState height={height} type="error" errorMessage={loadingState.error} />;
-    }
+  // Show loading while in loading states
+  if (loadingState.isLoading) {
+    const loadingMessage = loadingState.stage === 'api-key' 
+      ? retryCount > 0 
+        ? `Loading API key (attempt ${retryCount + 1})...`
+        : 'Loading API key...'
+      : loadingState.stage === 'google-maps'
+        ? 'Loading Google Maps...'
+        : 'Initializing map...';
 
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
-  
+
+  // Show error if any dependency failed
+  if (loadingState.error) {
+    console.error('Map loading error:', { 
+      error: loadingState.error,
+      stage: loadingState.stage,
+      retryCount 
+    });
+    
+    return (
+      <MapLoadingState 
+        height={height} 
+        type="error" 
+        errorMessage={loadingState.error} 
+      />
+    );
+  }
+
+  // Don't render map component until we have API key
+  if (!apiKey) {
+    console.log('Waiting for API key...');
+    return <MapLoadingState height={height} type="initializing" />;
+  }
+
+  // Now we can safely render the map with the API key
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
-      <MapView
+      <GoogleMapsLoader
+        apiKey={apiKey}
         mapState={mapState}
         selectedLocationId={selectedLocationId}
         onMarkerClick={onMarkerClick}
         onLocationSelect={onLocationSelect}
+        height={height}
         searchQuery={searchQuery}
         onMapLoaded={onMapLoaded}
         onMapIdle={onMapIdle}
       />
     </div>
   );
-};
-
-const MapContainer: React.FC<MapContainerProps> = (props) => {
-  const { apiKey, error: apiKeyError, loading: apiKeyLoading } = useApiKeyLoader();
-  const { height } = props;
-
-  if (apiKeyLoading) {
-    return <MapLoadingState height={height} type="loading" errorMessage="Loading API key..." />;
-  }
-
-  if (apiKeyError) {
-    return <MapLoadingState height={height} type="error" errorMessage={apiKeyError} />;
-  }
-
-  if (!apiKey) {
-    // This case might happen if loading finishes but key is still null without an error.
-    return <MapLoadingState height={height} type="error" errorMessage="API key not available." />;
-  }
-  
-  return <LoadedMap {...props} apiKey={apiKey} />;
 };
 
 export default MapContainer;

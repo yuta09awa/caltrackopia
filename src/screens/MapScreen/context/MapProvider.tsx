@@ -1,12 +1,16 @@
 
 import React, { useRef, useCallback } from 'react';
 import { MapProvider as BaseMapProvider, MapContextValue } from './MapContext';
-import { useMapStore } from '@/features/map/hooks/useMapStore';
+import { useMapState } from '@/features/map/hooks/useMapState';
+import { useMapSearch } from '@/features/map/hooks/useMapSearch';
+import { useMapInteractions } from '@/features/map/hooks/useMapInteractions';
+import { useMapUI } from '@/features/map/hooks/useMapUI';
+import { useUserLocation } from '@/features/map/hooks/useUserLocation';
 import { useLocations } from '@/features/locations/hooks/useLocations';
 import { usePlacesApi } from '@/features/map/hooks/usePlacesApi';
 import { useToastManager } from '@/features/map/hooks/useToastManager';
 import { Ingredient } from '@/models/NutritionalInfo';
-import { LatLng } from '@/store/slices/mapSlice';
+import { LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapProviderProps {
   children: React.ReactNode;
@@ -15,127 +19,78 @@ interface MapProviderProps {
 export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   
-  // Get state and actions from Zustand store
+  // Core hooks
+  const { 
+    mapState, 
+    updateCenter, 
+    updateZoom, 
+    updateMarkers, 
+    selectLocation, 
+    clearMarkers 
+  } = useMapState();
+  
   const {
-    mapState,
-    userLocation,
     selectedIngredient,
     currentSearchQuery,
     displayedSearchQuery,
+    handleSelectIngredient: baseHandleSelectIngredient,
+    handleSearchReset: baseHandleSearchReset
+  } = useMapSearch();
+  
+  const {
     showInfoCard,
-    selectedLocation,
     infoCardPosition,
-    updateCenter,
-    updateZoom,
-    updateMarkers,
-    selectLocation,
-    setUserLocation,
-    setSelectedIngredient,
-    setSearchQuery,
-    setDisplayedSearchQuery,
-    setShowInfoCard,
-    setSelectedLocationData,
-    setInfoCardPosition,
-    clearMarkers,
-  } = useMapStore();
-
-  // External data and services
+    selectedLocation,
+    handleLocationSelect: baseHandleLocationSelect,
+    handleMarkerClick: baseHandleMarkerClick,
+    handleInfoCardClose: baseHandleInfoCardClose,
+    handleViewDetails: baseHandleViewDetails,
+  } = useMapInteractions();
+  
+  const { mapHeight, listRef, handleScroll } = useMapUI();
+  const { userLocation } = useUserLocation();
   const { locations } = useLocations();
   const { searchPlacesByText, searchNearbyPlaces } = usePlacesApi();
   const { showInfoToast, showErrorToast } = useToastManager();
 
   // Enhanced action handlers
   const handleSelectIngredient = useCallback(async (ingredient: Ingredient) => {
-    console.log('Selected ingredient:', ingredient);
-    setSelectedIngredient(ingredient);
-    setSearchQuery(ingredient.name);
-    setDisplayedSearchQuery(ingredient.name);
-    
-    if (ingredient.locations && ingredient.locations.length > 0) {
-      const searchMarkers = ingredient.locations.map(location => ({
-        position: { lat: location.lat, lng: location.lng },
-        locationId: location.id,
-        type: 'search-result' as const
-      }));
-      
-      updateMarkers(searchMarkers);
-      if (searchMarkers.length > 0) {
-        updateCenter(searchMarkers[0].position);
-      }
-      showInfoToast(`Found ${ingredient.locations.length} locations for ${ingredient.name}`);
-    } else if (mapRef.current) {
-      try {
-        const placesResults = await searchPlacesByText(
-          mapRef.current, 
-          ingredient.name, 
-          mapState.center,
-          10000
-        );
-        
-        if (placesResults.length > 0) {
-          updateMarkers(placesResults);
-          updateCenter(placesResults[0].position);
-          showInfoToast(`Found ${placesResults.length} places for ${ingredient.name}`);
-        } else {
-          updateMarkers([]);
-          showInfoToast(`No locations found for ${ingredient.name}`);
-        }
-      } catch (error) {
-        console.error('Places search failed:', error);
-        updateMarkers([]);
-        showErrorToast(`Search failed for ${ingredient.name}`);
-      }
-    }
-  }, [setSelectedIngredient, setSearchQuery, setDisplayedSearchQuery, updateMarkers, updateCenter, mapState.center, searchPlacesByText, showInfoToast, showErrorToast]);
+    await baseHandleSelectIngredient(
+      ingredient,
+      mapRef,
+      mapState,
+      updateMarkers,
+      updateCenter,
+      searchPlacesByText
+    );
+  }, [baseHandleSelectIngredient, mapState, updateMarkers, updateCenter, searchPlacesByText]);
 
   const handleSearchReset = useCallback(() => {
-    console.log('Resetting search');
-    setSelectedIngredient(null);
-    setSearchQuery('');
-    setDisplayedSearchQuery('');
-    clearMarkers();
-    
-    if (mapRef.current) {
-      searchNearbyPlaces(mapRef.current, mapState.center)
-        .then((nearbyPlaces) => {
-          updateMarkers(nearbyPlaces);
-          if (nearbyPlaces.length > 0) {
-            showInfoToast(`Reloaded ${nearbyPlaces.length} nearby places.`);
-          }
-        })
-        .catch((error) => console.error('Failed to reload nearby places after search reset:', error));
-    }
-  }, [setSelectedIngredient, setSearchQuery, setDisplayedSearchQuery, clearMarkers, mapState.center, searchNearbyPlaces, updateMarkers, showInfoToast]);
+    baseHandleSearchReset(
+      clearMarkers,
+      mapRef,
+      mapState,
+      searchNearbyPlaces,
+      updateMarkers
+    );
+  }, [baseHandleSearchReset, clearMarkers, mapState, searchNearbyPlaces, updateMarkers]);
 
   const handleLocationSelect = useCallback((locationId: string) => {
-    console.log('Location selected:', locationId);
-    selectLocation(locationId);
-    
-    const location = locations.find(loc => loc.id === locationId);
-    if (location) {
-      setSelectedLocationData(location);
-      showInfoToast(`Showing ${location.name} on map`);
-    }
-  }, [selectLocation, locations, setSelectedLocationData, showInfoToast]);
+    baseHandleLocationSelect(locationId, locations, selectLocation);
+  }, [baseHandleLocationSelect, locations, selectLocation]);
 
   const handleMarkerClick = useCallback((locationId: string, position: { x: number; y: number }) => {
-    console.log('Marker clicked:', locationId, position);
-    const location = locations.find(loc => loc.id === locationId);
-    
-    if (location && (location.type === "Restaurant" || location.type === "Grocery")) {
-      setSelectedLocationData(location);
-      selectLocation(locationId);
-      setInfoCardPosition(position);
-      setShowInfoCard(true);
-    }
-  }, [locations, setSelectedLocationData, selectLocation, setInfoCardPosition, setShowInfoCard]);
+    baseHandleMarkerClick(locationId, position, locations, selectLocation);
+  }, [baseHandleMarkerClick, locations, selectLocation]);
 
   const handleInfoCardClose = useCallback(() => {
-    console.log('Info card closed');
-    setShowInfoCard(false);
-    selectLocation(null);
-    setSelectedLocationData(null);
-  }, [setShowInfoCard, selectLocation, setSelectedLocationData]);
+    baseHandleInfoCardClose(selectLocation);
+  }, [baseHandleInfoCardClose, selectLocation]);
+
+  const handleViewDetails = useCallback((locationId: string) => {
+    baseHandleViewDetails(locationId, locations);
+    handleInfoCardClose();
+  }, [baseHandleViewDetails, locations, handleInfoCardClose]);
 
   const handleMapLoaded = useCallback(async (map: google.maps.Map) => {
     mapRef.current = map;
@@ -150,13 +105,22 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
         console.error('Failed to load initial nearby places:', error);
         showErrorToast('Failed to load nearby places.');
       }
+    } else if (selectedIngredient) {
+      handleSelectIngredient(selectedIngredient);
     }
-  }, [currentSearchQuery, mapState.center, searchNearbyPlaces, updateMarkers, showInfoToast, showErrorToast]);
+  }, [currentSearchQuery, mapState.center, selectedIngredient, searchNearbyPlaces, updateMarkers, showInfoToast, showErrorToast, handleSelectIngredient]);
 
   const handleMapIdle = useCallback((center: LatLng, zoom: number) => {
     updateCenter(center);
     updateZoom(zoom);
   }, [updateCenter, updateZoom]);
+
+  // Auto-update center when user location changes
+  React.useEffect(() => {
+    if (userLocation) {
+      updateCenter(userLocation);
+    }
+  }, [userLocation, updateCenter]);
 
   const contextValue: MapContextValue = {
     // State
@@ -165,6 +129,8 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
     selectedIngredient,
     currentSearchQuery,
     displayedSearchQuery,
+    mapHeight,
+    listRef,
     showInfoCard,
     selectedLocation,
     infoCardPosition,
@@ -179,13 +145,13 @@ export const MapProvider: React.FC<MapProviderProps> = ({ children }) => {
     clearMarkers,
     handleSelectIngredient,
     handleSearchReset,
+    handleScroll,
     handleLocationSelect,
     handleMarkerClick,
     handleInfoCardClose,
+    handleViewDetails,
     handleMapLoaded,
     handleMapIdle,
-    handleScroll: () => {}, // Placeholder for now
-    handleViewDetails: () => {}, // Placeholder for now
   };
 
   return (

@@ -1,72 +1,44 @@
-
-import React, { useRef } from 'react';
-import { MapProvider, useMapContext } from './context';
+import React from 'react';
+import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
+import { useMapSearch, useMapActions, useMapUI, useMapState } from './hooks/useMapContext';
 
 const MapScreenLayout: React.FC = () => {
-  const listRef = useRef<HTMLDivElement>(null);
-  const {
-    displayedSearchQuery,
-    handleSelectIngredient,
-    handleSearchReset,
-    mapState,
-    selectedIngredient,
-    currentSearchQuery,
-    showInfoCard,
-    selectedLocation,
-    infoCardPosition,
-    handleLocationSelect,
-    handleMarkerClick,
-    handleMapLoaded,
-    handleMapIdle,
-    handleInfoCardClose,
-    handleViewDetails,
-    handleScroll,
-  } = useMapContext();
-
-  const headerProps = {
-    displayedSearchQuery,
-    onSelectIngredient: handleSelectIngredient,
-    onSearchReset: handleSearchReset,
-  };
-
-  const contentProps = {
-    mapState,
-    selectedIngredient,
-    currentSearchQuery,
-    showInfoCard,
-    selectedLocation,
-    infoCardPosition,
-    onLocationSelect: handleLocationSelect,
-    onMarkerClick: handleMarkerClick,
-    onMapLoaded: handleMapLoaded,
-    onMapIdle: handleMapIdle,
-    onInfoCardClose: handleInfoCardClose,
-    onViewDetails: handleViewDetails,
-  };
-  
-  const listProps = {
-    listRef,
-    selectedLocationId: mapState.selectedLocationId,
-    onScroll: handleScroll,
-  };
-
-  // Full viewport map with overlay list
-  const fullScreenContentProps = { ...contentProps, mapHeight: '100vh' };
+  const searchState = useMapSearch();
+  const mapActions = useMapActions();
+  const uiState = useMapUI();
+  const mapState = useMapState();
 
   return (
-    <div className="relative min-h-screen w-full bg-background">
-      <MapScreenHeader {...headerProps} />
+    <div className="flex flex-col min-h-screen w-full bg-background">
+      <MapScreenHeader 
+        displayedSearchQuery={searchState.displayedSearchQuery}
+        onSelectIngredient={searchState.handleSelectIngredient}
+        onSearchReset={searchState.handleSearchReset}
+      />
       
-      {/* Full-screen map as background */}
-      <div className="relative w-full h-screen">
-        <MapScreenContent {...fullScreenContentProps} />
-        
-        {/* Location list as overlay at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-2/5 z-10">
-          <MapScreenList {...listProps} />
-        </div>
-      </div>
+      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
+        <MapScreenContent
+          mapHeight={uiState.mapHeight}
+          selectedIngredient={searchState.selectedIngredient}
+          currentSearchQuery={searchState.currentSearchQuery}
+          mapState={mapState.mapState}
+          showInfoCard={uiState.showInfoCard}
+          selectedLocation={uiState.selectedLocation}
+          infoCardPosition={uiState.infoCardPosition}
+          onLocationSelect={uiState.handleLocationSelect}
+          onMarkerClick={uiState.handleMarkerClick}
+          onMapLoaded={mapActions.handleMapLoaded}
+          onMapIdle={mapActions.handleMapIdle}
+          onInfoCardClose={uiState.handleInfoCardClose}
+          onViewDetails={uiState.handleViewDetails}
+        />
+        <MapScreenList 
+          listRef={uiState.listRef}
+          selectedLocationId={mapState.mapState.selectedLocationId}
+          onScroll={uiState.handleScroll}
+        />
+      </main>
     </div>
   );
 };

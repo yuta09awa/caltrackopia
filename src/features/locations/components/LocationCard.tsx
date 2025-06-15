@@ -1,3 +1,4 @@
+
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, LeafyGreen, Phone, MapPin, Clock } from "lucide-react";
@@ -492,7 +493,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   const { detailLink } = locationNavigation;
 
   return (
-    <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative px-1 ${
+    <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative ${
       isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
     }`}>
       {/* Hazy overlay for closed locations */}
@@ -504,7 +505,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
       <Link 
         key={location.id}
         to={detailLink}
-        className="block py-4"
+        className="block p-4"
         onClick={handleCardClick}
       >
         {/* Changed from flex to grid for a 3-column layout */}
