@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
@@ -30,7 +29,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onMapIdle,
   onLocationSelect
 }) => {
-  const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
+  const { apiKey, error: apiKeyError, loading: apiKeyLoading } = useApiKeyLoader();
 
   const { isLoaded: googleMapsLoaded, loadError: googleMapsError } = useJsApiLoader({
     id: 'google-map-script',
@@ -57,7 +56,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
-    retryCount
   });
 
   // Show loading or error states
@@ -65,9 +63,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     let loadingMessage = 'Initializing map...';
     if (loadingState.isLoading) {
       if (loadingState.stage === 'api-key') {
-        loadingMessage = retryCount > 0 
-          ? `Loading API key (attempt ${retryCount + 1})...`
-          : 'Loading API key...';
+        loadingMessage = 'Loading API key...';
       } else if (loadingState.stage === 'google-maps') {
         loadingMessage = 'Loading Google Maps...';
       }
@@ -77,7 +73,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
       console.error('Map loading error:', { 
         error: loadingState.error,
         stage: loadingState.stage,
-        retryCount 
       });
       return <MapLoadingState height={height} type="error" errorMessage={loadingState.error} />;
     }

@@ -11,7 +11,6 @@ const MapLoadingState: React.FC<MapLoadingStateProps> = ({ height, type, errorMe
   if (type === 'error') {
     const isRefererError = errorMessage?.includes('RefererNotAllowedMapError');
     const isTimeoutError = errorMessage?.includes('timeout');
-    const isRetryError = errorMessage?.includes('attempt');
     
     return (
       <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
@@ -19,7 +18,6 @@ const MapLoadingState: React.FC<MapLoadingStateProps> = ({ height, type, errorMe
           <div className="text-sm font-medium mb-2">
             {isRefererError ? 'Google Maps API Configuration Error' : 
              isTimeoutError ? 'Map Loading Timeout' :
-             isRetryError ? 'Map Loading Failed After Retries' :
              'Map Configuration Error'}
           </div>
           <div className="text-xs">
