@@ -51,25 +51,22 @@ const MapScreenLayout: React.FC = () => {
     onScroll: handleScroll,
   };
 
-  // Fixed value for a standard scroll experience
-  const staticContentProps = { ...contentProps, mapHeight: '60vh' };
-  const staticListProps = { ...listProps, onScroll: undefined };
+  // Full viewport map with overlay list
+  const fullScreenContentProps = { ...contentProps, mapHeight: '100vh' };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-background">
+    <div className="relative min-h-screen w-full bg-background">
       <MapScreenHeader {...headerProps} />
       
-      <main className="w-full">
-        {/* Full-width map - flush with navbar */}
-        <div className="w-full">
-          <MapScreenContent {...staticContentProps} />
+      {/* Full-screen map as background */}
+      <div className="relative w-full h-screen">
+        <MapScreenContent {...fullScreenContentProps} />
+        
+        {/* Location list as overlay at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-2/5 z-10">
+          <MapScreenList {...listProps} />
         </div>
-
-        {/* Full-width listing - no max width constraints */}
-        <div className="w-full">
-          <MapScreenList {...staticListProps} />
-        </div>
-      </main>
+      </div>
     </div>
   );
 };

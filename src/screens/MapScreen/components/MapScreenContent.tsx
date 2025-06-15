@@ -38,7 +38,7 @@ const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
   onViewDetails
 }) => {
   return (
-    <div className="relative w-full px-0">
+    <div className="relative w-full">
       <MapScreenMap
         mapHeight={mapHeight}
         selectedIngredient={selectedIngredient}
