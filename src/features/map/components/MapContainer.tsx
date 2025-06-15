@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useApiKeyLoader } from './ApiKeyLoader';
@@ -31,13 +32,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
 }) => {
   const { apiKey, error: apiKeyError, loading: apiKeyLoading } = useApiKeyLoader();
 
+  // Only load Google Maps if we have an API key
   const { isLoaded: googleMapsLoaded, loadError: googleMapsError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: apiKey!,
+    googleMapsApiKey: apiKey || '',
     libraries: ['places'],
     preventGoogleFontsLoading: true,
-    // Only attempt to load the script once we have an API key
-    disabled: !apiKey,
   });
 
   // Use unified loading state to coordinate all dependencies
@@ -45,7 +45,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     apiKeyLoading,
     apiKeyError,
     apiKey,
-    googleMapsLoaded,
+    googleMapsLoaded: apiKey ? googleMapsLoaded : false,
     googleMapsError
   });
 
