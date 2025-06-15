@@ -1,56 +1,32 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
-import { useMapStore } from '@/features/map/hooks/useMapStore';
 import Container from '@/components/ui/Container';
+import { useMapContext } from './context/useMapContext';
 
 const MapScreenLayout: React.FC = () => {
-  const listRef = useRef<HTMLDivElement>(null);
   const {
-    mapState,
-    selectedIngredient,
-    currentSearchQuery,
-    displayedSearchQuery,
-    showInfoCard,
-    selectedLocation,
-    infoCardPosition
-  } = useMapStore();
+    headerProps,
+    contentProps,
+    listProps
+  } = useMapContext();
 
-  const handleScroll = () => {
-    // Simple scroll handler - can be enhanced later
-  };
+  // Override dynamic map height with a fixed value for a standard scroll experience.
+  // The interactive shrinking is disabled in favor of the map scrolling out of view.
+  const staticContentProps = { ...contentProps, mapHeight: '60vh' };
+  
+  // The onScroll handler is not needed on the list component when the whole page scrolls.
+  const staticListProps = { ...listProps, onScroll: undefined };
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
-      <MapScreenHeader 
-        displayedSearchQuery={displayedSearchQuery}
-        onSelectIngredient={() => {}} // Will be handled by context
-        onSearchReset={() => {}} // Will be handled by context
-      />
+      <MapScreenHeader {...headerProps} />
       
-      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
-        <MapScreenContent
-          mapHeight="60vh"
-          selectedIngredient={selectedIngredient}
-          currentSearchQuery={currentSearchQuery}
-          mapState={mapState}
-          showInfoCard={showInfoCard}
-          selectedLocation={selectedLocation}
-          infoCardPosition={infoCardPosition}
-          onLocationSelect={() => {}} // Will be handled by context
-          onMarkerClick={() => {}} // Will be handled by context
-          onMapLoaded={() => {}} // Will be handled by context
-          onMapIdle={() => {}} // Will be handled by context
-          onInfoCardClose={() => {}} // Will be handled by context
-          onViewDetails={() => {}} // Will be handled by context
-        />
+      <main className="w-full pt-20">
         <Container>
-          <MapScreenList 
-            listRef={listRef}
-            selectedLocationId={mapState.selectedLocationId}
-            onScroll={handleScroll}
-          />
+          <MapScreenContent {...staticContentProps} />
+          <MapScreenList {...staticListProps} />
         </Container>
       </main>
     </div>
