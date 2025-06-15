@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { LocationErrorBoundary } from './LocationErrorBoundary';
@@ -64,7 +65,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     <LocationErrorBoundary>
       <div className="flex flex-col h-full">
         <div className="sticky top-0 bg-background z-10 border-b">
-          <div className="px-2">
+          <div className="px-1">
             <LocationListHeader
               totalCount={displayLocations.length}
               sortOption={sortOption}
@@ -94,7 +95,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
             </div>
           ) : error ? (
             <div className="py-3">
-              <div className="px-2">
+              <div className="px-1">
                 <Card>
                   <CardContent className="p-6 text-center">
                     <p className="text-destructive mb-2">Error loading locations</p>
@@ -105,7 +106,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
             </div>
           ) : displayLocations.length === 0 ? (
             <div className="py-3">
-              <div className="px-2">
+              <div className="px-1">
                 <Card>
                   <CardContent className="p-6 text-center">
                     <p className="text-muted-foreground">

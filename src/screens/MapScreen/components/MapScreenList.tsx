@@ -17,14 +17,14 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   return (
     <div 
       ref={listRef}
-      className="flex-1 bg-background rounded-t-xl shadow-lg relative z-10 px-2 sm:px-4"
+      className="flex-1 bg-background rounded-t-xl shadow-lg relative z-10"
       onScroll={onScroll}
     >
       <div className="w-full flex justify-center py-2">
         <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
       </div>
       
-      <div className="sm:hidden pb-2">
+      <div className="sm:hidden pb-2 px-2">
         <CacheStatusIndicator cacheHitRate={null} />
       </div>
       

@@ -492,7 +492,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
   const { detailLink } = locationNavigation;
 
   return (
-    <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative ${
+    <div className={`hover:bg-muted/20 transition-colors cursor-pointer relative px-1 ${
       isHighlighted ? 'ring-2 ring-primary/30 bg-primary/5' : ''
     }`}>
       {/* Hazy overlay for closed locations */}
