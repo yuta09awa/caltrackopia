@@ -57,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           : "bg-transparent"
       )}
     >
-      <Container>
+      <Container className="px-4 sm:px-6 md:px-8">
         <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
           <Link
             to="/"
