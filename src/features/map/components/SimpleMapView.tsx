@@ -1,0 +1,83 @@
+
+import React, { useCallback } from 'react';
+import { GoogleMap } from '@react-google-maps/api';
+import MapMarkers from './MapMarkers';
+import { SimpleMapState, LatLng } from '@/features/map/hooks/useSimpleMapState';
+import { useMapOptions } from '../hooks/useMapOptions';
+
+interface SimpleMapViewProps {
+  mapState: SimpleMapState;
+  onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
+  onLocationSelect?: (locationId: string) => void;
+  onMapLoaded?: (map: google.maps.Map) => void;
+  onMapIdle?: (center: LatLng, zoom: number) => void;
+}
+
+const SimpleMapView: React.FC<SimpleMapViewProps> = ({ 
+  mapState,
+  onMarkerClick,
+  onLocationSelect,
+  onMapLoaded,
+  onMapIdle
+}) => {
+  const { mapOptions } = useMapOptions();
+
+  const handleMapLoad = useCallback((map: google.maps.Map) => {
+    if (onMapLoaded) {
+      onMapLoaded(map);
+    }
+  }, [onMapLoaded]);
+
+  const handleMarkerClick = useCallback((locationId: string, position: { x: number; y: number }) => {
+    if (onMarkerClick) {
+      onMarkerClick(locationId, position);
+    }
+    if (onLocationSelect) {
+      onLocationSelect(locationId);
+    }
+  }, [onMarkerClick, onLocationSelect]);
+
+  const handleMapClick = useCallback(() => {
+    if (onLocationSelect) {
+      onLocationSelect('');
+    }
+  }, [onLocationSelect]);
+
+  const handleCameraChanged = useCallback(() => {
+    // Debounced camera change handler can be added here if needed
+  }, []);
+
+  const handleMapIdle = useCallback((map: google.maps.Map) => {
+    if (onMapIdle) {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      if (center && zoom) {
+        onMapIdle({ lat: center.lat(), lng: center.lng() }, zoom);
+      }
+    }
+  }, [onMapIdle]);
+
+  return (
+    <GoogleMap
+      onLoad={handleMapLoad}
+      onIdle={handleMapIdle}
+      zoom={mapState.zoom}
+      center={mapState.center}
+      onCenterChanged={handleCameraChanged}
+      onZoomChanged={handleCameraChanged}
+      mapContainerClassName="w-full h-full"
+      options={mapOptions}
+      onClick={handleMapClick}
+    >
+      <MapMarkers 
+        markers={mapState.markers}
+        selectedLocationId={mapState.selectedLocationId}
+        hoveredLocationId={null}
+        onMarkerClick={handleMarkerClick}
+        onMarkerHover={() => {}}
+      />
+    </GoogleMap>
+  );
+};
+
+export default SimpleMapView;
