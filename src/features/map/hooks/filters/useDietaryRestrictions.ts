@@ -1,16 +1,10 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { FilterOption } from '@/features/map/config/filterConfig';
-
-interface DietaryRestrictionType {
-  id: string;
-  name: string;
-  description: string;
-}
+import { standardizedDataService } from '@/services/standardizedDataService';
 
 /**
- * Custom hook to fetch all available dietary restrictions from the database.
+ * Custom hook to fetch all available dietary restrictions from the standardized database.
  * Uses React Query for caching and state management with fallback to static options.
  */
 export function useDietaryRestrictions() {
@@ -18,23 +12,15 @@ export function useDietaryRestrictions() {
     queryKey: ['dietaryRestrictions'],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
-          .from('dietary_restriction_types')
-          .select('id, name, description')
-          .order('name');
+        const dietaryTagTypes = await standardizedDataService.getDietaryTagTypes();
         
-        if (error) {
-          console.warn('Database query failed, using fallback options:', error);
-          throw error;
-        }
-
-        // Transform database results to FilterOption format
-        return data.map((restriction: DietaryRestrictionType) => ({
-          id: restriction.name.toLowerCase().replace(/\s+/g, '-'),
-          label: restriction.name
+        // Transform standardized data to FilterOption format
+        return dietaryTagTypes.map((tagType) => ({
+          id: tagType.name.toLowerCase().replace(/\s+/g, '-'),
+          label: tagType.name
         }));
       } catch (error) {
-        console.warn('Failed to fetch dietary restrictions from database, using fallback options');
+        console.warn('Failed to fetch dietary restrictions from standardized database, using fallback options');
         
         // Fallback to static options if database fails
         return [

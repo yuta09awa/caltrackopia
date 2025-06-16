@@ -1,6 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { DatabaseError, NetworkError } from './errors/DatabaseError';
+import { enhancedDatabaseService } from './enhancedDatabaseService';
 
 export interface EnhancedPlace {
   id: string;
@@ -397,6 +397,113 @@ export class DatabaseService {
       'Place ingredients table is not available yet. Please use the mock data service.',
       'TABLE_NOT_AVAILABLE'
     );
+  }
+
+  // NEW ENHANCED METHODS
+
+  // TTL-aware cached places methods
+  async getCachedPlacesWithTTLSupport() {
+    try {
+      return await enhancedDatabaseService.getCachedPlacesWithTTL();
+    } catch (error) {
+      console.warn('TTL support not available, falling back to regular cached places:', error);
+      return this.getCachedPlacesByIds([]).then(() => []); // Fallback to empty array
+    }
+  }
+
+  async refreshExpiredPlaces() {
+    try {
+      const expiredPlaces = await enhancedDatabaseService.getExpiredCachedPlaces();
+      console.log(`Found ${expiredPlaces.length} expired places that need refresh`);
+      return expiredPlaces;
+    } catch (error) {
+      console.warn('Could not check for expired places:', error);
+      return [];
+    }
+  }
+
+  async updatePlaceWithTTL(placeId: string, refreshIntervalHours: number = 24) {
+    try {
+      await enhancedDatabaseService.updatePlaceTTL(placeId, refreshIntervalHours);
+    } catch (error) {
+      console.warn('Could not update place TTL:', error);
+      // Don't throw - this is an enhancement, not critical
+    }
+  }
+
+  // API quota management integration
+  async checkQuotaBeforeApiCall(serviceName: string) {
+    try {
+      const quotaCheck = await enhancedDatabaseService.checkApiQuota(serviceName);
+      if (!quotaCheck.allowed) {
+        throw new DatabaseError(
+          `API quota exceeded for ${serviceName}. Used: ${quotaCheck.quotaStatus.quotaUsed}/${quotaCheck.quotaStatus.quotaLimit}`,
+          'QUOTA_EXCEEDED'
+        );
+      }
+      return quotaCheck;
+    } catch (error) {
+      if (error instanceof DatabaseError && error.code === 'QUOTA_EXCEEDED') {
+        throw error;
+      }
+      console.warn('Could not check API quota, allowing request:', error);
+      return { allowed: true };
+    }
+  }
+
+  async trackApiCall(serviceName: string, amount: number = 1) {
+    try {
+      await enhancedDatabaseService.incrementApiQuota(serviceName, amount);
+    } catch (error) {
+      console.warn('Could not track API call:', error);
+      // Don't throw - this is monitoring, not critical
+    }
+  }
+
+  // Audit logging integration
+  async logDatabaseOperation(operation: string, tableName: string, recordId?: string, oldValues?: any, newValues?: any) {
+    try {
+      await enhancedDatabaseService.logAuditEvent({
+        actionType: operation as any,
+        tableName,
+        recordId,
+        oldValues,
+        newValues
+      });
+    } catch (error) {
+      console.warn('Could not log database operation:', error);
+      // Don't throw - this is auditing, not critical
+    }
+  }
+
+  // Enhanced place search with quota tracking
+  async searchPlacesWithQuotaTracking(query: string, limit: number = 20) {
+    await this.checkQuotaBeforeApiCall('database_search');
+    
+    try {
+      const results = await this.searchPlaces(query, limit);
+      await this.trackApiCall('database_search');
+      await this.logDatabaseOperation('READ', 'cached_places');
+      return results;
+    } catch (error) {
+      await this.logDatabaseOperation('READ', 'cached_places', undefined, undefined, { error: error instanceof Error ? error.message : 'Unknown error' });
+      throw error;
+    }
+  }
+
+  // Enhanced place by ID with quota tracking
+  async getPlaceByIdWithQuotaTracking(placeId: string) {
+    await this.checkQuotaBeforeApiCall('database_lookup');
+    
+    try {
+      const result = await this.getPlaceById(placeId);
+      await this.trackApiCall('database_lookup');
+      await this.logDatabaseOperation('READ', 'cached_places', placeId);
+      return result;
+    } catch (error) {
+      await this.logDatabaseOperation('READ', 'cached_places', placeId, undefined, { error: error instanceof Error ? error.message : 'Unknown error' });
+      throw error;
+    }
   }
 }
 

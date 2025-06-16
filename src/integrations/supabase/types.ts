@@ -9,6 +9,117 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      allergen_types: {
+        Row: {
+          common_aliases: string[] | null
+          created_at: string | null
+          description: string | null
+          i18n_key: string | null
+          id: string
+          name: string
+          severity_level: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          common_aliases?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          i18n_key?: string | null
+          id?: string
+          name: string
+          severity_level?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          common_aliases?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          i18n_key?: string | null
+          id?: string
+          name?: string
+          severity_level?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      api_quota_tracking: {
+        Row: {
+          burst_limit: number | null
+          created_at: string | null
+          id: string
+          quota_limit: number
+          quota_period: string
+          quota_reset_at: string
+          quota_used: number | null
+          rate_limit_window_seconds: number | null
+          service_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          burst_limit?: number | null
+          created_at?: string | null
+          id?: string
+          quota_limit: number
+          quota_period: string
+          quota_reset_at: string
+          quota_used?: number | null
+          rate_limit_window_seconds?: number | null
+          service_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          burst_limit?: number | null
+          created_at?: string | null
+          id?: string
+          quota_limit?: number
+          quota_period?: string
+          quota_reset_at?: string
+          quota_used?: number | null
+          rate_limit_window_seconds?: number | null
+          service_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cache_statistics: {
         Row: {
           api_calls_saved: number
@@ -40,11 +151,14 @@ export type Database = {
         Row: {
           api_calls_count: number
           custom_notes: string | null
+          expires_at: string | null
           first_cached_at: string
           formatted_address: string | null
           freshness_status: Database["public"]["Enums"]["freshness_status"]
+          google_api_calls_used: number | null
           id: string
           is_open_now: boolean | null
+          last_api_call_at: string | null
           last_updated_at: string
           last_verified_at: string | null
           latitude: number
@@ -60,17 +174,22 @@ export type Database = {
           primary_type: Database["public"]["Enums"]["place_type"]
           rating: number | null
           raw_google_data: Json | null
+          refresh_interval_hours: number | null
+          refresh_priority: number | null
           search_vector: unknown | null
           website: string | null
         }
         Insert: {
           api_calls_count?: number
           custom_notes?: string | null
+          expires_at?: string | null
           first_cached_at?: string
           formatted_address?: string | null
           freshness_status?: Database["public"]["Enums"]["freshness_status"]
+          google_api_calls_used?: number | null
           id?: string
           is_open_now?: boolean | null
+          last_api_call_at?: string | null
           last_updated_at?: string
           last_verified_at?: string | null
           latitude: number
@@ -86,17 +205,22 @@ export type Database = {
           primary_type: Database["public"]["Enums"]["place_type"]
           rating?: number | null
           raw_google_data?: Json | null
+          refresh_interval_hours?: number | null
+          refresh_priority?: number | null
           search_vector?: unknown | null
           website?: string | null
         }
         Update: {
           api_calls_count?: number
           custom_notes?: string | null
+          expires_at?: string | null
           first_cached_at?: string
           formatted_address?: string | null
           freshness_status?: Database["public"]["Enums"]["freshness_status"]
+          google_api_calls_used?: number | null
           id?: string
           is_open_now?: boolean | null
+          last_api_call_at?: string | null
           last_updated_at?: string
           last_verified_at?: string | null
           latitude?: number
@@ -112,6 +236,8 @@ export type Database = {
           primary_type?: Database["public"]["Enums"]["place_type"]
           rating?: number | null
           raw_google_data?: Json | null
+          refresh_interval_hours?: number | null
+          refresh_priority?: number | null
           search_vector?: unknown | null
           website?: string | null
         }
@@ -144,6 +270,87 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      dietary_tag_types: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          i18n_key: string | null
+          icon_name: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          i18n_key?: string | null
+          icon_name?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          i18n_key?: string | null
+          icon_name?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      master_ingredients: {
+        Row: {
+          allergen_ids: string[] | null
+          category: string
+          common_names: string[] | null
+          created_at: string | null
+          description: string | null
+          external_api_ids: Json | null
+          id: string
+          is_organic_available: boolean | null
+          is_seasonal: boolean | null
+          name: string
+          nutritional_data: Json | null
+          peak_season_months: number[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          allergen_ids?: string[] | null
+          category: string
+          common_names?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          external_api_ids?: Json | null
+          id?: string
+          is_organic_available?: boolean | null
+          is_seasonal?: boolean | null
+          name: string
+          nutritional_data?: Json | null
+          peak_season_months?: number[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          allergen_ids?: string[] | null
+          category?: string
+          common_names?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          external_api_ids?: Json | null
+          id?: string
+          is_organic_available?: boolean | null
+          is_seasonal?: boolean | null
+          name?: string
+          nutritional_data?: Json | null
+          peak_season_months?: number[] | null
+          updated_at?: string | null
         }
         Relationships: []
       }
