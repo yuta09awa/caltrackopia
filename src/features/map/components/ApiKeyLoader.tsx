@@ -39,6 +39,8 @@ export const useApiKeyLoader = () => {
           console.log('Successfully retrieved API key');
           setApiKey(data.apiKey);
           setError(null);
+          setLoading(false); // Set loading to false immediately on success
+          return; // Exit early on success
         } else {
           throw new Error('Google Maps API key not found in response');
         }
@@ -56,10 +58,7 @@ export const useApiKeyLoader = () => {
         
         // All retries exhausted
         setError(`Failed to load API key after ${MAX_RETRIES + 1} attempts: ${e.message}`);
-      } finally {
-        if (retryCount >= MAX_RETRIES || apiKey || error) {
-          setLoading(false);
-        }
+        setLoading(false); // Set loading to false on final error
       }
     };
 
