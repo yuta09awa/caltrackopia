@@ -1119,6 +1119,10 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      increment_api_quota: {
+        Args: { p_service_name: string; p_amount?: number }
+        Returns: undefined
+      }
       json: {
         Args: { "": unknown }
         Returns: Json
