@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useApiKeyLoader } from './ApiKeyLoader';
-import { useMapLoadingState } from '../hooks/useMapLoadingState';
 import MapLoadingState from './MapLoadingState';
 import GoogleMapsLoader from './GoogleMapsLoader';
 import { Ingredient } from '@/models/NutritionalInfo';
@@ -31,18 +30,10 @@ const MapContainer: React.FC<MapContainerProps> = ({
 }) => {
   const { apiKey, error: apiKeyError, loading: apiKeyLoading, retryCount } = useApiKeyLoader();
 
-  // Use unified loading state to coordinate all dependencies
-  const loadingState = useMapLoadingState({
+  console.log('MapContainer render state:', { 
+    apiKey: apiKey ? 'present' : 'missing', 
     apiKeyLoading,
     apiKeyError,
-    apiKey,
-    googleMapsLoaded: false, // This will be managed by GoogleMapsLoader
-    googleMapsError: null
-  });
-
-  console.log('MapContainer render state:', { 
-    loadingState,
-    apiKey: apiKey ? 'present' : 'missing', 
     markersCount: mapState.markers.length,
     center: mapState.center,
     zoom: mapState.zoom,
@@ -51,24 +42,19 @@ const MapContainer: React.FC<MapContainerProps> = ({
     currentUrl: window.location.href
   });
 
-  // Show loading while in loading states
-  if (loadingState.isLoading) {
-    const loadingMessage = loadingState.stage === 'api-key' 
-      ? retryCount > 0 
-        ? `Loading API key (attempt ${retryCount + 1})...`
-        : 'Loading API key...'
-      : loadingState.stage === 'google-maps'
-        ? 'Loading Google Maps...'
-        : 'Initializing map...';
+  // Show loading while API key is loading
+  if (apiKeyLoading) {
+    const loadingMessage = retryCount > 0 
+      ? `Loading API key (attempt ${retryCount + 1})...`
+      : 'Loading API key...';
 
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
 
-  // Show error if any dependency failed
-  if (loadingState.error) {
-    console.error('Map loading error:', { 
-      error: loadingState.error,
-      stage: loadingState.stage,
+  // Show error if API key failed to load
+  if (apiKeyError) {
+    console.error('API key loading error:', { 
+      error: apiKeyError,
       retryCount 
     });
     
@@ -76,7 +62,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       <MapLoadingState 
         height={height} 
         type="error" 
-        errorMessage={loadingState.error} 
+        errorMessage={apiKeyError} 
       />
     );
   }

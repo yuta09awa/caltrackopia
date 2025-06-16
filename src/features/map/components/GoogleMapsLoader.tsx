@@ -33,6 +33,7 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
 }) => {
   const [placesReady, setPlacesReady] = useState(false);
   const [initializationError, setInitializationError] = useState<string | null>(null);
+  const [loadingStage, setLoadingStage] = useState<'script' | 'places' | 'ready'>('script');
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -43,7 +44,12 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
 
   // Wait for Places API to be fully ready
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded) {
+      setLoadingStage('script');
+      return;
+    }
+
+    setLoadingStage('places');
 
     const checkPlacesApi = async () => {
       const maxAttempts = 20;
@@ -55,6 +61,7 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
         if (window.google?.maps?.places?.PlacesService) {
           console.log('Places API is ready');
           setPlacesReady(true);
+          setLoadingStage('ready');
           clearInterval(checkInterval);
         } else if (attempts >= maxAttempts) {
           console.error('Places API failed to load after maximum attempts');
@@ -71,6 +78,7 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'missing',
     isLoaded, 
     placesReady,
+    loadingStage,
     loadError: loadError?.message,
     initializationError,
     markersCount: mapState.markers.length,
@@ -109,16 +117,16 @@ const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({
     );
   }
 
-  // Wait for script to load
-  if (!isLoaded) {
-    console.log('Waiting for Google Maps script to load...');
-    return <MapLoadingState height={height} type="initializing" />;
-  }
+  // Show appropriate loading message based on stage
+  if (!isLoaded || !placesReady) {
+    const loadingMessage = loadingStage === 'script' 
+      ? 'Loading Google Maps...'
+      : loadingStage === 'places'
+        ? 'Initializing Places API...'
+        : 'Preparing map...';
 
-  // Wait for Places API to be ready
-  if (!placesReady) {
-    console.log('Waiting for Places API to be ready...');
-    return <MapLoadingState height={height} type="initializing" />;
+    console.log(`Loading stage: ${loadingStage} - ${loadingMessage}`);
+    return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
   }
 
   console.log('Google Maps and Places API successfully loaded, rendering MapView with markers:', mapState.markers);
