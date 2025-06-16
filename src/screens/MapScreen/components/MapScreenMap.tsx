@@ -28,7 +28,6 @@ const MapScreenMap: React.FC<MapScreenMapProps> = React.memo(({
   return (
     <MapContainer 
       height={mapHeight}
-      selectedIngredient={selectedIngredient}
       onLocationSelect={onLocationSelect}
       selectedLocationId={mapState.selectedLocationId}
       onMarkerClick={onMarkerClick}

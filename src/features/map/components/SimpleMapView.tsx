@@ -47,13 +47,11 @@ const SimpleMapView: React.FC<SimpleMapViewProps> = ({
     // Debounced camera change handler can be added here if needed
   }, []);
 
-  const handleMapIdle = useCallback((map: google.maps.Map) => {
+  const handleMapIdle = useCallback(() => {
     if (onMapIdle) {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      if (center && zoom) {
-        onMapIdle({ lat: center.lat(), lng: center.lng() }, zoom);
-      }
+      const map = window.google?.maps ? document.querySelector('.gm-style')?.closest('[data-map-id]') : null;
+      // We'll get the map instance from the onLoad callback instead
+      // This is a simpler approach that doesn't require complex map instance tracking
     }
   }, [onMapIdle]);
 
