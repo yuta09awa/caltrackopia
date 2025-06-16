@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { DatabaseError, NetworkError } from './errors/DatabaseError';
 import {
@@ -283,16 +282,11 @@ export class EnhancedDatabaseService {
 
   async incrementApiQuota(serviceName: string, amount: number = 1): Promise<void> {
     try {
-      // Use direct SQL update instead of RPC to avoid TypeScript issues
-      const { error } = await supabase
-        .from('api_quota_tracking')
-        .update({
-          quota_used: supabase.sql`quota_used + ${amount}`,
-          updated_at: new Date().toISOString()
-        })
-        .eq('service_name', serviceName)
-        .eq('quota_period', 'daily')
-        .gte('quota_reset_at', new Date().toISOString());
+      // Use the RPC function we created
+      const { error } = await supabase.rpc('increment_api_quota', {
+        p_service_name: serviceName,
+        p_amount: amount
+      });
 
       if (error) {
         console.error('Error incrementing API quota:', error);
