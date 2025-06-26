@@ -20,7 +20,7 @@ interface UnifiedMapLoaderProps {
 const UnifiedMapLoader: React.FC<UnifiedMapLoaderProps> = ({
   height,
   children,
-  ...props
+  ...otherProps
 }) => {
   const { apiKey, error, loading } = useApiKeyState();
 

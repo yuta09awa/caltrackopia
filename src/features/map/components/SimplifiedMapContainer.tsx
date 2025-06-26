@@ -33,7 +33,15 @@ const SimplifiedMapContainer: React.FC<SimplifiedMapContainerProps> = ({
 
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
-      <UnifiedMapLoader height={height}>
+      <UnifiedMapLoader 
+        height={height}
+        mapState={mapState}
+        selectedLocationId={selectedLocationId}
+        onMarkerClick={onMarkerClick}
+        onLocationSelect={onLocationSelect}
+        onMapLoaded={onMapLoaded}
+        onMapIdle={onMapIdle}
+      >
         {(isReady) => isReady && (
           <CoreMapView
             mapState={coreMapState}
