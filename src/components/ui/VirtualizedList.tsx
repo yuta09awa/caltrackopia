@@ -39,7 +39,10 @@ function VirtualizedList<T>({
 
   const handleScroll = useMemo(() => {
     if (!onScroll) return undefined;
-    return (props: ListOnScrollProps) => onScroll(props.scrollTop);
+    return (props: ListOnScrollProps) => {
+      // ListOnScrollProps has scrollOffset, not scrollTop
+      onScroll(props.scrollOffset);
+    };
   }, [onScroll]);
 
   if (items.length === 0) {
@@ -57,6 +60,7 @@ function VirtualizedList<T>({
   return (
     <List
       height={height}
+      width="100%" // Required width property
       itemCount={items.length}
       itemSize={itemHeight}
       className={className}
