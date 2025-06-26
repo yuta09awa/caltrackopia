@@ -1,42 +1,61 @@
+
 import React from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
-import { useMapSearch, useMapActions, useMapUI, useMapState } from './hooks/useMapContext';
+import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
 
 const MapScreenLayout: React.FC = () => {
-  const searchState = useMapSearch();
-  const mapActions = useMapActions();
-  const uiState = useMapUI();
-  const mapState = useMapState();
+  const {
+    // State
+    mapState,
+    selectedIngredient,
+    selectedLocation,
+    mapHeight,
+    showInfoCard,
+    infoCardPosition,
+    displayedSearchQuery,
+    listRef,
+    
+    // Actions
+    handleSelectIngredient,
+    handleSearchReset,
+    handleLocationSelect,
+    handleMarkerClick,
+    handleMapLoaded,
+    handleMapIdle,
+    handleInfoCardClose,
+    handleViewDetails,
+    handleScroll
+  } = useSimplifiedMapContext();
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
       <MapScreenHeader 
-        displayedSearchQuery={searchState.displayedSearchQuery}
-        onSelectIngredient={searchState.handleSelectIngredient}
-        onSearchReset={searchState.handleSearchReset}
+        displayedSearchQuery={displayedSearchQuery}
+        onSelectIngredient={handleSelectIngredient}
+        onSearchReset={handleSearchReset}
       />
       
       <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
         <MapScreenContent
-          mapHeight={uiState.mapHeight}
-          selectedIngredient={searchState.selectedIngredient}
-          currentSearchQuery={searchState.currentSearchQuery}
-          mapState={mapState.mapState}
-          showInfoCard={uiState.showInfoCard}
-          selectedLocation={uiState.selectedLocation}
-          infoCardPosition={uiState.infoCardPosition}
-          onLocationSelect={uiState.handleLocationSelect}
-          onMarkerClick={uiState.handleMarkerClick}
-          onMapLoaded={mapActions.handleMapLoaded}
-          onMapIdle={mapActions.handleMapIdle}
-          onInfoCardClose={uiState.handleInfoCardClose}
-          onViewDetails={uiState.handleViewDetails}
+          mapHeight={mapHeight}
+          selectedIngredient={selectedIngredient}
+          currentSearchQuery={displayedSearchQuery}
+          mapState={mapState}
+          showInfoCard={showInfoCard}
+          selectedLocation={selectedLocation}
+          infoCardPosition={infoCardPosition}
+          onLocationSelect={handleLocationSelect}
+          onMarkerClick={handleMarkerClick}
+          onMapLoaded={handleMapLoaded}
+          onMapIdle={handleMapIdle}
+          onInfoCardClose={handleInfoCardClose}
+          onViewDetails={handleViewDetails}
         />
         <MapScreenList 
-          listRef={uiState.listRef}
-          selectedLocationId={mapState.mapState.selectedLocationId}
-          onScroll={uiState.handleScroll}
+          listRef={listRef}
+          selectedLocationId={mapState.selectedLocationId}
+          onScroll={handleScroll}
         />
       </main>
     </div>
