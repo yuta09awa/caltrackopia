@@ -1,7 +1,8 @@
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { locationService } from '@/services/locationService';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { 
   filterLocationsByType, 
   filterLocationsByOpenStatus, 
@@ -10,18 +11,23 @@ import {
 import { validateAndSanitizeLocations } from '../utils/validationUtils';
 import { Location, LocationType, SortOption } from '../types';
 
+const LOCATIONS_PER_PAGE = 20;
+
 export function useLocations() {
   // Initialize locations as an empty array, then fetch from database
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [allLocations, setAllLocations] = useState<Location[]>([]);
+  const [displayedLocations, setDisplayedLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
   
   const [activeTab, setActiveTab] = useState<LocationType>('all');
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useAppStore();
 
-  // Fetch locations from the database on component mount
+  // Fetch all locations from the database on component mount
   useEffect(() => {
     const fetchLocations = async () => {
       setLoading(true);
@@ -35,9 +41,9 @@ export function useLocations() {
           console.log('No locations found in database, falling back to mock data');
           // If database returns empty array, use mock data
           const { mockLocations } = await import('../data/mockLocations');
-          setLocations(mockLocations);
+          setAllLocations(mockLocations);
         } else {
-          setLocations(fetchedLocations);
+          setAllLocations(fetchedLocations);
         }
       } catch (err) {
         console.error('Error fetching locations in useLocations:', err);
@@ -46,12 +52,12 @@ export function useLocations() {
         try {
           const { mockLocations } = await import('../data/mockLocations');
           console.log('Falling back to mock locations due to error');
-          setLocations(mockLocations);
+          setAllLocations(mockLocations);
           // Clear error since we have fallback data
           setError(null);
         } catch (mockErr) {
           console.error('Error loading mock locations:', mockErr);
-          setLocations([]);
+          setAllLocations([]);
         }
       } finally {
         setLoading(false);
@@ -61,11 +67,11 @@ export function useLocations() {
     fetchLocations();
   }, []);
 
-  // Filter locations by type, open status, and sort by selected option
+  // Filter and sort locations based on current filters
   const filteredAndSortedLocations = useMemo(() => {
     try {
       // Validate and sanitize locations before filtering
-      const validatedLocations = validateAndSanitizeLocations(locations);
+      const validatedLocations = validateAndSanitizeLocations(allLocations);
       
       // First filter by location type
       const typeFiltered = filterLocationsByType(validatedLocations, activeTab);
@@ -80,14 +86,40 @@ export function useLocations() {
       // Return empty array if filtering fails
       return [];
     }
-  }, [locations, activeTab, sortOption, isOpenNow]);
-  
+  }, [allLocations, activeTab, sortOption, isOpenNow]);
+
+  // Update displayed locations and pagination when filters change
+  useEffect(() => {
+    const totalItems = filteredAndSortedLocations.length;
+    const itemsToShow = page * LOCATIONS_PER_PAGE;
+    
+    setDisplayedLocations(filteredAndSortedLocations.slice(0, itemsToShow));
+    setHasNextPage(itemsToShow < totalItems);
+  }, [filteredAndSortedLocations, page]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, sortOption, isOpenNow]);
+
+  const loadMore = useCallback(async () => {
+    if (hasNextPage) {
+      setPage(prev => prev + 1);
+    }
+  }, [hasNextPage]);
+
+  const { isLoading: isLoadingMore, loadingRef } = useInfiniteScroll({
+    hasNextPage,
+    loadMore,
+    threshold: 200
+  });
+
   const filterByType = (type: LocationType) => {
     setActiveTab(type);
   };
 
   return {
-    locations: filteredAndSortedLocations,
+    locations: displayedLocations,
     activeTab,
     filterByType,
     sortOption,
@@ -95,6 +127,11 @@ export function useLocations() {
     isOpenNow,
     setIsOpenNow,
     loading,
-    error
+    error,
+    // Infinite scroll props
+    hasNextPage,
+    isLoadingMore,
+    loadingRef,
+    totalCount: filteredAndSortedLocations.length
   };
 }

@@ -1,23 +1,40 @@
-
 import { dataService } from './serviceFactory';
 import { Location } from '@/features/locations/types';
 import { mockLocations } from '@/features/locations/data/mockLocations';
 import { EnhancedPlace } from './databaseService';
+import { enhancedCachingService } from './enhancedCachingService';
 
 class LocationService {
+  private readonly CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
   async getLocations(): Promise<Location[]> {
+    const cacheKey = 'all-locations';
+    
+    // Try to get from cache first
+    const cached = enhancedCachingService.getLocationData(cacheKey);
+    if (cached) {
+      console.log('Locations cache hit:', cacheKey);
+      return cached;
+    }
+
     try {
       // Try to get places from the database service
       const places = await dataService.searchPlaces('', 50);
       
+      let locations: Location[];
+      
       if (places.length === 0) {
         console.log('No places found in database, using mock locations');
-        return mockLocations;
+        locations = mockLocations;
+      } else {
+        // Transform database places to Location format
+        locations = places.map(place => this.mapCachedPlaceToLocation(place));
       }
 
-      // Transform database places to Location format
-      const locations: Location[] = places.map(place => this.mapCachedPlaceToLocation(place));
-
+      // Cache the result
+      enhancedCachingService.setLocationData(cacheKey, locations);
+      console.log('Locations cached:', cacheKey);
+      
       return locations;
     } catch (error) {
       console.error('Error fetching locations from database:', error);
@@ -27,19 +44,36 @@ class LocationService {
   }
 
   async searchLocations(query: string): Promise<Location[]> {
+    const cacheKey = `location-search-${query}`;
+    
+    // Try to get from cache first
+    const cached = enhancedCachingService.getLocationData(cacheKey);
+    if (cached) {
+      console.log('Location search cache hit:', cacheKey);
+      return cached;
+    }
+
     try {
       const places = await dataService.searchPlaces(query, 20);
       
+      let locations: Location[];
+      
       if (places.length === 0) {
         // Filter mock locations by query
-        return mockLocations.filter(loc => 
+        locations = mockLocations.filter(loc => 
           loc.name.toLowerCase().includes(query.toLowerCase()) ||
           loc.address.toLowerCase().includes(query.toLowerCase()) ||
           loc.cuisine?.toLowerCase().includes(query.toLowerCase())
         );
+      } else {
+        locations = places.map(place => this.mapCachedPlaceToLocation(place));
       }
 
-      return places.map(place => this.mapCachedPlaceToLocation(place));
+      // Cache the result
+      enhancedCachingService.setLocationData(cacheKey, locations);
+      console.log('Location search cached:', cacheKey);
+      
+      return locations;
     } catch (error) {
       console.error('Error searching locations:', error);
       return mockLocations.filter(loc => 

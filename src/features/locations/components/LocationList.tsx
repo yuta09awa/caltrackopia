@@ -27,7 +27,11 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     isOpenNow, 
     setIsOpenNow,
     loading,
-    error
+    error,
+    hasNextPage,
+    isLoadingMore,
+    loadingRef,
+    totalCount
   } = useLocations();
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
@@ -152,6 +156,17 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
             </div>
           </LocationErrorBoundary>
         ))}
+        
+        {/* Infinite scroll loading trigger */}
+        {hasNextPage && (
+          <div ref={loadingRef} className="px-3 py-6 text-center">
+            {isLoadingMore ? (
+              <LoadingSkeleton variant="location-card" count={2} />
+            ) : (
+              <p className="text-muted-foreground text-sm">Scroll to load more...</p>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -161,7 +176,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
       <div className="flex flex-col h-full">
         <div className="sticky top-0 bg-background z-10 border-b px-3">
           <LocationListHeader
-            totalCount={displayLocations.length}
+            totalCount={totalCount || displayLocations.length}
             sortOption={sortOption}
             setSortOption={setSortOption}
           />
