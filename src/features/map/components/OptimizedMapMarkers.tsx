@@ -67,7 +67,6 @@ const OptimizedMapMarkers: React.FC<OptimizedMapMarkersProps> = ({
           onMouseOver={() => onMarkerHover?.(marker.locationId)}
           onMouseOut={() => onMarkerHover?.(null)}
           zIndex={marker.isSelected ? 1000 : marker.isHovered ? 999 : 1}
-          optimized={true} // Enable marker optimization
         />
       ))}
     </>

@@ -1,6 +1,6 @@
 
 import React, { memo, useMemo } from 'react';
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+import { FixedSizeList as List, ListChildComponentProps, ListOnScrollProps } from 'react-window';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface VirtualizedListProps<T> {
@@ -39,7 +39,7 @@ function VirtualizedList<T>({
 
   const handleScroll = useMemo(() => {
     if (!onScroll) return undefined;
-    return ({ scrollTop }: { scrollTop: number }) => onScroll(scrollTop);
+    return (props: ListOnScrollProps) => onScroll(props.scrollTop);
   }, [onScroll]);
 
   if (items.length === 0) {
