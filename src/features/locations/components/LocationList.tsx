@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { LocationErrorBoundary } from './LocationErrorBoundary';
 import LocationListHeader from './LocationListHeader';
@@ -7,12 +7,15 @@ import LocationCard from './LocationCard';
 import LocationFilters from './LocationFilters';
 import FilterChips from '@/components/search/FilterChips';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
+import VirtualizedLocationList from './VirtualizedLocationList';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
 
 interface LocationListProps {
   selectedLocationId?: string | null;
 }
+
+const VIRTUALIZATION_THRESHOLD = 50; // Use virtualization for lists with 50+ items
 
 const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId }) => {
   const { 
@@ -29,10 +32,15 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
   const listContainerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(600);
   
   const displayLocations = useMemo(() => {
     return activeSpoof ? getFilteredLocations() : locations;
   }, [activeSpoof, getFilteredLocations, locations]);
+
+  const shouldUseVirtualization = useMemo(() => {
+    return displayLocations.length >= VIRTUALIZATION_THRESHOLD;
+  }, [displayLocations.length]);
 
   const scrollToSelectedLocation = useCallback((locationId: string) => {
     if (!listContainerRef.current) return;
@@ -59,7 +67,94 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     }
   }, [selectedLocationId, scrollToSelectedLocation]);
 
+  // Update container height based on available space
+  useEffect(() => {
+    const updateHeight = () => {
+      if (listContainerRef.current) {
+        const rect = listContainerRef.current.getBoundingClientRect();
+        const availableHeight = window.innerHeight - rect.top - 100; // 100px buffer
+        setContainerHeight(Math.max(400, availableHeight));
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
+  const handleScroll = useCallback((scrollTop: number) => {
+    // Optional: Implement scroll-based features like lazy loading more data
+  }, []);
+
   const skeletonCount = useMemo(() => 6, []);
+
+  const renderLocationsList = () => {
+    if (loading) {
+      return (
+        <div className="px-3 py-3">
+          <LoadingSkeleton 
+            variant="location-card" 
+            count={skeletonCount}
+            className="space-y-3"
+          />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="px-3 py-3">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-destructive mb-2">Error loading locations</p>
+              <p className="text-muted-foreground text-sm">{error}</p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (displayLocations.length === 0) {
+      return (
+        <div className="px-3 py-3">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-muted-foreground">
+                No locations found matching your criteria.
+                {activeSpoof && ` Try a different region or filter.`}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (shouldUseVirtualization) {
+      return (
+        <VirtualizedLocationList
+          locations={displayLocations}
+          selectedLocationId={selectedLocationId}
+          height={containerHeight}
+          onScroll={handleScroll}
+        />
+      );
+    }
+
+    return (
+      <div className="divide-y divide-border">
+        {displayLocations.map((location) => (
+          <LocationErrorBoundary key={location.id}>
+            <div id={`location-${location.id}`} className="transition-colors duration-300">
+              <LocationCard 
+                location={location} 
+                isHighlighted={selectedLocationId === location.id}
+              />
+            </div>
+          </LocationErrorBoundary>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <LocationErrorBoundary>
@@ -83,48 +178,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
           ref={listContainerRef}
           className="flex-1 overflow-y-auto"
         >
-          {loading ? (
-            <div className="px-3 py-3">
-              <LoadingSkeleton 
-                variant="location-card" 
-                count={skeletonCount}
-                className="space-y-3"
-              />
-            </div>
-          ) : error ? (
-            <div className="px-3 py-3">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <p className="text-destructive mb-2">Error loading locations</p>
-                  <p className="text-muted-foreground text-sm">{error}</p>
-                </CardContent>
-              </Card>
-            </div>
-          ) : displayLocations.length === 0 ? (
-            <div className="px-3 py-3">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <p className="text-muted-foreground">
-                    No locations found matching your criteria.
-                    {activeSpoof && ` Try a different region or filter.`}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {displayLocations.map((location) => (
-                <LocationErrorBoundary key={location.id}>
-                  <div id={`location-${location.id}`} className="transition-colors duration-300">
-                    <LocationCard 
-                      location={location} 
-                      isHighlighted={selectedLocationId === location.id}
-                    />
-                  </div>
-                </LocationErrorBoundary>
-              ))}
-            </div>
-          )}
+          {renderLocationsList()}
         </div>
       </div>
     </LocationErrorBoundary>
