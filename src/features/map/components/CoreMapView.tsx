@@ -36,7 +36,7 @@ const CoreMapView: React.FC<CoreMapViewProps> = ({
   onMapIdle,
   viewportBounds
 }) => {
-  const mapOptions = useMapOptions();
+  const { mapOptions } = useMapOptions();
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const handleMapLoad = useCallback((mapInstance: google.maps.Map) => {
