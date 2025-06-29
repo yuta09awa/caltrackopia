@@ -1,3 +1,4 @@
+
 export { useMapSearch } from './useMapSearch';
 export { useMapInteractions } from './useMapInteractions';
 export { useMapUI } from './useMapUI';
@@ -21,3 +22,6 @@ export { useLocationSelection } from './useLocationSelection';
 export { useInfoCardState } from './useInfoCardState';
 export { useMarkerInteractions } from './useMarkerInteractions';
 export { useNavigationActions } from './useNavigationActions';
+
+// New unified hooks
+export { useMapCore } from './useMapCore';

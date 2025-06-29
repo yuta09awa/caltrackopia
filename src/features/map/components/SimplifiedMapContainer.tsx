@@ -1,7 +1,6 @@
 
 import React from 'react';
-import UnifiedMapLoader from './UnifiedMapLoader';
-import CoreMapView from './CoreMapView';
+import MapRenderer from './core/MapRenderer';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface SimplifiedMapContainerProps {
@@ -17,53 +16,8 @@ interface SimplifiedMapContainerProps {
   viewportBounds?: google.maps.LatLngBounds | null;
 }
 
-const SimplifiedMapContainer: React.FC<SimplifiedMapContainerProps> = ({
-  height,
-  mapState,
-  selectedLocationId,
-  hoveredLocationId,
-  onMarkerClick,
-  onMarkerHover,
-  onLocationSelect,
-  onMapLoaded,
-  onMapIdle,
-  viewportBounds
-}) => {
-  // Convert MapState to CoreMapState format with optimization props
-  const coreMapState = {
-    center: mapState.center,
-    zoom: mapState.zoom,
-    markers: mapState.markers,
-    selectedLocationId: selectedLocationId || null
-  };
-
-  return (
-    <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
-      <UnifiedMapLoader 
-        height={height}
-        mapState={mapState}
-        selectedLocationId={selectedLocationId}
-        onMarkerClick={onMarkerClick}
-        onLocationSelect={onLocationSelect}
-        onMapLoaded={onMapLoaded}
-        onMapIdle={onMapIdle}
-      >
-        {(isReady) => isReady && (
-          <CoreMapView
-            mapState={coreMapState}
-            selectedLocationId={selectedLocationId}
-            hoveredLocationId={hoveredLocationId}
-            onMarkerClick={onMarkerClick}
-            onMarkerHover={onMarkerHover}
-            onLocationSelect={onLocationSelect}
-            onMapLoaded={onMapLoaded}
-            onMapIdle={onMapIdle}
-            viewportBounds={viewportBounds}
-          />
-        )}
-      </UnifiedMapLoader>
-    </div>
-  );
+const SimplifiedMapContainer: React.FC<SimplifiedMapContainerProps> = (props) => {
+  return <MapRenderer {...props} />;
 };
 
 export default SimplifiedMapContainer;

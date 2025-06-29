@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SimplifiedMapContainer from './SimplifiedMapContainer';
+import MapRenderer from './core/MapRenderer';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapContainerProps {
@@ -15,7 +15,7 @@ interface MapContainerProps {
 }
 
 const MapContainer: React.FC<MapContainerProps> = (props) => {
-  return <SimplifiedMapContainer {...props} />;
+  return <MapRenderer {...props} />;
 };
 
 export default MapContainer;

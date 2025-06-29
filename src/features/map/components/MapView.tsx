@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SimpleMapView from './SimpleMapView';
+import UnifiedMapView from './core/UnifiedMapView';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 
 interface MapViewProps {
@@ -21,17 +21,19 @@ const MapView: React.FC<MapViewProps> = ({
   onMapLoaded,
   onMapIdle
 }) => {
-  // Convert MapState to SimpleMapState format
-  const simpleMapState = {
+  // Convert MapState to UnifiedMapState format
+  const unifiedMapState = {
     center: mapState.center,
     zoom: mapState.zoom,
     markers: mapState.markers,
-    selectedLocationId: selectedLocationId || null
+    selectedLocationId: selectedLocationId || null,
+    hoveredLocationId: mapState.hoveredLocationId || null
   };
 
   return (
-    <SimpleMapView
-      mapState={simpleMapState}
+    <UnifiedMapView
+      mapState={unifiedMapState}
+      selectedLocationId={selectedLocationId}
       onMarkerClick={onMarkerClick}
       onLocationSelect={onLocationSelect}
       onMapLoaded={onMapLoaded}
