@@ -85,4 +85,4 @@ export const useMapState = () => {
 };
 
 // Re-export types for backward compatibility
-export { LatLng, MarkerData };
+export type { LatLng, MarkerData };

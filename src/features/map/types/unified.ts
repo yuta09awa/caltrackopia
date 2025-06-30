@@ -27,4 +27,4 @@ export interface MapRendererProps extends MapViewProps {
 }
 
 // Re-export LatLng to fix import issues
-export { LatLng, MarkerData } from './index';
+export type { LatLng, MarkerData } from './index';
