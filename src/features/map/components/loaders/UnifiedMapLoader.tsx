@@ -3,11 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useLoadScript } from '@react-google-maps/api';
 import { useApiKeyState } from '../../hooks/useApiKeyState';
 import MapLoadingState from '../MapLoadingState';
-import { MapState, LatLng } from '../../hooks/useMapState';
+import { UnifiedMapState, LatLng } from '../../types/unified';
 
 interface UnifiedMapLoaderProps {
-  mapState: MapState;
-  selectedLocationId?: string | null;
+  mapState: UnifiedMapState;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
   onLocationSelect?: (locationId: string) => void;
   height: string;

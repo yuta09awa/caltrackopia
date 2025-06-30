@@ -2,26 +2,11 @@
 import React from 'react';
 import UnifiedMapLoader from '../loaders/UnifiedMapLoader';
 import UnifiedMapView from './UnifiedMapView';
-import { MapState, LatLng } from '../../hooks/useMapState';
-
-interface MapRendererProps {
-  height: string;
-  mapState: MapState;
-  selectedLocationId?: string | null;
-  hoveredLocationId?: string | null;
-  onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
-  onMarkerHover?: (locationId: string | null) => void;
-  onLocationSelect?: (locationId: string) => void;
-  onMapLoaded?: (map: google.maps.Map) => void;
-  onMapIdle?: (center: LatLng, zoom: number) => void;
-  viewportBounds?: google.maps.LatLngBounds | null;
-}
+import { MapRendererProps, UnifiedMapState } from '../../types/unified';
 
 const MapRenderer: React.FC<MapRendererProps> = ({
   height,
   mapState,
-  selectedLocationId,
-  hoveredLocationId,
   onMarkerClick,
   onMarkerHover,
   onLocationSelect,
@@ -29,21 +14,22 @@ const MapRenderer: React.FC<MapRendererProps> = ({
   onMapIdle,
   viewportBounds
 }) => {
-  // Convert MapState to UnifiedMapState format
-  const unifiedMapState = {
+  // Ensure mapState conforms to UnifiedMapState
+  const unifiedMapState: UnifiedMapState = {
     center: mapState.center,
     zoom: mapState.zoom,
     markers: mapState.markers,
-    selectedLocationId: selectedLocationId || null,
-    hoveredLocationId: hoveredLocationId || null
+    selectedLocationId: mapState.selectedLocationId || null,
+    hoveredLocationId: mapState.hoveredLocationId || null,
+    isLoading: mapState.isLoading || false,
+    error: mapState.error || null
   };
 
   return (
     <div className="relative w-full bg-muted overflow-hidden" style={{ height }}>
       <UnifiedMapLoader 
         height={height}
-        mapState={mapState}
-        selectedLocationId={selectedLocationId}
+        mapState={unifiedMapState}
         onMarkerClick={onMarkerClick}
         onLocationSelect={onLocationSelect}
         onMapLoaded={onMapLoaded}
@@ -52,8 +38,6 @@ const MapRenderer: React.FC<MapRendererProps> = ({
         {(isReady) => isReady && (
           <UnifiedMapView
             mapState={unifiedMapState}
-            selectedLocationId={selectedLocationId}
-            hoveredLocationId={hoveredLocationId}
             onMarkerClick={onMarkerClick}
             onMarkerHover={onMarkerHover}
             onLocationSelect={onLocationSelect}

@@ -25,3 +25,4 @@ export { useNavigationActions } from './useNavigationActions';
 
 // New unified hooks
 export { useMapCore } from './useMapCore';
+export { useMapRendering } from './useMapRendering';

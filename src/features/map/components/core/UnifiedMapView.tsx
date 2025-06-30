@@ -1,34 +1,12 @@
 
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
 import OptimizedMapMarkers from '../OptimizedMapMarkers';
-import { useMapOptions } from '../../hooks/useMapOptions';
-import { MarkerData, LatLng } from '../../types';
+import { useMapRendering } from '../../hooks/useMapRendering';
+import { MapViewProps } from '../../types/unified';
 
-interface UnifiedMapState {
-  center: LatLng;
-  zoom: number;
-  markers: MarkerData[];
-  selectedLocationId?: string | null;
-  hoveredLocationId?: string | null;
-}
-
-interface UnifiedMapViewProps {
-  mapState: UnifiedMapState;
-  selectedLocationId?: string | null;
-  hoveredLocationId?: string | null;
-  onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;
-  onMarkerHover?: (locationId: string | null) => void;
-  onLocationSelect?: (locationId: string) => void;
-  onMapLoaded?: (map: google.maps.Map) => void;
-  onMapIdle?: (center: LatLng, zoom: number) => void;
-  viewportBounds?: google.maps.LatLngBounds | null;
-}
-
-const UnifiedMapView: React.FC<UnifiedMapViewProps> = ({
+const UnifiedMapView: React.FC<MapViewProps> = ({
   mapState,
-  selectedLocationId,
-  hoveredLocationId,
   onMarkerClick,
   onMarkerHover,
   onLocationSelect,
@@ -36,37 +14,27 @@ const UnifiedMapView: React.FC<UnifiedMapViewProps> = ({
   onMapIdle,
   viewportBounds
 }) => {
-  const { mapOptions } = useMapOptions();
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const { mapOptions, handleMapLoad, handleMapIdle, getCurrentViewportBounds } = useMapRendering();
 
-  const handleMapLoad = useCallback((mapInstance: google.maps.Map) => {
-    setMap(mapInstance);
+  const handleMapLoadComplete = useCallback((mapInstance: google.maps.Map) => {
+    handleMapLoad(mapInstance);
     onMapLoaded?.(mapInstance);
-  }, [onMapLoaded]);
+  }, [handleMapLoad, onMapLoaded]);
 
-  const handleMapIdle = useCallback(() => {
-    if (map && onMapIdle) {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      if (center && zoom !== undefined) {
-        onMapIdle({ lat: center.lat(), lng: center.lng() }, zoom);
-      }
-    }
-  }, [map, onMapIdle]);
+  const handleMapIdleComplete = useCallback(() => {
+    handleMapIdle(onMapIdle);
+  }, [handleMapIdle, onMapIdle]);
 
   const handleMapClick = useCallback(() => {
     onLocationSelect?.('');
   }, [onLocationSelect]);
 
-  // Get current viewport bounds for marker optimization
-  const currentViewportBounds = useMemo(() => {
-    return map?.getBounds() || viewportBounds;
-  }, [map, viewportBounds]);
-
   const handleMarkerClick = useCallback((locationId: string, position: { x: number; y: number }) => {
     onMarkerClick?.(locationId, position);
     onLocationSelect?.(locationId);
   }, [onMarkerClick, onLocationSelect]);
+
+  const currentViewportBounds = getCurrentViewportBounds || viewportBounds;
 
   return (
     <GoogleMap
@@ -74,14 +42,14 @@ const UnifiedMapView: React.FC<UnifiedMapViewProps> = ({
       center={mapState.center}
       zoom={mapState.zoom}
       options={mapOptions}
-      onLoad={handleMapLoad}
-      onIdle={handleMapIdle}
+      onLoad={handleMapLoadComplete}
+      onIdle={handleMapIdleComplete}
       onClick={handleMapClick}
     >
       <OptimizedMapMarkers
         markers={mapState.markers}
-        selectedLocationId={selectedLocationId}
-        hoveredLocationId={hoveredLocationId}
+        selectedLocationId={mapState.selectedLocationId}
+        hoveredLocationId={mapState.hoveredLocationId}
         onMarkerClick={handleMarkerClick}
         onMarkerHover={onMarkerHover}
         viewportBounds={currentViewportBounds}
