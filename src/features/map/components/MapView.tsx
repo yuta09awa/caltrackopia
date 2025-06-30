@@ -2,6 +2,7 @@
 import React from 'react';
 import UnifiedMapView from './core/UnifiedMapView';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
+import { UnifiedMapState } from '../types/unified';
 
 interface MapViewProps {
   mapState: MapState;
@@ -22,18 +23,19 @@ const MapView: React.FC<MapViewProps> = ({
   onMapIdle
 }) => {
   // Convert MapState to UnifiedMapState format
-  const unifiedMapState = {
+  const unifiedMapState: UnifiedMapState = {
     center: mapState.center,
     zoom: mapState.zoom,
     markers: mapState.markers,
-    selectedLocationId: selectedLocationId || null,
-    hoveredLocationId: mapState.hoveredLocationId || null
+    selectedLocationId: selectedLocationId || mapState.selectedLocationId,
+    hoveredLocationId: mapState.hoveredLocationId,
+    isLoading: false,
+    error: null
   };
 
   return (
     <UnifiedMapView
       mapState={unifiedMapState}
-      selectedLocationId={selectedLocationId}
       onMarkerClick={onMarkerClick}
       onLocationSelect={onLocationSelect}
       onMapLoaded={onMapLoaded}

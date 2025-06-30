@@ -25,3 +25,6 @@ export interface MapViewProps {
 export interface MapRendererProps extends MapViewProps {
   height: string;
 }
+
+// Re-export LatLng to fix import issues
+export { LatLng, MarkerData } from './index';

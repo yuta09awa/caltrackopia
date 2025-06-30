@@ -2,6 +2,7 @@
 import React from 'react';
 import MapRenderer from './core/MapRenderer';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
+import { UnifiedMapState } from '../types/unified';
 
 interface MapContainerProps {
   height: string;
@@ -14,8 +15,23 @@ interface MapContainerProps {
   onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
-const MapContainer: React.FC<MapContainerProps> = (props) => {
-  return <MapRenderer {...props} />;
+const MapContainer: React.FC<MapContainerProps> = ({
+  mapState,
+  selectedLocationId,
+  ...props
+}) => {
+  // Convert MapState to UnifiedMapState
+  const unifiedMapState: UnifiedMapState = {
+    center: mapState.center,
+    zoom: mapState.zoom,
+    markers: mapState.markers,
+    selectedLocationId: selectedLocationId || mapState.selectedLocationId,
+    hoveredLocationId: mapState.hoveredLocationId,
+    isLoading: false,
+    error: null
+  };
+
+  return <MapRenderer {...props} mapState={unifiedMapState} />;
 };
 
 export default MapContainer;

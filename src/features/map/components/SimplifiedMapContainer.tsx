@@ -2,6 +2,7 @@
 import React from 'react';
 import MapRenderer from './core/MapRenderer';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
+import { UnifiedMapState } from '../types/unified';
 
 interface SimplifiedMapContainerProps {
   height: string;
@@ -16,8 +17,24 @@ interface SimplifiedMapContainerProps {
   viewportBounds?: google.maps.LatLngBounds | null;
 }
 
-const SimplifiedMapContainer: React.FC<SimplifiedMapContainerProps> = (props) => {
-  return <MapRenderer {...props} />;
+const SimplifiedMapContainer: React.FC<SimplifiedMapContainerProps> = ({
+  mapState,
+  selectedLocationId,
+  hoveredLocationId,
+  ...props
+}) => {
+  // Convert MapState to UnifiedMapState
+  const unifiedMapState: UnifiedMapState = {
+    center: mapState.center,
+    zoom: mapState.zoom,
+    markers: mapState.markers,
+    selectedLocationId: selectedLocationId || mapState.selectedLocationId,
+    hoveredLocationId: hoveredLocationId || mapState.hoveredLocationId,
+    isLoading: false,
+    error: null
+  };
+
+  return <MapRenderer {...props} mapState={unifiedMapState} />;
 };
 
 export default SimplifiedMapContainer;

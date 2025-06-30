@@ -1,16 +1,6 @@
 
 import { useState, useCallback } from 'react';
-
-export interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-export interface MarkerData {
-  position: LatLng;
-  locationId: string;
-  type: string;
-}
+import { LatLng, MarkerData } from '../types';
 
 export interface MapState {
   center: LatLng;
@@ -24,13 +14,11 @@ export interface MapState {
 const TEST_MARKERS: MarkerData[] = [
   {
     position: { lat: 40.7589, lng: -73.9851 }, // Times Square area
-    locationId: 'loc-1', // This should match an actual location ID
-    type: 'restaurant'
+    locationId: 'loc-1' // This should match an actual location ID
   },
   {
     position: { lat: 40.7505, lng: -73.9934 }, // Herald Square area  
-    locationId: 'loc-2', // This should match an actual location ID
-    type: 'restaurant'
+    locationId: 'loc-2' // This should match an actual location ID
   }
 ];
 
@@ -95,3 +83,6 @@ export const useMapState = () => {
     clearMarkers
   };
 };
+
+// Re-export types for backward compatibility
+export { LatLng, MarkerData };
