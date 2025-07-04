@@ -1,6 +1,8 @@
 
 import { toast } from "sonner";
 import { httpClient } from "@/utils/http_client/http_client_factory";
+import { ServiceBase } from "../base/ServiceBase";
+import { IEnhancedService } from "../base/ServiceInterface";
 
 export type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -13,11 +15,20 @@ export interface ApiRequestOptions {
   successMessage?: string;
 }
 
-export class ApiService {
+export class ApiService extends ServiceBase implements IEnhancedService {
   private baseUrl: string;
 
   constructor(baseUrl: string = '') {
+    super();
     this.baseUrl = baseUrl;
+  }
+
+  getName(): string {
+    return 'ApiService';
+  }
+
+  getVersion(): string {
+    return '2.0.0';
   }
 
   /**
@@ -38,7 +49,7 @@ export class ApiService {
     
     const url = this.getFullUrl(endpoint);
 
-    try {
+    return this.executeWithStateManagement(async () => {
       let response: T;
       
       switch (method) {
@@ -62,21 +73,15 @@ export class ApiService {
           });
       }
 
+      // Increment API quota usage
+      this.incrementQuotaUsage(1);
+
       if (showSuccessToast) {
-        toast.success(successMessage);
+        this.showSuccessToast(successMessage);
       }
       
       return response;
-    } catch (error) {
-      console.error(`API ${method} request to ${endpoint} failed:`, error);
-      
-      if (showErrorToast) {
-        const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-        toast.error(`Request failed: ${errorMessage}`);
-      }
-      
-      throw error;
-    }
+    }, `API ${method} request to ${endpoint}`);
   }
 
   /**
