@@ -68,8 +68,8 @@ export function useConsolidatedMap(options: ConsolidatedMapOptions = {}) {
     try {
       let results: MarkerData[] = [];
       
-      if (type === 'text') {
-        results = await placesApi.searchPlacesByText(query);
+      if (type === 'text' && mapCore.mapRef.current) {
+        results = await placesApi.searchPlacesByText(mapCore.mapRef.current, query, center, radius);
       } else if (type === 'nearby' && mapCore.mapRef.current) {
         results = await placesApi.searchNearbyPlaces(mapCore.mapRef.current, center, radius);
       }
