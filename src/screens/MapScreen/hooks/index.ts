@@ -1,7 +1,19 @@
+// ============= MAPSCREEN CONSOLIDATED HOOKS =============
 
-export { useMapContext, useMapState, useMapActions, useMapSearch, useMapUI } from './useMapContext';
+// PRIMARY INTERFACE - Use this for MapScreen functionality
+export { 
+  useMapContext, 
+  useMapState, 
+  useMapActions, 
+  useMapSearch, 
+  useMapUI 
+} from './useMapContext';
 
-// Legacy exports for backward compatibility - can be removed after migration
+// SIMPLIFIED CONTEXT HOOK - For lighter MapScreen usage
+export { useSimplifiedMapContext } from './useSimplifiedMapContext';
+
+// === LEGACY HOOKS - Use useMapContext instead ===
+// These will be removed in future versions
 export { useMapScreenState } from './useMapScreenState';
 export { useMapScreenCallbacks } from './useMapScreenCallbacks';
 export { useMapScreenProps } from './useMapScreenProps';
