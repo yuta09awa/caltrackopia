@@ -188,11 +188,7 @@ export abstract class StandardServiceBase extends ServiceBase implements IEnhanc
       data,
       success,
       message,
-      meta: {
-        timestamp: new Date().toISOString(),
-        service: this.getName(),
-        version: this.getVersion(),
-      },
+      meta: {},
     };
   }
 

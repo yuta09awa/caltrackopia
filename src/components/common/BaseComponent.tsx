@@ -8,11 +8,10 @@ import { StandardComponentProps, LoadingProps } from '@/types';
  * Base component wrapper that provides standard functionality
  */
 export interface BaseComponentWrapperProps extends StandardComponentProps {
-  as?: keyof JSX.IntrinsicElements;
   variant?: 'default' | 'primary' | 'secondary' | 'ghost';
 }
 
-export const BaseComponent = React.forwardRef<HTMLElement, BaseComponentWrapperProps>(
+export const BaseComponent = React.forwardRef<HTMLDivElement, BaseComponentWrapperProps>(
   ({ 
     className, 
     children, 
@@ -20,9 +19,7 @@ export const BaseComponent = React.forwardRef<HTMLElement, BaseComponentWrapperP
     error, 
     disabled, 
     testId, 
-    as: Component = 'div',
     variant = 'default',
-    ...props 
   }, ref) => {
     
     const baseClasses = cn(
@@ -38,13 +35,12 @@ export const BaseComponent = React.forwardRef<HTMLElement, BaseComponentWrapperP
     );
 
     return (
-      <Component
-        ref={ref as any}
+      <div
+        ref={ref}
         className={baseClasses}
         data-testid={testId}
         aria-disabled={disabled}
         aria-busy={loading}
-        {...props}
       >
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/50">
@@ -57,7 +53,7 @@ export const BaseComponent = React.forwardRef<HTMLElement, BaseComponentWrapperP
           </div>
         )}
         {children}
-      </Component>
+      </div>
     );
   }
 );

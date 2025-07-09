@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 /**
  * Standard form wrapper with validation and error handling
  */
-export interface StandardFormProps<T extends FieldValues = FieldValues> extends StandardComponentProps {
+export interface StandardFormProps<T extends FieldValues = FieldValues> extends Omit<StandardComponentProps, 'children'> {
   onSubmit: (data: T) => void | Promise<void>;
   defaultValues?: Partial<T>;
   children: (form: UseFormReturn<T>) => React.ReactNode;
