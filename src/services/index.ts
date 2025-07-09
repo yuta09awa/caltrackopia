@@ -2,6 +2,7 @@
 
 // Base Service Architecture
 export { ServiceBase } from './base/ServiceBase';
+export { StandardServiceBase, StandardHttpService } from './core/StandardServiceBase';
 export type { 
   ServiceState, 
   ApiQuotaInfo 
