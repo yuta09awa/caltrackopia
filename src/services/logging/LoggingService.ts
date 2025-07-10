@@ -145,15 +145,20 @@ export class LoggingService {
 
   // API call logging
   apiCall(endpoint: string, method: string, duration: number, status: number, context?: Record<string, any>): void {
-    const level = status >= 400 ? 'error' : 'info';
-    this[level](`API Call: ${method} ${endpoint}`, {
+    const apiContext = {
       ...context,
       endpoint,
       method,
       status,
       duration,
       type: 'api_call'
-    });
+    };
+    
+    if (status >= 400) {
+      this.error(`API Call: ${method} ${endpoint}`, undefined, apiContext);
+    } else {
+      this.info(`API Call: ${method} ${endpoint}`, apiContext);
+    }
   }
 }
 
