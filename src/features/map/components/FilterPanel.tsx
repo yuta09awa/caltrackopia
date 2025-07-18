@@ -3,7 +3,7 @@ import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
+import EnhancedPriceRangeFilter from '@/features/map/components/filters/EnhancedPriceRangeFilter';
 import CuisineFilter from '@/features/map/components/filters/CuisineFilter';
 import GroceryCategoryFilter from '@/features/map/components/filters/GroceryCategoryFilter';
 import IngredientFilters from './IngredientFilters';
@@ -56,10 +56,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         {/* Enhanced Ingredient Filters */}
         <IngredientFilters />
 
-        <PriceRangeFilter 
-          priceFilter={priceFilter}
-          setPriceFilter={setPriceFilter}
-        />
+        <EnhancedPriceRangeFilter compact />
 
         {(activeTab === 'all' || activeTab === 'restaurant') && (
           <CuisineFilter cuisineOptions={cuisineOptions} />
