@@ -59,14 +59,11 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-20 flex flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
+        "fixed top-0 left-0 right-0 z-20 flex h-full flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
         isExpanded
-          ? "translate-y-[30vh]" // When expanded, top is at 30vh from top
-          : "translate-y-[85vh]" // When collapsed, top is at 85vh from top
+          ? "translate-y-[120px]" // When expanded, the top of the sheet is 120px from the top
+          : "translate-y-[calc(100vh-140px)]" // When collapsed, 140px is visible from the bottom
       )}
-      style={{
-        height: '100vh', // Full potential height
-      }}
     >
       {/* Drag Handle */}
       <div 
@@ -100,7 +97,7 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
       {/* List Content */}
       <div 
         ref={listRef}
-        className="flex-1 overflow-y-auto px-2 pb-4"
+        className="flex-1 overflow-y-auto px-2 pb-24"
         onScroll={onScroll}
       >
         <LocationList selectedLocationId={selectedLocationId} />
