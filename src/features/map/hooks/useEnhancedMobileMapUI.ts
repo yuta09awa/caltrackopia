@@ -5,14 +5,17 @@ export interface EnhancedMobileMapUIState {
   mapHeight: string;
   listRef: React.RefObject<HTMLDivElement>;
   isMobile: boolean;
+  isBottomSheetExpanded: boolean;
 }
 
 export interface EnhancedMobileMapUIActions {
   handleScroll: () => void;
+  toggleBottomSheet: () => void;
 }
 
 export const useEnhancedMobileMapUI = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
   const [mapHeight, setMapHeight] = useState('60vh');
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -32,16 +35,29 @@ export const useEnhancedMobileMapUI = () => {
     };
   }, []);
 
-  // Simplified height calculation - let the Drawer handle mobile sizing
+  // Simplified height calculation with predictable viewport units
   useEffect(() => {
     if (isMobile) {
-      // For mobile, use a fixed height since Drawer handles the panel
-      setMapHeight('50vh');
+      // When expanded, map takes smaller portion (30vh)
+      // When collapsed, map takes most of screen (85vh)
+      setMapHeight(isBottomSheetExpanded ? '30vh' : '85vh');
     } else {
       // Desktop behavior with scroll-based height adjustment
-      setMapHeight('60vh');
+      if (listRef.current) {
+        const scrollTop = listRef.current.scrollTop;
+        const maxScroll = 200;
+        const minHeight = 40;
+        const maxHeight = 60;
+        
+        const scrollPercentage = Math.min(scrollTop / maxScroll, 1);
+        const newHeight = maxHeight - (scrollPercentage * (maxHeight - minHeight));
+        
+        setMapHeight(`${newHeight}vh`);
+      } else {
+        setMapHeight('60vh');
+      }
     }
-  }, [isMobile]);
+  }, [isMobile, isBottomSheetExpanded]);
 
   const handleScroll = useCallback(() => {
     if (!isMobile && listRef.current) {
@@ -57,13 +73,19 @@ export const useEnhancedMobileMapUI = () => {
     }
   }, [isMobile]);
 
+  const toggleBottomSheet = useCallback(() => {
+    setIsBottomSheetExpanded(prev => !prev);
+  }, []);
+
   return {
     // State
     mapHeight,
     listRef,
     isMobile,
+    isBottomSheetExpanded,
     
     // Actions
     handleScroll,
+    toggleBottomSheet,
   };
 };

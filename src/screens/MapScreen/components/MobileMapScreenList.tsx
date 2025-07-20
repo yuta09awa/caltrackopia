@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import LocationList from "@/features/locations/components/LocationList";
 import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
 
@@ -56,13 +57,15 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
   }, [startY, currentY, isExpanded, onToggleExpanded]);
 
   return (
-    <div 
-      className={`fixed bottom-0 left-0 right-0 bg-background rounded-t-xl shadow-lg z-20 transition-transform duration-300 ease-out ${
-        isExpanded ? 'translate-y-0' : 'translate-y-[calc(100%-140px)]'
-      }`}
-      style={{ 
-        height: isExpanded ? 'calc(100vh - 120px)' : '200px',
-        maxHeight: 'calc(100vh - 120px)'
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-20 flex flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
+        isExpanded
+          ? "translate-y-[30vh]" // When expanded, top is at 30vh from top
+          : "translate-y-[85vh]" // When collapsed, top is at 85vh from top
+      )}
+      style={{
+        height: '100vh', // Full potential height
       }}
     >
       {/* Drag Handle */}
@@ -76,7 +79,7 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
         <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
       </div>
 
-      {/* Expand/Collapse Button */}
+      {/* Header with Cache Status and Toggle */}
       <div className="px-4 pb-2 flex items-center justify-between">
         <div>
           <CacheStatusIndicator cacheHitRate={null} />
@@ -97,11 +100,8 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
       {/* List Content */}
       <div 
         ref={listRef}
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto px-2 pb-4"
         onScroll={onScroll}
-        style={{ 
-          height: isExpanded ? 'calc(100% - 80px)' : '120px',
-        }}
       >
         <LocationList selectedLocationId={selectedLocationId} />
       </div>
