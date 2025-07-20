@@ -61,7 +61,7 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
       className={cn(
         "fixed top-0 left-0 right-0 z-20 flex h-full flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
         isExpanded
-          ? "translate-y-[120px]" // When expanded, the top of the sheet is 120px from the top
+          ? "translate-y-[50vh]" // When expanded, align with 50vh map height
           : "translate-y-[calc(100vh-140px)]" // When collapsed, 140px is visible from the bottom
       )}
     >

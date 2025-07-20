@@ -35,11 +35,13 @@ export const useEnhancedMobileMapUI = () => {
     };
   }, []);
 
-  // Fixed height calculation for mobile, scroll-based for desktop
+  // Dynamic height calculation for mobile, scroll-based for desktop
   useEffect(() => {
     if (isMobile) {
-      // The map will now have a fixed height, and the list will scroll over it.
-      setMapHeight('calc(100vh - 120px)'); // Set to a fixed height that leaves space for the collapsed list handle.
+      // Give more breathing room to the map
+      // Expanded: Map gets 50% of screen (better visibility)
+      // Collapsed: Map gets nearly full screen minus handle space
+      setMapHeight(isBottomSheetExpanded ? '50vh' : 'calc(100vh - 140px)');
     } else {
       // Desktop behavior with scroll-based height adjustment
       if (listRef.current) {
@@ -56,7 +58,7 @@ export const useEnhancedMobileMapUI = () => {
         setMapHeight('60vh');
       }
     }
-  }, [isMobile]);
+  }, [isMobile, isBottomSheetExpanded]);
 
   const handleScroll = useCallback(() => {
     if (!isMobile && listRef.current) {
