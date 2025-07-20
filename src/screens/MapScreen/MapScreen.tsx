@@ -3,7 +3,7 @@ import React from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent } from './components';
 import MapScreenList from './components/MapScreenList';
-import EnhancedMobileMapScreenList from './components/EnhancedMobileMapScreenList';
+import MobileLocationPanel from './components/MobileLocationPanel';
 import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
 import { useEnhancedMobileMapUI } from '@/features/map/hooks/useEnhancedMobileMapUI';
 
@@ -32,10 +32,7 @@ const MapScreenLayout: React.FC = () => {
     mapHeight,
     listRef,
     isMobile,
-    isExpanded,
-    handleScroll,
-    handlePanelStateChange,
-    toggleExpanded
+    handleScroll
   } = useEnhancedMobileMapUI();
 
   return (
@@ -66,13 +63,10 @@ const MapScreenLayout: React.FC = () => {
         />
         
         {isMobile ? (
-          <EnhancedMobileMapScreenList 
-            listRef={listRef}
+          <MobileLocationPanel 
             selectedLocationId={mapState.selectedLocationId}
+            listRef={listRef}
             onScroll={handleScroll}
-            isExpanded={isExpanded}
-            onPanelStateChange={handlePanelStateChange}
-            onToggleExpanded={toggleExpanded}
           />
         ) : (
           <MapScreenList 
