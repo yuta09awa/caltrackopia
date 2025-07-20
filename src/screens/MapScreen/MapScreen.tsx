@@ -36,22 +36,31 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
       
-      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
-        <MapScreenContent
-          mapHeight={mapHeight}
-          selectedIngredient={selectedIngredient}
-          currentSearchQuery={displayedSearchQuery}
-          mapState={mapState}
-          showInfoCard={showInfoCard}
-          selectedLocation={selectedLocation}
-          infoCardPosition={infoCardPosition}
-          onLocationSelect={handleLocationSelect}
-          onMarkerClick={handleMarkerClick}
-          onMapLoaded={handleMapLoaded}
-          onMapIdle={handleMapIdle}
-          onInfoCardClose={handleInfoCardClose}
-          onViewDetails={handleViewDetails}
-        />
+      <main className="flex-1 flex flex-col relative w-full overflow-hidden" style={{ marginTop: '30px' }}>
+        <div 
+          className="relative w-full"
+          style={{ 
+            height: mapHeight,
+            '--map-height': mapHeight 
+          } as React.CSSProperties}
+        >
+          <MapScreenContent
+            mapHeight="100%"
+            selectedIngredient={selectedIngredient}
+            currentSearchQuery={displayedSearchQuery}
+            mapState={mapState}
+            showInfoCard={showInfoCard}
+            selectedLocation={selectedLocation}
+            infoCardPosition={infoCardPosition}
+            onLocationSelect={handleLocationSelect}
+            onMarkerClick={handleMarkerClick}
+            onMapLoaded={handleMapLoaded}
+            onMapIdle={handleMapIdle}
+            onInfoCardClose={handleInfoCardClose}
+            onViewDetails={handleViewDetails}
+          />
+        </div>
+        
         <MapScreenList 
           listRef={listRef}
           selectedLocationId={mapState.selectedLocationId}

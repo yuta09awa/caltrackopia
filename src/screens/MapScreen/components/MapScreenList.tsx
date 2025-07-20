@@ -17,13 +17,20 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   return (
     <div 
       ref={listRef}
-      className="flex-1 bg-background rounded-t-xl shadow-lg -mt-4 relative z-10 overflow-y-auto"
+      className="flex-1 bg-background rounded-t-xl shadow-lg relative z-10 overflow-y-auto sm:rounded-none sm:shadow-none"
       onScroll={onScroll}
+      style={{
+        // Mobile-specific height calculation
+        height: 'calc(100vh - var(--map-height, 50vh) - 100px)',
+        minHeight: '300px'
+      }}
     >
-      <div className="w-full flex justify-center py-2">
+      {/* Mobile drag handle */}
+      <div className="w-full flex justify-center py-2 sm:hidden">
         <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
       </div>
       
+      {/* Mobile cache status */}
       <div className="sm:hidden px-4 pb-2">
         <CacheStatusIndicator cacheHitRate={null} />
       </div>

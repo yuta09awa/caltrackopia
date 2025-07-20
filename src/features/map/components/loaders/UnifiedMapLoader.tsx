@@ -26,6 +26,7 @@ const UnifiedMapLoader: React.FC<UnifiedMapLoaderProps> = ({
   const [placesReady, setPlacesReady] = useState(false);
   const [initializationError, setInitializationError] = useState<string | null>(null);
   const [loadingStage, setLoadingStage] = useState<'apiKey' | 'script' | 'places' | 'ready'>('apiKey');
+  const [retryCount, setRetryCount] = useState(0);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
@@ -34,51 +35,76 @@ const UnifiedMapLoader: React.FC<UnifiedMapLoaderProps> = ({
     preventGoogleFontsLoading: true,
   });
 
-  // Handle API key loading
+  // Handle API key loading with mobile-specific timeouts
   useEffect(() => {
     if (apiKeyLoading) {
       setLoadingStage('apiKey');
     } else if (apiKeyError) {
+      console.error('API Key Error:', apiKeyError);
       setInitializationError(apiKeyError);
     } else if (apiKey) {
       setLoadingStage('script');
     }
   }, [apiKey, apiKeyError, apiKeyLoading]);
 
-  // Wait for Places API to be fully ready
+  // Wait for Places API with mobile-optimized timing
   useEffect(() => {
     if (!isLoaded || !apiKey) return;
 
     setLoadingStage('places');
 
     const checkPlacesApi = async () => {
-      const maxAttempts = 20;
+      const maxAttempts = 15; // Reduced for mobile
+      const checkInterval = 150; // Slightly longer for mobile
       let attempts = 0;
       
-      const checkInterval = setInterval(() => {
+      const intervalId = setInterval(() => {
         attempts++;
         
-        if (window.google?.maps?.places?.PlacesService) {
-          console.log('Places API is ready');
-          setPlacesReady(true);
-          setLoadingStage('ready');
-          clearInterval(checkInterval);
-        } else if (attempts >= maxAttempts) {
-          console.error('Places API failed to load after maximum attempts');
-          setInitializationError('Places API failed to initialize');
-          clearInterval(checkInterval);
+        try {
+          if (window.google?.maps?.places?.PlacesService) {
+            console.log('Places API is ready');
+            setPlacesReady(true);
+            setLoadingStage('ready');
+            clearInterval(intervalId);
+          } else if (attempts >= maxAttempts) {
+            console.error('Places API failed to load after maximum attempts');
+            if (retryCount < 2) {
+              console.log(`Retrying Places API initialization (attempt ${retryCount + 1})`);
+              setRetryCount(prev => prev + 1);
+              setPlacesReady(false);
+              setLoadingStage('script');
+              clearInterval(intervalId);
+              // Retry after a short delay
+              setTimeout(() => {
+                setLoadingStage('places');
+                checkPlacesApi();
+              }, 1000);
+            } else {
+              setInitializationError('Places API failed to initialize after retries');
+              clearInterval(intervalId);
+            }
+          }
+        } catch (error) {
+          console.error('Error checking Places API:', error);
+          if (attempts >= maxAttempts) {
+            setInitializationError('Places API check failed');
+            clearInterval(intervalId);
+          }
         }
-      }, 100);
+      }, checkInterval);
     };
 
     checkPlacesApi();
-  }, [isLoaded, apiKey]);
+  }, [isLoaded, apiKey, retryCount]);
 
-  // Handle loading error
+  // Handle loading error with better mobile messaging
   if (loadError || initializationError) {
     const errorMessage = loadError 
       ? `Google Maps Error: ${loadError.message}` 
       : initializationError || 'Unknown error';
+    
+    console.error('Map loading error:', errorMessage);
     
     return (
       <MapLoadingState 
@@ -96,7 +122,7 @@ const UnifiedMapLoader: React.FC<UnifiedMapLoaderProps> = ({
       : loadingStage === 'script' 
         ? 'Loading Google Maps...'
         : loadingStage === 'places'
-          ? 'Initializing Places API...'
+          ? retryCount > 0 ? `Retrying... (${retryCount}/2)` : 'Initializing Places API...'
           : 'Preparing map...';
 
     return <MapLoadingState height={height} type="loading" errorMessage={loadingMessage} />;
