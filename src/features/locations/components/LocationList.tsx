@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LocationErrorBoundary } from './LocationErrorBoundary';
 import LocationListHeader from './LocationListHeader';
 import LocationCard from './LocationCard';
+import MobileLocationCard from './MobileLocationCard';
 import LocationFilters from './LocationFilters';
 import FilterChips from '@/components/search/FilterChips';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
@@ -15,7 +16,7 @@ interface LocationListProps {
   selectedLocationId?: string | null;
 }
 
-const VIRTUALIZATION_THRESHOLD = 50; // Use virtualization for lists with 50+ items
+const VIRTUALIZATION_THRESHOLD = 50;
 
 const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId }) => {
   const { 
@@ -37,14 +38,26 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
   const listContainerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(600);
+  const [isMobile, setIsMobile] = useState(false);
   
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const displayLocations = useMemo(() => {
     return activeSpoof ? getFilteredLocations() : locations;
   }, [activeSpoof, getFilteredLocations, locations]);
 
   const shouldUseVirtualization = useMemo(() => {
-    return displayLocations.length >= VIRTUALIZATION_THRESHOLD;
-  }, [displayLocations.length]);
+    return displayLocations.length >= VIRTUALIZATION_THRESHOLD && !isMobile;
+  }, [displayLocations.length, isMobile]);
 
   const scrollToSelectedLocation = useCallback((locationId: string) => {
     if (!listContainerRef.current) return;
@@ -76,7 +89,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     const updateHeight = () => {
       if (listContainerRef.current) {
         const rect = listContainerRef.current.getBoundingClientRect();
-        const availableHeight = window.innerHeight - rect.top - 100; // 100px buffer
+        const availableHeight = window.innerHeight - rect.top - 100;
         setContainerHeight(Math.max(400, availableHeight));
       }
     };
@@ -149,15 +162,21 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
         {displayLocations.map((location) => (
           <LocationErrorBoundary key={location.id}>
             <div id={`location-${location.id}`} className="transition-colors duration-300">
-              <LocationCard 
-                location={location} 
-                isHighlighted={selectedLocationId === location.id}
-              />
+              {isMobile ? (
+                <MobileLocationCard 
+                  location={location} 
+                  isHighlighted={selectedLocationId === location.id}
+                />
+              ) : (
+                <LocationCard 
+                  location={location} 
+                  isHighlighted={selectedLocationId === location.id}
+                />
+              )}
             </div>
           </LocationErrorBoundary>
         ))}
         
-        {/* Infinite scroll loading trigger */}
         {hasNextPage && (
           <div ref={loadingRef} className="px-3 py-6 text-center">
             {isLoadingMore ? (
@@ -174,20 +193,22 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   return (
     <LocationErrorBoundary>
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 bg-background z-10 border-b px-3">
-          <LocationListHeader
-            totalCount={totalCount || displayLocations.length}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
-          <LocationFilters
-            activeTab={activeTab}
-            onTabChange={filterByType}
-            isOpenNow={isOpenNow}
-            setIsOpenNow={setIsOpenNow}
-          />
-          <FilterChips />
-        </div>
+        {!isMobile && (
+          <div className="sticky top-0 bg-background z-10 border-b px-3">
+            <LocationListHeader
+              totalCount={totalCount || displayLocations.length}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+            />
+            <LocationFilters
+              activeTab={activeTab}
+              onTabChange={filterByType}
+              isOpenNow={isOpenNow}
+              setIsOpenNow={setIsOpenNow}
+            />
+            <FilterChips />
+          </div>
+        )}
         
         <div 
           ref={listContainerRef}
