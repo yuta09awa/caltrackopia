@@ -3,9 +3,9 @@ import React from 'react';
 import { MapProvider } from './context/MapProvider';
 import { MapScreenHeader, MapScreenContent } from './components';
 import MapScreenList from './components/MapScreenList';
-import MobileMapScreenList from './components/MobileMapScreenList';
+import EnhancedMobileMapScreenList from './components/EnhancedMobileMapScreenList';
 import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
-import { useMobileMapUI } from '@/features/map/hooks/useMobileMapUI';
+import { useEnhancedMobileMapUI } from '@/features/map/hooks/useEnhancedMobileMapUI';
 
 const MapScreenLayout: React.FC = () => {
   const {
@@ -32,11 +32,11 @@ const MapScreenLayout: React.FC = () => {
     mapHeight,
     listRef,
     isMobile,
-    isBottomSheetExpanded,
+    isExpanded,
     handleScroll,
-    toggleBottomSheet,
-    setBottomSheetExpanded
-  } = useMobileMapUI();
+    handlePanelStateChange,
+    toggleExpanded
+  } = useEnhancedMobileMapUI();
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
@@ -66,12 +66,13 @@ const MapScreenLayout: React.FC = () => {
         />
         
         {isMobile ? (
-          <MobileMapScreenList 
+          <EnhancedMobileMapScreenList 
             listRef={listRef}
             selectedLocationId={mapState.selectedLocationId}
             onScroll={handleScroll}
-            isExpanded={isBottomSheetExpanded}
-            onToggleExpanded={toggleBottomSheet}
+            isExpanded={isExpanded}
+            onPanelStateChange={handlePanelStateChange}
+            onToggleExpanded={toggleExpanded}
           />
         ) : (
           <MapScreenList 
