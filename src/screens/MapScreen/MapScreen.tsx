@@ -5,7 +5,7 @@ import { MapScreenHeader, MapScreenContent } from './components';
 import MapScreenList from './components/MapScreenList';
 import MobileMapScreenList from './components/MobileMapScreenList';
 import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
-import { useEnhancedMobileMapUI } from '@/features/map/hooks/useEnhancedMobileMapUI';
+import { useMobileMapUI } from '@/features/map/hooks/useMobileMapUI';
 
 const MapScreenLayout: React.FC = () => {
   const {
@@ -32,10 +32,8 @@ const MapScreenLayout: React.FC = () => {
     mapHeight,
     listRef,
     isMobile,
-    isBottomSheetExpanded,
     handleScroll,
-    toggleBottomSheet
-  } = useEnhancedMobileMapUI();
+  } = useMobileMapUI();
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
@@ -45,8 +43,9 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
       
-      <main className={`flex-1 flex flex-col relative w-full ${
-        isMobile ? '' : 'mt-[30px]'
+      {/* Main layout now uses flex-col on mobile and flex-row on desktop */}
+      <main className={`flex-1 flex w-full overflow-hidden ${
+        isMobile ? 'flex-col' : 'flex-row mt-[60px]' // Adjusted margin for desktop
       }`}>
         <MapScreenContent
           mapHeight={mapHeight}
@@ -69,8 +68,6 @@ const MapScreenLayout: React.FC = () => {
             listRef={listRef}
             selectedLocationId={mapState.selectedLocationId}
             onScroll={handleScroll}
-            isExpanded={isBottomSheetExpanded}
-            onToggleExpanded={toggleBottomSheet}
           />
         ) : (
           <MapScreenList 
