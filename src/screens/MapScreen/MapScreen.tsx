@@ -5,7 +5,7 @@ import { MapScreenHeader, MapScreenContent } from './components';
 import MapScreenList from './components/MapScreenList';
 import MobileMapScreenList from './components/MobileMapScreenList';
 import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
-import { useMobileMapUI } from '@/features/map/hooks/useMobileMapUI';
+import { useEnhancedMobileMapUI } from '@/features/map/hooks/useEnhancedMobileMapUI';
 
 const MapScreenLayout: React.FC = () => {
   const {
@@ -32,61 +32,53 @@ const MapScreenLayout: React.FC = () => {
     mapHeight,
     listRef,
     isMobile,
+    isBottomSheetExpanded,
     handleScroll,
-  } = useMobileMapUI();
+    toggleBottomSheet
+  } = useEnhancedMobileMapUI();
 
   return (
-    <div className="flex flex-col h-screen w-full bg-background">
+    <div className="flex flex-col min-h-screen w-full bg-background">
       <MapScreenHeader 
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={handleSelectIngredient}
         onSearchReset={handleSearchReset}
       />
       
-      {/* Main container with proper mobile/desktop layout */}
-      <main className={`flex flex-1 w-full ${
-        isMobile ? 'flex-col' : 'flex-row'
+      <main className={`flex-1 flex flex-col relative w-full ${
+        isMobile ? '' : 'mt-[30px]'
       }`}>
+        <MapScreenContent
+          mapHeight={mapHeight}
+          selectedIngredient={selectedIngredient}
+          currentSearchQuery={displayedSearchQuery}
+          mapState={mapState}
+          showInfoCard={showInfoCard}
+          selectedLocation={selectedLocation}
+          infoCardPosition={infoCardPosition}
+          onLocationSelect={handleLocationSelect}
+          onMarkerClick={handleMarkerClick}
+          onMapLoaded={handleMapLoaded}
+          onMapIdle={handleMapIdle}
+          onInfoCardClose={handleInfoCardClose}
+          onViewDetails={handleViewDetails}
+        />
         
-        {/* Map container - proper height constraints for mobile vs desktop */}
-        <div className={`relative ${
-          isMobile ? 'h-[50vh]' : 'flex-1'
-        }`}>
-          <MapScreenContent
-            mapHeight="100%"
-            selectedIngredient={selectedIngredient}
-            currentSearchQuery={displayedSearchQuery}
-            mapState={mapState}
-            showInfoCard={showInfoCard}
-            selectedLocation={selectedLocation}
-            infoCardPosition={infoCardPosition}
-            onLocationSelect={handleLocationSelect}
-            onMarkerClick={handleMarkerClick}
-            onMapLoaded={handleMapLoaded}
-            onMapIdle={handleMapIdle}
-            onInfoCardClose={handleInfoCardClose}
-            onViewDetails={handleViewDetails}
+        {isMobile ? (
+          <MobileMapScreenList 
+            listRef={listRef}
+            selectedLocationId={mapState.selectedLocationId}
+            onScroll={handleScroll}
+            isExpanded={isBottomSheetExpanded}
+            onToggleExpanded={toggleBottomSheet}
           />
-        </div>
-        
-        {/* List container - proper height constraints for mobile vs desktop */}
-        <div className={`${
-          isMobile ? 'h-[50vh]' : 'w-96'
-        }`}>
-          {isMobile ? (
-            <MobileMapScreenList 
-              listRef={listRef}
-              selectedLocationId={mapState.selectedLocationId}
-              onScroll={handleScroll}
-            />
-          ) : (
-            <MapScreenList 
-              listRef={listRef}
-              selectedLocationId={mapState.selectedLocationId}
-              onScroll={handleScroll}
-            />
-          )}
-        </div>
+        ) : (
+          <MapScreenList 
+            listRef={listRef}
+            selectedLocationId={mapState.selectedLocationId}
+            onScroll={handleScroll}
+          />
+        )}
       </main>
     </div>
   );
