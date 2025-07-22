@@ -43,15 +43,17 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
       
-      {/* Main container now correctly handles layout for all screen sizes */}
-      <main className={`flex flex-1 w-full overflow-hidden ${
+      {/* Main container with proper mobile/desktop layout */}
+      <main className={`flex flex-1 w-full ${
         isMobile ? 'flex-col' : 'flex-row'
       }`}>
         
-        {/* The map content area is now a flex item that takes up the remaining space on desktop */}
-        <div className="flex-1 relative">
+        {/* Map container - proper height constraints for mobile vs desktop */}
+        <div className={`relative ${
+          isMobile ? 'h-[50vh]' : 'flex-1'
+        }`}>
           <MapScreenContent
-            mapHeight={isMobile ? '50vh' : '100%'}
+            mapHeight="100%"
             selectedIngredient={selectedIngredient}
             currentSearchQuery={displayedSearchQuery}
             mapState={mapState}
@@ -67,20 +69,24 @@ const MapScreenLayout: React.FC = () => {
           />
         </div>
         
-        {/* The appropriate list component is rendered based on screen size */}
-        {isMobile ? (
-          <MobileMapScreenList 
-            listRef={listRef}
-            selectedLocationId={mapState.selectedLocationId}
-            onScroll={handleScroll}
-          />
-        ) : (
-          <MapScreenList 
-            listRef={listRef}
-            selectedLocationId={mapState.selectedLocationId}
-            onScroll={handleScroll}
-          />
-        )}
+        {/* List container - proper height constraints for mobile vs desktop */}
+        <div className={`${
+          isMobile ? 'h-[50vh]' : 'w-96'
+        }`}>
+          {isMobile ? (
+            <MobileMapScreenList 
+              listRef={listRef}
+              selectedLocationId={mapState.selectedLocationId}
+              onScroll={handleScroll}
+            />
+          ) : (
+            <MapScreenList 
+              listRef={listRef}
+              selectedLocationId={mapState.selectedLocationId}
+              onScroll={handleScroll}
+            />
+          )}
+        </div>
       </main>
     </div>
   );

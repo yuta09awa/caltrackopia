@@ -13,9 +13,8 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
   selectedLocationId,
   onScroll,
 }) => {
-  // This component is now a static container for the location list
   return (
-    <div className="h-[50vh] flex flex-col bg-background shadow-lg">
+    <div className="h-full flex flex-col bg-background shadow-lg">
       {/* List Content */}
       <div 
         ref={listRef}
