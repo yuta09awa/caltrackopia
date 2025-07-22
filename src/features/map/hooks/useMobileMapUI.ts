@@ -1,9 +1,8 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 export const useMobileMapUI = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [mapHeight, setMapHeight] = useState('60vh');
+  const [mapHeight, setMapHeight] = useState('100%');
   const listRef = useRef<HTMLDivElement>(null);
 
   // Detect mobile viewport
@@ -20,23 +19,15 @@ export const useMobileMapUI = () => {
       // Set a fixed 50% viewport height for the map on mobile
       setMapHeight('50vh');
     } else {
-      // Keep original desktop behavior
-      setMapHeight('60vh');
+      // Use 100% height for desktop to fill the flex container
+      setMapHeight('100%');
     }
   }, [isMobile]);
 
-  // The scroll handler is now only for desktop
+  // The scroll handler is now only for desktop list scrolling
   const handleScroll = useCallback(() => {
-    if (!isMobile && listRef.current) {
-      const scrollTop = listRef.current.scrollTop;
-      const maxScroll = 200;
-      const minHeight = 40;
-      const maxHeight = 60;
-      const scrollPercentage = Math.min(scrollTop / maxScroll, 1);
-      const newHeight = maxHeight - (scrollPercentage * (maxHeight - minHeight));
-      setMapHeight(`${newHeight}vh`);
-    }
-  }, [isMobile]);
+    // Keep this for desktop list scroll behavior if needed
+  }, []);
 
   return {
     mapHeight,

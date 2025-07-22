@@ -36,33 +36,38 @@ const MapScreenLayout: React.FC = () => {
   } = useMobileMapUI();
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-background">
+    <div className="flex flex-col h-screen w-full bg-background">
       <MapScreenHeader 
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={handleSelectIngredient}
         onSearchReset={handleSearchReset}
       />
       
-      {/* Main layout now uses flex-col on mobile and flex-row on desktop */}
-      <main className={`flex-1 flex w-full overflow-hidden ${
-        isMobile ? 'flex-col' : 'flex-row mt-[60px]' // Adjusted margin for desktop
+      {/* Main container now correctly handles layout for all screen sizes */}
+      <main className={`flex flex-1 w-full overflow-hidden ${
+        isMobile ? 'flex-col' : 'flex-row'
       }`}>
-        <MapScreenContent
-          mapHeight={mapHeight}
-          selectedIngredient={selectedIngredient}
-          currentSearchQuery={displayedSearchQuery}
-          mapState={mapState}
-          showInfoCard={showInfoCard}
-          selectedLocation={selectedLocation}
-          infoCardPosition={infoCardPosition}
-          onLocationSelect={handleLocationSelect}
-          onMarkerClick={handleMarkerClick}
-          onMapLoaded={handleMapLoaded}
-          onMapIdle={handleMapIdle}
-          onInfoCardClose={handleInfoCardClose}
-          onViewDetails={handleViewDetails}
-        />
         
+        {/* The map content area is now a flex item that takes up the remaining space on desktop */}
+        <div className="flex-1 relative">
+          <MapScreenContent
+            mapHeight={isMobile ? '50vh' : '100%'}
+            selectedIngredient={selectedIngredient}
+            currentSearchQuery={displayedSearchQuery}
+            mapState={mapState}
+            showInfoCard={showInfoCard}
+            selectedLocation={selectedLocation}
+            infoCardPosition={infoCardPosition}
+            onLocationSelect={handleLocationSelect}
+            onMarkerClick={handleMarkerClick}
+            onMapLoaded={handleMapLoaded}
+            onMapIdle={handleMapIdle}
+            onInfoCardClose={handleInfoCardClose}
+            onViewDetails={handleViewDetails}
+          />
+        </div>
+        
+        {/* The appropriate list component is rendered based on screen size */}
         {isMobile ? (
           <MobileMapScreenList 
             listRef={listRef}
