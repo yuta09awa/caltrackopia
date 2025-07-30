@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AuthService } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
+import { security } from '@/services/security/SecurityService';
 
 const restaurantSchema = z.object({
   // Personal info
@@ -59,21 +60,48 @@ const RestaurantRegisterForm: React.FC<RestaurantRegisterFormProps> = ({ onSucce
       setIsLoading(true);
       setError(null);
 
-      await AuthService.signUp(data.email, data.password, {
+      // Validate and sanitize all inputs
+      const validations = {
+        email: security.validateInput(data.email, 'email'),
+        firstName: security.validateInput(data.firstName, 'text'),
+        lastName: security.validateInput(data.lastName, 'text'),
+        businessName: security.validateInput(data.businessName, 'text'),
+        businessEmail: data.businessEmail ? security.validateInput(data.businessEmail, 'email') : { isValid: true, sanitized: '', errors: [] },
+        businessPhone: security.validateInput(data.businessPhone, 'phone'),
+        address: security.validateInput(data.address, 'text'),
+        city: security.validateInput(data.city, 'text'),
+        state: security.validateInput(data.state, 'text'),
+        zipCode: security.validateInput(data.zipCode, 'text'),
+        website: data.website ? security.validateInput(data.website, 'url') : { isValid: true, sanitized: '', errors: [] }
+      };
+
+      // Check if any validations failed
+      const allErrors = Object.values(validations).flatMap(v => v.errors);
+      if (allErrors.length > 0) {
+        throw new Error(allErrors.join(', '));
+      }
+
+      // Check for suspicious activity
+      const fieldsToCheck = [data.email, data.firstName, data.lastName, data.businessName];
+      if (fieldsToCheck.some(field => security.detectSuspiciousActivity(field, 'registration'))) {
+        throw new Error("Invalid input detected. Please check your information.");
+      }
+
+      await AuthService.signUp(validations.email.sanitized, data.password, {
         userType: 'restaurant_owner',
-        firstName: data.firstName,
-        lastName: data.lastName,
+        firstName: validations.firstName.sanitized,
+        lastName: validations.lastName.sanitized,
         restaurant: {
-          businessName: data.businessName,
-          businessEmail: data.businessEmail || undefined,
-          businessPhone: data.businessPhone,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          zipCode: data.zipCode,
+          businessName: validations.businessName.sanitized,
+          businessEmail: validations.businessEmail.sanitized || undefined,
+          businessPhone: validations.businessPhone.sanitized,
+          address: validations.address.sanitized,
+          city: validations.city.sanitized,
+          state: validations.state.sanitized,
+          zipCode: validations.zipCode.sanitized,
           cuisineType: [data.cuisineType],
           description: data.description || undefined,
-          website: data.website || undefined,
+          website: validations.website.sanitized || undefined,
         },
       });
 
