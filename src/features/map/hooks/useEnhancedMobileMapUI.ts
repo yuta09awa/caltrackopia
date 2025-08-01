@@ -15,7 +15,7 @@ export interface EnhancedMobileMapUIActions {
 
 export const useEnhancedMobileMapUI = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
+  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(true);
   const [mapHeight, setMapHeight] = useState('60vh');
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +46,7 @@ export const useEnhancedMobileMapUI = () => {
       const headerHeight = 60;
       
       if (isBottomSheetExpanded) {
-        setMapHeight('35vh');
+        setMapHeight('50vh');
       } else {
         setMapHeight('calc(100vh - 120px)');
       }

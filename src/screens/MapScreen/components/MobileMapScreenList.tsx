@@ -61,7 +61,7 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
       className={cn(
         "fixed bottom-0 left-0 right-0 z-20 flex flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
         isExpanded
-          ? "h-[65vh]" // Expanded: takes remaining space when map is 35vh
+          ? "h-[50vh]" // Expanded: 50/50 split with map
           : "h-[120px]" // Collapsed: just show handle and preview
       )}
     >
