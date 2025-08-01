@@ -38,10 +38,20 @@ export const useEnhancedMobileMapUI = () => {
   // Dynamic height calculation for mobile, scroll-based for desktop
   useEffect(() => {
     if (isMobile) {
-      // Give more breathing room to the map
-      // Expanded: Map gets 50% of screen (better visibility)
-      // Collapsed: Map gets nearly full screen minus handle space
-      setMapHeight(isBottomSheetExpanded ? '50vh' : 'calc(100vh - 140px)');
+      // Optimized mobile heights for better content/map balance
+      // Expanded: 35vh allows good map visibility while prioritizing list content
+      // Collapsed: Nearly full screen for map-focused interaction
+      const visualViewportHeight = window.visualViewport?.height || window.innerHeight;
+      const safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--mobile-safe-area-top') || '0px');
+      const headerHeight = 60;
+      
+      if (isBottomSheetExpanded) {
+        setMapHeight('35vh');
+      } else {
+        // Account for safe areas and header
+        const availableHeight = visualViewportHeight - safeAreaTop - headerHeight - 80;
+        setMapHeight(`${Math.max(200, availableHeight)}px`);
+      }
     } else {
       // Desktop behavior with scroll-based height adjustment
       if (listRef.current) {
