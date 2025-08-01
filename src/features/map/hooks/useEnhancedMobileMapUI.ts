@@ -48,9 +48,7 @@ export const useEnhancedMobileMapUI = () => {
       if (isBottomSheetExpanded) {
         setMapHeight('35vh');
       } else {
-        // Account for safe areas and header
-        const availableHeight = visualViewportHeight - safeAreaTop - headerHeight - 80;
-        setMapHeight(`${Math.max(200, availableHeight)}px`);
+        setMapHeight('calc(100vh - 120px)');
       }
     } else {
       // Desktop behavior with scroll-based height adjustment

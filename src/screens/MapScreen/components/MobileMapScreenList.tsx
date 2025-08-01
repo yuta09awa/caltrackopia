@@ -59,10 +59,10 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
   return (
     <div
       className={cn(
-        "fixed top-0 left-0 right-0 z-20 flex h-full flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
+        "fixed bottom-0 left-0 right-0 z-20 flex flex-col rounded-t-xl bg-background shadow-lg transition-transform duration-300 ease-in-out",
         isExpanded
-          ? "translate-y-[50vh]" // When expanded, align with 50vh map height
-          : "translate-y-[calc(100vh-140px)]" // When collapsed, 140px is visible from the bottom
+          ? "h-[65vh]" // Expanded: takes remaining space when map is 35vh
+          : "h-[120px]" // Collapsed: just show handle and preview
       )}
     >
       {/* Drag Handle */}
