@@ -828,13 +828,23 @@ export type Database = {
         Args: { "": unknown } | { "": unknown }
         Returns: string
       }
+      check_profile_completion: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       check_rate_limit: {
-        Args: {
-          user_id: string
-          action_type: string
-          max_attempts?: number
-          window_minutes?: number
-        }
+        Args:
+          | {
+              identifier: string
+              max_requests?: number
+              window_seconds?: number
+            }
+          | {
+              user_id: string
+              action_type: string
+              max_attempts?: number
+              window_minutes?: number
+            }
         Returns: boolean
       }
       cleanup_old_audit_logs: {
@@ -1351,6 +1361,10 @@ export type Database = {
       postgis_wagyu_version: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      secure_profile_update: {
+        Args: { profile_id: string; update_data: Json }
+        Returns: boolean
       }
       spheroid_in: {
         Args: { "": unknown }
