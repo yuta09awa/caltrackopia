@@ -32,7 +32,10 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     hasNextPage,
     isLoadingMore,
     loadingRef,
-    totalCount
+    totalCount,
+    detectedLocation,
+    useTopRated,
+    setUseTopRated
   } = useLocations();
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
@@ -199,6 +202,10 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
               totalCount={totalCount || displayLocations.length}
               sortOption={sortOption}
               setSortOption={setSortOption}
+              detectedLocation={detectedLocation}
+              isDetecting={loading && !locations.length}
+              useTopRated={useTopRated}
+              onToggleTopRated={setUseTopRated}
             />
             <LocationFilters
               activeTab={activeTab}
