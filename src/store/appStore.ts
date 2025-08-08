@@ -17,13 +17,18 @@ import {
   CartSlice,
   createCartSlice
 } from './slices/cartSlice';
+import {
+  MapSlice,
+  createMapSlice
+} from './slices/mapSlice';
 
 // Combine all slices
 export type AppState = 
   AuthSlice & 
   UserPreferencesSlice & 
   MapFiltersSlice &
-  CartSlice;
+  CartSlice &
+  MapSlice;
 
 // Create the combined store with persistence
 export const useAppStore = create<AppState>()(
@@ -33,6 +38,7 @@ export const useAppStore = create<AppState>()(
       ...createUserPreferencesSlice(...a),
       ...createMapFiltersSlice(...a),
       ...createCartSlice(...a),
+      ...createMapSlice(...a),
     }),
     {
       name: 'caltrackopia-storage',

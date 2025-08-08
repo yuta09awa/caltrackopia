@@ -1,6 +1,7 @@
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { LatLng, MarkerData } from '../types';
+import { useAppStore } from '@/store/appStore';
 
 export interface MapState {
   center: LatLng;
@@ -10,77 +11,31 @@ export interface MapState {
   hoveredLocationId: string | null;
 }
 
-// Sample test markers - only restaurants to limit popups to food locations
-const TEST_MARKERS: MarkerData[] = [
-  {
-    position: { lat: 40.7589, lng: -73.9851 }, // Times Square area
-    locationId: 'loc-1' // This should match an actual location ID
-  },
-  {
-    position: { lat: 40.7505, lng: -73.9934 }, // Herald Square area  
-    locationId: 'loc-2' // This should match an actual location ID
-  }
-];
-
 export const useMapState = () => {
-  const [mapState, setMapState] = useState<MapState>({
-    center: { lat: 40.7589, lng: -73.9851 }, // NYC coordinates
-    zoom: 12,
-    markers: TEST_MARKERS,
-    selectedLocationId: null,
-    hoveredLocationId: null
-  });
+  const mapState = useAppStore((s) => s.mapState);
+  const updateCenter = useAppStore((s) => s.updateCenter);
+  const updateZoom = useAppStore((s) => s.updateZoom);
+  const updateMarkers = useAppStore((s) => s.updateMarkers);
+  const selectLocation = useAppStore((s) => s.selectLocation);
+  const hoverLocation = useAppStore((s) => s.hoverLocation);
+  const clearMarkers = useAppStore((s) => s.clearMarkers);
 
-  const updateCenter = useCallback((newCenter: LatLng) => {
-    setMapState(prevState => ({
-      ...prevState,
-      center: newCenter
-    }));
-  }, []);
-
-  const updateZoom = useCallback((newZoom: number) => {
-    setMapState(prevState => ({
-      ...prevState,
-      zoom: newZoom
-    }));
-  }, []);
-
-  const updateMarkers = useCallback((newMarkers: MarkerData[]) => {
-    setMapState(prevState => ({
-      ...prevState,
-      markers: newMarkers
-    }));
-  }, []);
-
-  const selectLocation = useCallback((locationId: string | null) => {
-    setMapState(prevState => ({
-      ...prevState,
-      selectedLocationId: locationId
-    }));
-  }, []);
-
-  const hoverLocation = useCallback((locationId: string | null) => {
-    setMapState(prevState => ({
-      ...prevState,
-      hoveredLocationId: locationId
-    }));
-  }, []);
-
-  const clearMarkers = useCallback(() => {
-    setMapState(prevState => ({
-      ...prevState,
-      markers: []
-    }));
-  }, []);
+  // Keep stable callbacks (optional, mirrors previous API with useCallback)
+  const setCenter = useCallback((newCenter: LatLng) => updateCenter(newCenter), [updateCenter]);
+  const setZoom = useCallback((newZoom: number) => updateZoom(newZoom), [updateZoom]);
+  const setMarkers = useCallback((newMarkers: MarkerData[]) => updateMarkers(newMarkers), [updateMarkers]);
+  const setSelectLocation = useCallback((locationId: string | null) => selectLocation(locationId), [selectLocation]);
+  const setHoverLocation = useCallback((locationId: string | null) => hoverLocation(locationId), [hoverLocation]);
+  const setClearMarkers = useCallback(() => clearMarkers(), [clearMarkers]);
 
   return {
     mapState,
-    updateCenter,
-    updateZoom,
-    updateMarkers,
-    selectLocation,
-    hoverLocation,
-    clearMarkers
+    updateCenter: setCenter,
+    updateZoom: setZoom,
+    updateMarkers: setMarkers,
+    selectLocation: setSelectLocation,
+    hoverLocation: setHoverLocation,
+    clearMarkers: setClearMarkers,
   };
 };
 
