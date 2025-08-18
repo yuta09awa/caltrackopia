@@ -111,6 +111,14 @@ const Footer = () => {
                   Contact Us
                 </a>
               </li>
+              <li>
+                <Link
+                  to="/database-diagram"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Database Schema
+                </Link>
+              </li>
             </ul>
           </div>
 
