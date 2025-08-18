@@ -11,9 +11,8 @@ import {
   LazyNotFound,
   LazyHomePage,
   RouteLoadingFallback 
- } from '@/components/routing/LazyRoutes';
+} from '@/components/routing/LazyRoutes';
 import ShoppingPage from '@/pages/ShoppingPage';
-import DatabaseDiagramPage from '@/pages/DatabaseDiagramPage';
 import { AppRoute } from './types';
 
 // Wrapper component for lazy routes with suspense
@@ -103,11 +102,6 @@ export const routes: AppRoute[] = [
     navLabel: 'Profile',
     icon: <UserRound className="w-4 h-4" />,
     showInNav: true,
-  },
-  {
-    path: '/database-diagram',
-    element: <DatabaseDiagramPage />,
-    title: 'Database Schema',
   },
   {
     path: '*',
