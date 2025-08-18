@@ -66,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           >
             <img 
               src="/lovable-uploads/0b3bf1b1-20e6-4b84-a220-f978cdf6b783.png" 
-              alt="Recipe Book" 
+              alt="FoodToMe logo" 
               className="h-10 w-auto" 
             />
           </Link>

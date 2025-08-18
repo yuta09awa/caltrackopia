@@ -85,7 +85,7 @@ export const PWAInstallPrompt: React.FC = () => {
             
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-sm mb-1">
-                Install Food Finder
+                Install FoodToMe
               </h3>
               <p className="text-xs text-muted-foreground mb-3">
                 Install our app for faster access, offline features, and a better experience.
