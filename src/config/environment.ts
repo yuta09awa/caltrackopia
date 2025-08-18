@@ -10,8 +10,8 @@ export const environment = {
   environment: import.meta.env.VITE_ENVIRONMENT || 'development',
   
   // Supabase
-  supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  supabaseUrl: 'https://aulfiflberencgsdvyay.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1bGZpZmxiZXJlbmNnc2R2eWF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1NjM1NjAsImV4cCI6MjA2NDEzOTU2MH0.r5KVeORNXx95s8BGpJCQrGKmUu5hHsyembSQJsgh8qQ',
   
   // Google Maps
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,

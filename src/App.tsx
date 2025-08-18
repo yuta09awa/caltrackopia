@@ -4,6 +4,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import AppProviders from './providers/AppProviders';
+import { AuthWrapper } from '@/components/auth/AuthWrapper';
+import { ProfileCompletionWrapper } from '@/components/layout/ProfileCompletionWrapper';
 import AppRoutes from './routes/AppRoutes';
 import AuthInitializer from './components/auth/AuthInitializer';
 import { HealthCheck } from '@/components/common/HealthCheck';
@@ -32,11 +34,15 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AppProviders>
         <Router>
-          <AuthInitializer>
-            <AppRoutes />
-            <Toaster />
-            <HealthCheck />
-          </AuthInitializer>
+          <AuthWrapper>
+            <AuthInitializer>
+              <ProfileCompletionWrapper>
+                <AppRoutes />
+              </ProfileCompletionWrapper>
+              <Toaster />
+              <HealthCheck />
+            </AuthInitializer>
+          </AuthWrapper>
         </Router>
       </AppProviders>
     </QueryClientProvider>
