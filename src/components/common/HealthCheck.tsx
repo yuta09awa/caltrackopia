@@ -165,22 +165,22 @@ export const HealthCheck: React.FC = () => {
   const getStatusIcon = (status: HealthStatus['status']) => {
     switch (status) {
       case 'healthy':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-primary" />;
       case 'degraded':
-        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+        return <AlertTriangle className="w-4 h-4 text-muted-foreground" />;
       case 'unhealthy':
-        return <XCircle className="w-4 h-4 text-red-500" />;
+        return <XCircle className="w-4 h-4 text-destructive" />;
     }
   };
 
   const getStatusColor = (status: HealthStatus['status']) => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-500';
+        return 'bg-primary';
       case 'degraded':
-        return 'bg-yellow-500';
+        return 'bg-muted-foreground';
       case 'unhealthy':
-        return 'bg-red-500';
+        return 'bg-destructive';
     }
   };
 
