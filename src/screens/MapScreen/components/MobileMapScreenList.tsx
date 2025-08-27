@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LocationList from "@/features/locations/components/LocationList";
 import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
@@ -64,9 +65,9 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
           : "h-[120px]" // Collapsed: just show handle and preview
       )}
     >
-      {/* Clickable Header Bar with Pill Handle */}
+      {/* Clickable Header Bar */}
       <div 
-        className="relative w-full px-4 py-3 cursor-pointer active:bg-muted/20 flex items-center justify-center transition-colors hover:bg-muted/10"
+        className="w-full px-4 py-3 cursor-pointer active:bg-muted/20 flex items-center justify-between transition-colors hover:bg-muted/10"
         onClick={onToggleExpanded}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -82,12 +83,12 @@ const MobileMapScreenList: React.FC<MobileMapScreenListProps> = ({
         aria-expanded={isExpanded}
         aria-label={isExpanded ? "Collapse location list" : "Expand location list"}
       >
-        {/* Centered Pill Handle */}
-        <div className="w-16 h-2 bg-muted-foreground/40 rounded-full ring-1 ring-muted-foreground/10 shadow-sm" />
-        
-        {/* Cache Status in Top Right */}
-        <div className="absolute top-3 right-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-1.5 bg-muted-foreground/30 rounded-full" />
           <CacheStatusIndicator cacheHitRate={null} />
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {isExpanded ? "Tap to collapse" : "Tap to expand"}
         </div>
       </div>
       
