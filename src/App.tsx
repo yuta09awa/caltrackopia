@@ -8,7 +8,6 @@ import { AuthWrapper } from '@/components/auth/AuthWrapper';
 import { ProfileCompletionWrapper } from '@/components/layout/ProfileCompletionWrapper';
 import AppRoutes from './routes/AppRoutes';
 import AuthInitializer from './components/auth/AuthInitializer';
-import { HealthCheck } from '@/components/common/HealthCheck';
 import { environment, validateEnvironment } from '@/config/environment';
 import { errorHandler } from '@/utils/errorHandler';
 import './App.css';
@@ -40,7 +39,6 @@ function App() {
                 <AppRoutes />
               </ProfileCompletionWrapper>
               <Toaster />
-              <HealthCheck />
             </AuthInitializer>
           </AuthWrapper>
         </Router>
