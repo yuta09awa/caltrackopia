@@ -17,8 +17,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { name: "Map", path: "/map", icon: MapPin },
-  { name: "Shopping List", path: "/shopping", icon: ShoppingCart },
-  { name: "Nutrition", path: "/nutrition", icon: Utensils },
 ];
 
 interface NavbarProps {
