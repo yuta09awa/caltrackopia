@@ -16,79 +16,12 @@ interface PlacesCacheRequest {
   radius?: number
 }
 
-// Input validation utilities
-const validateInput = (input: any, type: 'string' | 'number' | 'uuid'): { isValid: boolean; sanitized: any; errors: string[] } => {
-  const errors: string[] = [];
-  let sanitized = input;
-
-  if (input === null || input === undefined) {
-    errors.push(`${type} is required`);
-    return { isValid: false, sanitized: null, errors };
-  }
-
-  switch (type) {
-    case 'string':
-      if (typeof input !== 'string') {
-        errors.push('Must be a string');
-      } else {
-        // Basic sanitization - remove potential XSS
-        sanitized = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                         .replace(/javascript:/gi, '')
-                         .replace(/on\w+\s*=/gi, '')
-                         .trim();
-        if (sanitized.length > 1000) {
-          errors.push('Text too long (max 1000 characters)');
-        }
-      }
-      break;
-    case 'number':
-      if (typeof input !== 'number' || isNaN(input)) {
-        errors.push('Must be a valid number');
-      } else if (input < -180 || input > 180) {
-        errors.push('Coordinate out of valid range');
-      }
-      break;
-    case 'uuid':
-      if (typeof input !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input)) {
-        errors.push('Invalid UUID format');
-      }
-      break;
-  }
-
-  return {
-    isValid: errors.length === 0,
-    sanitized,
-    errors
-  };
-}
-
-const detectSuspiciousActivity = (input: string): boolean => {
-  const suspiciousPatterns = [
-    /union\s+select/i,
-    /drop\s+table/i,
-    /delete\s+from/i,
-    /insert\s+into/i,
-    /<script/i,
-    /javascript:/i,
-    /vbscript:/i,
-    /eval\s*\(/i,
-    /document\./i,
-    /window\./i,
-  ];
-  
-  return suspiciousPatterns.some(pattern => pattern.test(input));
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
-  // Request logging for security monitoring
-  const userAgent = req.headers.get('user-agent') || 'unknown';
-  const startTime = Date.now();
-  
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -100,127 +33,35 @@ serve(async (req) => {
       throw new Error('Google Maps API key not configured')
     }
 
-    // Parse and validate request body
-    let requestBody;
-    try {
-      requestBody = await req.json() as PlacesCacheRequest;
-    } catch (e) {
-      console.warn('Invalid JSON in request body:', e);
-      return new Response(
-        JSON.stringify({ error: 'Invalid JSON in request body' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const { action, area_id, search_query, latitude, longitude, radius } = await req.json() as PlacesCacheRequest
 
-    const { action, area_id, search_query, latitude, longitude, radius } = requestBody;
+    console.log(`Places cache manager action: ${action}`)
 
-    // Enhanced input validation
-    if (!action || typeof action !== 'string') {
-      return new Response(
-        JSON.stringify({ error: 'Action is required and must be a string' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Validate action
-    const validActions = ['populate_area', 'refresh_stale', 'search_and_cache', 'get_stats'];
-    if (!validActions.includes(action)) {
-      console.warn('Invalid action attempted:', action, 'from user agent:', userAgent);
-      return new Response(
-        JSON.stringify({ error: 'Invalid action specified' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Validate inputs based on action
-    if (action === 'search_and_cache') {
-      if (!search_query || !latitude || !longitude) {
-        return new Response(
-          JSON.stringify({ error: 'search_query, latitude, and longitude are required for search_and_cache action' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const queryValidation = validateInput(search_query, 'string');
-      const latValidation = validateInput(latitude, 'number');
-      const lngValidation = validateInput(longitude, 'number');
-
-      if (!queryValidation.isValid || !latValidation.isValid || !lngValidation.isValid) {
-        const allErrors = [
-          ...queryValidation.errors,
-          ...latValidation.errors,
-          ...lngValidation.errors
-        ];
-        return new Response(
-          JSON.stringify({ error: `Validation failed: ${allErrors.join(', ')}` }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      // Check for suspicious activity
-      if (detectSuspiciousActivity(search_query)) {
-        console.warn('Suspicious query detected:', search_query, 'from user agent:', userAgent);
-        return new Response(
-          JSON.stringify({ error: 'Invalid search query' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    if (action === 'populate_area' && area_id) {
-      const areaIdValidation = validateInput(area_id, 'uuid');
-      if (!areaIdValidation.isValid) {
-        return new Response(
-          JSON.stringify({ error: `Invalid area_id: ${areaIdValidation.errors.join(', ')}` }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    console.log(`Places cache manager action: ${action} from ${userAgent}`);
-
-    let result;
     switch (action) {
       case 'populate_area':
-        result = await populateSearchArea(supabase, googleApiKey, area_id);
-        break;
+        return await populateSearchArea(supabase, googleApiKey, area_id)
       
       case 'refresh_stale':
-        result = await refreshStaleData(supabase, googleApiKey);
-        break;
+        return await refreshStaleData(supabase, googleApiKey)
       
       case 'search_and_cache':
-        result = await searchAndCache(supabase, googleApiKey, search_query, latitude, longitude, radius);
-        break;
+        return await searchAndCache(supabase, googleApiKey, search_query || '', latitude!, longitude!, radius)
       
       case 'get_stats':
-        result = await getCacheStats(supabase);
-        break;
+        return await getCacheStats(supabase)
+      
+      default:
+        return new Response(
+          JSON.stringify({ error: 'Invalid action' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
     }
-
-    const executionTime = Date.now() - startTime;
-    console.log(`Action ${action} completed in ${executionTime}ms`);
-    
-    return result;
-
   } catch (error) {
-    const executionTime = Date.now() - startTime;
-    console.error(`Places cache manager error after ${executionTime}ms:`, error);
-    
-    // Don't expose internal errors to clients in production
-    const errorMessage = error.message.includes('Validation failed') || 
-                        error.message.includes('Invalid') ||
-                        error.message.includes('required') ? 
-                        error.message : 
-                        'An internal error occurred';
-
+    console.error('Places cache manager error:', error)
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { 
-        status: error.message.includes('Invalid') || error.message.includes('required') ? 400 : 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 })
 

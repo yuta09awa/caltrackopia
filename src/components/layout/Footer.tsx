@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <h3 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-              FoodToMe
+              Nutrackr
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs">
               The ultimate nutrition tracking app with location-based services
@@ -135,7 +135,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-muted/20 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} FoodToMe. All rights reserved.
+            © {new Date().getFullYear()} Nutrackr. All rights reserved.
           </p>
           <div className="flex space-x-6 text-xs text-muted-foreground">
             <a href="#" className="hover:text-primary transition-colors">

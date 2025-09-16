@@ -2,8 +2,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { locationService } from '@/services/locationService';
-import { topRatedLocationService } from '@/services/topRatedLocationService';
-import { useLocationDetection } from '@/hooks/useLocationDetection';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { 
   filterLocationsByType, 
@@ -23,47 +21,24 @@ export function useLocations() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [useTopRated, setUseTopRated] = useState(true);
   
   const [activeTab, setActiveTab] = useState<LocationType>('all');
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useAppStore();
-  const { detectedLocation, isDetecting } = useLocationDetection();
 
   // Fetch all locations from the database on component mount
   useEffect(() => {
     const fetchLocations = async () => {
-      if (isDetecting) return; // Wait for location detection
-      
       setLoading(true);
       setError(null);
       try {
-        let fetchedLocations: Location[];
-        
-        if (useTopRated && detectedLocation) {
-          console.log(`Fetching top-rated locations for ${detectedLocation.detectedCity}...`);
-          
-          // Get user profile for personalized filtering
-          const userProfile = await topRatedLocationService.getUserProfile();
-          
-          // Get top rated locations based on detected location
-          fetchedLocations = await topRatedLocationService.getTopRatedLocations({
-            center: detectedLocation.defaultCenter,
-            radiusKm: 15, // 15km radius
-            userProfile: userProfile || undefined,
-            limit: 50
-          });
-          
-          console.log(`Fetched ${fetchedLocations.length} top-rated locations for ${detectedLocation.detectedCity}`);
-        } else {
-          console.log('Fetching locations from database...');
-          fetchedLocations = await locationService.getLocations();
-          console.log('Fetched locations:', fetchedLocations.length, 'items');
-        }
+        console.log('Fetching locations from database...');
+        const fetchedLocations = await locationService.getLocations();
+        console.log('Fetched locations:', fetchedLocations.length, 'items');
         
         if (fetchedLocations.length === 0) {
-          console.log('No locations found, falling back to mock data');
+          console.log('No locations found in database, falling back to mock data');
           // If database returns empty array, use mock data
           const { mockLocations } = await import('../data/mockLocations');
           setAllLocations(mockLocations);
@@ -72,7 +47,7 @@ export function useLocations() {
         }
       } catch (err) {
         console.error('Error fetching locations in useLocations:', err);
-        setError('Failed to load locations');
+        setError('Failed to load locations from database');
         // Fallback to mock data if database fetch fails
         try {
           const { mockLocations } = await import('../data/mockLocations');
@@ -90,7 +65,7 @@ export function useLocations() {
     };
 
     fetchLocations();
-  }, [isDetecting, detectedLocation, useTopRated]);
+  }, []);
 
   // Filter and sort locations based on current filters
   const filteredAndSortedLocations = useMemo(() => {
@@ -104,11 +79,6 @@ export function useLocations() {
       // Then filter by open status
       const openStatusFiltered = filterLocationsByOpenStatus(typeFiltered, isOpenNow);
       
-      // If using top-rated, skip additional sorting as it's already optimally sorted
-      if (useTopRated && sortOption === 'default') {
-        return openStatusFiltered;
-      }
-      
       // Finally sort the results
       return sortLocations(openStatusFiltered, sortOption);
     } catch (error) {
@@ -116,7 +86,7 @@ export function useLocations() {
       // Return empty array if filtering fails
       return [];
     }
-  }, [allLocations, activeTab, sortOption, isOpenNow, useTopRated]);
+  }, [allLocations, activeTab, sortOption, isOpenNow]);
 
   // Update displayed locations and pagination when filters change
   useEffect(() => {
@@ -162,10 +132,6 @@ export function useLocations() {
     hasNextPage,
     isLoadingMore,
     loadingRef,
-    totalCount: filteredAndSortedLocations.length,
-    // Top-rated feature
-    detectedLocation,
-    useTopRated,
-    setUseTopRated
+    totalCount: filteredAndSortedLocations.length
   };
 }

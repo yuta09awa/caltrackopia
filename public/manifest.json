@@ -1,6 +1,6 @@
 {
-  "name": "FoodToMe - Local Food Discovery",
-  "short_name": "FoodToMe",
+  "name": "Food Finder - Local Food Discovery",
+  "short_name": "Food Finder",
   "description": "Discover local restaurants, markets, and fresh ingredients in your area",
   "start_url": "/",
   "display": "standalone",
@@ -16,14 +16,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "FoodToMe app on desktop"
+      "label": "Food Finder app on desktop"
     },
     {
       "src": "/screenshot-narrow.png", 
       "sizes": "540x960",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "FoodToMe app on mobile"
+      "label": "Food Finder app on mobile"
     }
   ],
   "icons": [

@@ -25,6 +25,11 @@ const LocationFilters: React.FC<LocationFiltersProps> = ({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <LocationTabs activeTab={activeTab} onTabChange={onTabChange} />
+          <InlineFilters
+            activeTab={activeTab}
+            cuisineOptions={cuisineOptions}
+            groceryCategoryOptions={groceryCategoryOptions}
+          />
         </div>
         
         <FilterActions 

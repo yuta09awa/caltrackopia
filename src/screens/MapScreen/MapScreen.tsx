@@ -1,11 +1,8 @@
 
 import React from 'react';
 import { MapProvider } from './context/MapProvider';
-import { MapScreenHeader, MapScreenContent } from './components';
-import MapScreenList from './components/MapScreenList';
-import MobileMapScreenList from './components/MobileMapScreenList';
+import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
-import { useEnhancedMobileMapUI } from '@/features/map/hooks/useEnhancedMobileMapUI';
 
 const MapScreenLayout: React.FC = () => {
   const {
@@ -13,7 +10,11 @@ const MapScreenLayout: React.FC = () => {
     mapState,
     selectedIngredient,
     selectedLocation,
+    mapHeight,
+    showInfoCard,
+    infoCardPosition,
     displayedSearchQuery,
+    listRef,
     
     // Actions
     handleSelectIngredient,
@@ -24,18 +25,8 @@ const MapScreenLayout: React.FC = () => {
     handleMapIdle,
     handleInfoCardClose,
     handleViewDetails,
-    showInfoCard,
-    infoCardPosition
+    handleScroll
   } = useSimplifiedMapContext();
-
-  const {
-    mapHeight,
-    listRef,
-    isMobile,
-    isBottomSheetExpanded,
-    handleScroll,
-    toggleBottomSheet
-  } = useEnhancedMobileMapUI();
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
@@ -45,9 +36,7 @@ const MapScreenLayout: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
       
-      <main className={`flex-1 flex flex-col relative w-full ${
-        isMobile ? '' : 'mt-[30px]'
-      }`}>
+      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
         <MapScreenContent
           mapHeight={mapHeight}
           selectedIngredient={selectedIngredient}
@@ -63,22 +52,11 @@ const MapScreenLayout: React.FC = () => {
           onInfoCardClose={handleInfoCardClose}
           onViewDetails={handleViewDetails}
         />
-        
-        {isMobile ? (
-          <MobileMapScreenList 
-            listRef={listRef}
-            selectedLocationId={mapState.selectedLocationId}
-            onScroll={handleScroll}
-            isExpanded={isBottomSheetExpanded}
-            onToggleExpanded={toggleBottomSheet}
-          />
-        ) : (
-          <MapScreenList 
-            listRef={listRef}
-            selectedLocationId={mapState.selectedLocationId}
-            onScroll={handleScroll}
-          />
-        )}
+        <MapScreenList 
+          listRef={listRef}
+          selectedLocationId={mapState.selectedLocationId}
+          onScroll={handleScroll}
+        />
       </main>
     </div>
   );

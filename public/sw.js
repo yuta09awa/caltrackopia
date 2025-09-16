@@ -1,7 +1,7 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = 'foodtome-v1';
-const STATIC_CACHE_NAME = 'static-v2';
-const DYNAMIC_CACHE_NAME = 'dynamic-v2';
+const CACHE_NAME = 'food-finder-v1';
+const STATIC_CACHE_NAME = 'static-v1';
+const DYNAMIC_CACHE_NAME = 'dynamic-v1';
 
 // Files to cache immediately
 const STATIC_FILES = [

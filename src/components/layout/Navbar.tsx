@@ -17,6 +17,8 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { name: "Map", path: "/map", icon: MapPin },
+  { name: "Shopping List", path: "/shopping", icon: ShoppingCart },
+  { name: "Nutrition", path: "/nutrition", icon: Utensils },
 ];
 
 interface NavbarProps {
@@ -64,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           >
             <img 
               src="/lovable-uploads/0b3bf1b1-20e6-4b84-a220-f978cdf6b783.png" 
-              alt="FoodToMe logo" 
+              alt="Recipe Book" 
               className="h-10 w-auto" 
             />
           </Link>

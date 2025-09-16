@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AuthService } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
-import { security } from '@/services/security/SecurityService';
 
 const customerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -46,31 +45,10 @@ const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({ onSuccess, 
       setIsLoading(true);
       setError(null);
 
-      // Validate and sanitize all inputs
-      const emailValidation = security.validateInput(data.email, 'email');
-      const firstNameValidation = security.validateInput(data.firstName, 'text');
-      const lastNameValidation = security.validateInput(data.lastName, 'text');
-
-      if (!emailValidation.isValid || !firstNameValidation.isValid || !lastNameValidation.isValid) {
-        const errors = [
-          ...emailValidation.errors,
-          ...firstNameValidation.errors,
-          ...lastNameValidation.errors
-        ];
-        throw new Error(errors.join(', '));
-      }
-
-      // Check for suspicious activity
-      if (security.detectSuspiciousActivity(data.email, 'registration_email') ||
-          security.detectSuspiciousActivity(data.firstName, 'registration_name') ||
-          security.detectSuspiciousActivity(data.lastName, 'registration_name')) {
-        throw new Error("Invalid input detected. Please check your information.");
-      }
-
-      await AuthService.signUp(emailValidation.sanitized, data.password, {
+      await AuthService.signUp(data.email, data.password, {
         userType: 'customer',
-        firstName: firstNameValidation.sanitized,
-        lastName: lastNameValidation.sanitized,
+        firstName: data.firstName,
+        lastName: data.lastName,
       });
 
       toast({
