@@ -10,21 +10,25 @@ import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import VirtualizedLocationList from './VirtualizedLocationList';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
+import { Location } from '@/models/Location';
 
 interface LocationListProps {
   selectedLocationId?: string | null;
+  locations?: Location[];
+  onLocationSelect?: (locationId: string | null) => void;
 }
 
 const VIRTUALIZATION_THRESHOLD = 50; // Use virtualization for lists with 50+ items
 
-const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId }) => {
-  const { 
-    locations, 
-    activeTab, 
-    filterByType, 
-    sortOption, 
-    setSortOption, 
-    isOpenNow, 
+const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocationId, locations: locationsFromProps, onLocationSelect }) => {
+  // Conditionally fetch data only if not provided via props
+  const {
+    locations: locationsFromHook,
+    activeTab,
+    filterByType,
+    sortOption,
+    setSortOption,
+    isOpenNow,
     setIsOpenNow,
     loading,
     error,
@@ -32,7 +36,11 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     isLoadingMore,
     loadingRef,
     totalCount
-  } = useLocations();
+  } = useLocations({
+    disabled: !!locationsFromProps,
+  });
+
+  const locations = locationsFromProps || locationsFromHook;
   
   const { activeSpoof, getFilteredLocations } = useLocationSpoof();
   const listContainerRef = useRef<HTMLDivElement>(null);
@@ -86,14 +94,16 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
     return () => window.removeEventListener('resize', updateHeight);
   }, []);
 
-  const handleScroll = useCallback((scrollTop: number) => {
-    // Optional: Implement scroll-based features like lazy loading more data
-  }, []);
+  const handleCardClick = (locationId: string) => {
+    if (onLocationSelect) {
+      onLocationSelect(locationId);
+    }
+  };
 
   const skeletonCount = useMemo(() => 6, []);
 
   const renderLocationsList = () => {
-    if (loading) {
+    if (loading && !locationsFromProps) {
       return (
         <div className="px-3 py-3">
           <LoadingSkeleton 
@@ -105,7 +115,7 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
       );
     }
 
-    if (error) {
+    if (error && !locationsFromProps) {
       return (
         <div className="px-3 py-3">
           <Card>
@@ -133,38 +143,18 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
       );
     }
 
-    if (shouldUseVirtualization) {
-      return (
-        <VirtualizedLocationList
-          locations={displayLocations}
-          selectedLocationId={selectedLocationId}
-          height={containerHeight}
-          onScroll={handleScroll}
-        />
-      );
-    }
-
     return (
       <div className="divide-y divide-border">
         {displayLocations.map((location) => (
           <LocationErrorBoundary key={location.id}>
-            <div id={`location-${location.id}`} className="transition-colors duration-300">
-              <LocationCard 
-                location={location} 
-                isHighlighted={selectedLocationId === location.id}
-              />
+            <div id={`location-${location.id}`} className="transition-colors duration-300" onClick={() => handleCardClick(location.id)}>
+              <LocationCard location={location} isHighlighted={selectedLocationId === location.id} />
             </div>
           </LocationErrorBoundary>
         ))}
-        
-        {/* Infinite scroll loading trigger */}
-        {hasNextPage && (
+        {hasNextPage && !locationsFromProps && (
           <div ref={loadingRef} className="px-3 py-6 text-center">
-            {isLoadingMore ? (
-              <LoadingSkeleton variant="location-card" count={2} />
-            ) : (
-              <p className="text-muted-foreground text-sm">Scroll to load more...</p>
-            )}
+            {isLoadingMore ? <LoadingSkeleton variant="location-card" count={2} /> : <p className="text-muted-foreground text-sm">Scroll to load more...</p>}
           </div>
         )}
       </div>
@@ -174,25 +164,14 @@ const LocationList: React.FC<LocationListProps> = React.memo(({ selectedLocation
   return (
     <LocationErrorBoundary>
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 bg-background z-10 border-b px-3">
-          <LocationListHeader
-            totalCount={totalCount || displayLocations.length}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
-          <LocationFilters
-            activeTab={activeTab}
-            onTabChange={filterByType}
-            isOpenNow={isOpenNow}
-            setIsOpenNow={setIsOpenNow}
-          />
-          <FilterChips />
-        </div>
-        
-        <div 
-          ref={listContainerRef}
-          className="flex-1 overflow-y-auto"
-        >
+        {!locationsFromProps && (
+          <div className="sticky top-0 bg-background z-10 border-b px-3">
+            <LocationListHeader totalCount={totalCount || displayLocations.length} sortOption={sortOption} setSortOption={setSortOption} />
+            <LocationFilters activeTab={activeTab} onTabChange={filterByType} isOpenNow={isOpenNow} setIsOpenNow={setIsOpenNow} />
+            <FilterChips />
+          </div>
+        )}
+        <div ref={listContainerRef} className="flex-1 overflow-y-auto">
           {renderLocationsList()}
         </div>
       </div>

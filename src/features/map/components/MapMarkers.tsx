@@ -29,11 +29,11 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     <>
       {memoizedMarkers.map((marker) => (
         <Marker
-          key={marker.locationId}
+          key={marker.id}
           position={marker.position}
           icon={marker.markerIcon}
-          onClick={handleMarkerClick(marker.locationId, onMarkerClick)}
-          onMouseOver={() => onMarkerHover?.(marker.locationId)}
+          onClick={handleMarkerClick(marker.id, onMarkerClick)}
+          onMouseOver={() => onMarkerHover?.(marker.id)}
           onMouseOut={() => onMarkerHover?.(null)}
           zIndex={marker.isSelected ? 1000 : marker.isHovered ? 999 : 1}
         />

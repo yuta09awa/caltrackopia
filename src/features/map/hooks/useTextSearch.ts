@@ -44,7 +44,7 @@ export const useTextSearch = () => {
         
         const markers: MarkerData[] = filteredResults.map((place: any) => ({
           position: { lat: Number(place.latitude), lng: Number(place.longitude) },
-          locationId: place.place_id || place.id,
+          id: place.place_id || place.id,
           type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
@@ -90,7 +90,7 @@ export const useTextSearch = () => {
                   lat: place.geometry!.location!.lat(),
                   lng: place.geometry!.location!.lng()
                 },
-                locationId: place.place_id!,
+                id: place.place_id!,
                 type: 'restaurant'
               }));
             

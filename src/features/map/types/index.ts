@@ -4,7 +4,7 @@ export interface LatLng {
 }
 
 export interface MarkerData {
-  locationId: string;
+  id: string; // Changed from locationId to id for consistency
   position: LatLng;
 }
 

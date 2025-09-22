@@ -13,7 +13,8 @@ import { Location, LocationType, SortOption } from '../types';
 
 const LOCATIONS_PER_PAGE = 20;
 
-export function useLocations() {
+export function useLocations(options?: { disabled?: boolean }) {
+  const { disabled = false } = options || {};
   // Initialize locations as an empty array, then fetch from database
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [displayedLocations, setDisplayedLocations] = useState<Location[]>([]);

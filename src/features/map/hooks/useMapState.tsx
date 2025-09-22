@@ -14,11 +14,11 @@ export interface MapState {
 const TEST_MARKERS: MarkerData[] = [
   {
     position: { lat: 40.7589, lng: -73.9851 }, // Times Square area
-    locationId: 'loc-1' // This should match an actual location ID
+    id: 'loc-1' // This should match an actual location ID
   },
   {
     position: { lat: 40.7505, lng: -73.9934 }, // Herald Square area  
-    locationId: 'loc-2' // This should match an actual location ID
+    id: 'loc-2' // This should match an actual location ID
   }
 ];
 

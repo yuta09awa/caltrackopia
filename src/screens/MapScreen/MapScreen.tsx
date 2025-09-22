@@ -1,72 +1,111 @@
 
-import React from 'react';
-import { MapProvider } from './context/MapProvider';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
-import { useSimplifiedMapContext } from './hooks/useSimplifiedMapContext';
+import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
+import { useLocations } from '@/features/locations/hooks/useLocations';
+import { Ingredient } from '@/models/NutritionalInfo';
+import { Location } from '@/models/Location';
 
-const MapScreenLayout: React.FC = () => {
+const MapScreen: React.FC = () => {
+  const navigate = useNavigate();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [mapHeight, setMapHeight] = useState('calc(100vh - 120px)');
+  const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
+
+  // 1. Consolidated hook for map logic
   const {
-    // State
     mapState,
-    selectedIngredient,
-    selectedLocation,
-    mapHeight,
-    showInfoCard,
+    infoCardVisible,
     infoCardPosition,
-    displayedSearchQuery,
-    listRef,
-    
-    // Actions
-    handleSelectIngredient,
-    handleSearchReset,
-    handleLocationSelect,
+    selectedLocationId,
+    markers, // This gives us basic MarkerData[]
+    performSearch,
     handleMarkerClick,
     handleMapLoaded,
     handleMapIdle,
-    handleInfoCardClose,
-    handleViewDetails,
-    handleScroll
-  } = useSimplifiedMapContext();
+    hideCard,
+    clearAll,
+    selectLocation,
+  } = useConsolidatedMap({
+    enableSearch: true,
+    enableUserLocation: true,
+    enableInfoCard: true,
+  });
+
+  // 2. Fetch rich location data
+  const { locations } = useLocations(); // This gives us rich Location[]
+
+  // 3. Enrich MarkerData with full Location details
+  const enrichedMarkers: Location[] = useMemo(() => {
+    return markers.map(marker => {
+      const fullLocation = locations.find(loc => loc.id === marker.id);
+      return fullLocation;
+    }).filter((location): location is Location => location !== undefined);
+  }, [markers, locations]);
+
+  const selectedLocation: Location | null = useMemo(() => {
+    return enrichedMarkers.find(marker => marker.id === selectedLocationId) || null;
+  }, [enrichedMarkers, selectedLocationId]);
+
+  const handleSelectIngredient = useCallback((ingredient: Ingredient) => {
+    const query = ingredient.name;
+    setDisplayedSearchQuery(query);
+    performSearch(query);
+  }, [performSearch]);
+
+  const handleSearchReset = useCallback(() => {
+    setDisplayedSearchQuery('');
+    clearAll();
+  }, [clearAll]);
+
+  const handleLocationSelect = useCallback((locationId: string | null) => {
+    selectLocation(locationId);
+  }, [selectLocation]);
+
+  const handleViewDetails = useCallback((locationId: string) => {
+    if (locationId) {
+        navigate(`/location/${locationId}`);
+    }
+  }, [navigate]);
+
+  const handleScroll = useCallback(() => {
+    // Placeholder for scroll handling logic
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
-      <MapScreenHeader 
+      <MapScreenHeader
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={handleSelectIngredient}
         onSearchReset={handleSearchReset}
       />
-      
+
       <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
         <MapScreenContent
           mapHeight={mapHeight}
-          selectedIngredient={selectedIngredient}
+          selectedIngredient={null} // Correctly phased out
           currentSearchQuery={displayedSearchQuery}
           mapState={mapState}
-          showInfoCard={showInfoCard}
-          selectedLocation={selectedLocation}
+          showInfoCard={infoCardVisible}
+          selectedLocation={selectedLocation} // Now correctly typed as Location | null
           infoCardPosition={infoCardPosition}
           onLocationSelect={handleLocationSelect}
           onMarkerClick={handleMarkerClick}
           onMapLoaded={handleMapLoaded}
           onMapIdle={handleMapIdle}
-          onInfoCardClose={handleInfoCardClose}
-          onViewDetails={handleViewDetails}
+          onInfoCardClose={hideCard}
+          onViewDetails={handleViewDetails} // Callback signature now matches
         />
-        <MapScreenList 
+        <MapScreenList
           listRef={listRef}
-          selectedLocationId={mapState.selectedLocationId}
+          locations={enrichedMarkers} // Pass enriched data to the list
+          selectedLocationId={selectedLocationId}
+          onLocationSelect={handleLocationSelect}
           onScroll={handleScroll}
         />
       </main>
     </div>
-  );
-};
-
-const MapScreen = () => {
-  return (
-    <MapProvider>
-      <MapScreenLayout />
-    </MapProvider>
   );
 };
 

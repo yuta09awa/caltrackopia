@@ -49,7 +49,7 @@ export const useMapSearch = () => {
     if (ingredient.locations && ingredient.locations.length > 0) {
       const searchMarkers = ingredient.locations.map(location => ({
         position: { lat: location.lat, lng: location.lng },
-        locationId: location.id,
+        id: location.id,
         type: 'search-result' as const
       }));
       

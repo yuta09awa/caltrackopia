@@ -8,7 +8,7 @@ export interface LatLng {
 
 export interface MarkerData {
   position: LatLng;
-  locationId: string;
+  id: string;
   type: string;
 }
 

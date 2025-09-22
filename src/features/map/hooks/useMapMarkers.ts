@@ -18,8 +18,8 @@ export const useMapMarkers = ({
 
   // Memoize markers to prevent unnecessary re-renders
   const memoizedMarkers = useMemo(() => markers.map((marker) => {
-    const isSelected = selectedLocationId === marker.locationId;
-    const isHovered = hoveredLocationId === marker.locationId;
+    const isSelected = selectedLocationId === marker.id;
+    const isHovered = hoveredLocationId === marker.id;
     
     // Determine marker type based on state
     let markerType: 'default' | 'selected' | 'highlighted' = 'default';

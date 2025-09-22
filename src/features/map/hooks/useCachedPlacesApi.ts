@@ -90,7 +90,7 @@ export const useCachedPlacesApi = () => {
         
         const markers: MarkerData[] = filteredResults.map((place: any) => ({
           position: { lat: Number(place.latitude), lng: Number(place.longitude) },
-          locationId: place.place_id,
+          id: place.place_id,
           type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
@@ -155,7 +155,7 @@ export const useCachedPlacesApi = () => {
         const results = data.results || [];
         const markers: MarkerData[] = results.map((place: any) => ({
           position: { lat: Number(place.latitude), lng: Number(place.longitude) },
-          locationId: place.place_id || place.id,
+          id: place.place_id || place.id,
           type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
@@ -205,7 +205,7 @@ export const useCachedPlacesApi = () => {
           lat: Number(place.latitude),
           lng: Number(place.longitude)
         },
-        locationId: place.place_id,
+        id: place.place_id,
         type: mapPlaceTypeToMarkerType(place.primary_type)
       }));
 
