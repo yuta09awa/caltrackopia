@@ -36,8 +36,14 @@ const MapScreen: React.FC = () => {
   // 2. Fetch rich location data
   const { locations } = useLocations(); // This gives us rich Location[]
 
-  // 3. Enrich MarkerData with full Location details
-  const enrichedMarkers: Location[] = useMemo(() => {
+  // 3. Determine what locations to display
+  const displayLocations: Location[] = useMemo(() => {
+    // If no search is active (no markers), show default locations
+    if (markers.length === 0) {
+      return locations;
+    }
+    
+    // If search is active, show enriched markers that match our location data
     return markers.map(marker => {
       const fullLocation = locations.find(loc => loc.id === marker.id);
       return fullLocation;
@@ -45,8 +51,8 @@ const MapScreen: React.FC = () => {
   }, [markers, locations]);
 
   const selectedLocation: Location | null = useMemo(() => {
-    return enrichedMarkers.find(marker => marker.id === selectedLocationId) || null;
-  }, [enrichedMarkers, selectedLocationId]);
+    return displayLocations.find(location => location.id === selectedLocationId) || null;
+  }, [displayLocations, selectedLocationId]);
 
   const handleSelectIngredient = useCallback((ingredient: Ingredient) => {
     const query = ingredient.name;
@@ -99,7 +105,7 @@ const MapScreen: React.FC = () => {
         />
         <MapScreenList
           listRef={listRef}
-          locations={enrichedMarkers} // Pass enriched data to the list
+          locations={displayLocations} // Pass appropriate data to the list
           selectedLocationId={selectedLocationId}
           onLocationSelect={handleLocationSelect}
           onScroll={handleScroll}
