@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
@@ -13,6 +13,23 @@ const MapScreen: React.FC = () => {
   const isMobile = useIsMobile();
   const listRef = useRef<HTMLDivElement>(null);
   const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
+  const [navHeight, setNavHeight] = useState(0);
+
+  // Dynamic navbar height measurement
+  useLayoutEffect(() => {
+    const measureNavHeight = () => {
+      const navElement = document.querySelector('nav') || document.querySelector('header');
+      if (navElement) {
+        const height = navElement.getBoundingClientRect().height;
+        setNavHeight(height);
+      }
+    };
+
+    measureNavHeight();
+    window.addEventListener('resize', measureNavHeight);
+    
+    return () => window.removeEventListener('resize', measureNavHeight);
+  }, []);
 
   // 1. Consolidated hook for map logic
   const {
@@ -89,7 +106,13 @@ const MapScreen: React.FC = () => {
           onSearchReset={handleSearchReset}
         />
 
-        <main className="flex-1 flex flex-col relative w-full mt-10 h-[calc(100vh-40px)] overflow-hidden">
+        <main 
+          className="flex-1 flex flex-col relative w-full overflow-hidden"
+          style={{ 
+            marginTop: `${navHeight}px`, 
+            height: `calc(100vh - ${navHeight}px)` 
+          }}
+        >
           <MapScreenContent
             mapHeight="60%"
             selectedIngredient={null}
@@ -128,7 +151,13 @@ const MapScreen: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
 
-      <main className="flex-1 flex h-[calc(100vh-48px)] w-full overflow-hidden mt-12">
+      <main 
+        className="flex-1 flex w-full overflow-hidden"
+        style={{ 
+          marginTop: `${navHeight}px`, 
+          height: `calc(100vh - ${navHeight}px)` 
+        }}
+      >
         <div className="flex-1 relative h-full">
           <MapScreenContent
             mapHeight="100%"
