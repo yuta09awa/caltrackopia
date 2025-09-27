@@ -40,7 +40,7 @@ const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
   isMobile
 }) => {
   return (
-    <div className="relative h-full">
+    <div className={isMobile ? "relative" : "relative h-full"}>
       <MapScreenMap
         mapHeight={mapHeight}
         selectedIngredient={selectedIngredient}
