@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
 import { useLocations } from '@/features/locations/hooks/useLocations';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { Location } from '@/models/Location';
 
 const MapScreen: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const listRef = useRef<HTMLDivElement>(null);
   const [mapHeight, setMapHeight] = useState('calc(100vh - 120px)');
   const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
@@ -79,6 +81,46 @@ const MapScreen: React.FC = () => {
     // Placeholder for scroll handling logic
   }, []);
 
+  if (isMobile) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-background">
+        <MapScreenHeader
+          displayedSearchQuery={displayedSearchQuery}
+          onSelectIngredient={handleSelectIngredient}
+          onSearchReset={handleSearchReset}
+        />
+
+        <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
+          <MapScreenContent
+            mapHeight={mapHeight}
+            selectedIngredient={null}
+            currentSearchQuery={displayedSearchQuery}
+            mapState={mapState}
+            showInfoCard={infoCardVisible}
+            selectedLocation={selectedLocation}
+            infoCardPosition={infoCardPosition}
+            onLocationSelect={handleLocationSelect}
+            onMarkerClick={handleMarkerClick}
+            onMapLoaded={handleMapLoaded}
+            onMapIdle={handleMapIdle}
+            onInfoCardClose={hideCard}
+            onViewDetails={handleViewDetails}
+            isMobile={true}
+          />
+          <MapScreenList
+            listRef={listRef}
+            locations={displayLocations}
+            selectedLocationId={selectedLocationId}
+            onLocationSelect={handleLocationSelect}
+            onScroll={handleScroll}
+            isMobile={true}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
       <MapScreenHeader
@@ -87,29 +129,36 @@ const MapScreen: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
 
-      <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
-        <MapScreenContent
-          mapHeight={mapHeight}
-          selectedIngredient={null} // Correctly phased out
-          currentSearchQuery={displayedSearchQuery}
-          mapState={mapState}
-          showInfoCard={infoCardVisible}
-          selectedLocation={selectedLocation} // Now correctly typed as Location | null
-          infoCardPosition={infoCardPosition}
-          onLocationSelect={handleLocationSelect}
-          onMarkerClick={handleMarkerClick}
-          onMapLoaded={handleMapLoaded}
-          onMapIdle={handleMapIdle}
-          onInfoCardClose={hideCard}
-          onViewDetails={handleViewDetails} // Callback signature now matches
-        />
-        <MapScreenList
-          listRef={listRef}
-          locations={displayLocations} // Pass appropriate data to the list
-          selectedLocationId={selectedLocationId}
-          onLocationSelect={handleLocationSelect}
-          onScroll={handleScroll}
-        />
+      <main className="flex-1 flex h-[calc(100vh-80px)] w-full" style={{ marginTop: '30px' }}>
+        <div className="flex-1 relative">
+          <MapScreenContent
+            mapHeight="100%"
+            selectedIngredient={null}
+            currentSearchQuery={displayedSearchQuery}
+            mapState={mapState}
+            showInfoCard={infoCardVisible}
+            selectedLocation={selectedLocation}
+            infoCardPosition={infoCardPosition}
+            onLocationSelect={handleLocationSelect}
+            onMarkerClick={handleMarkerClick}
+            onMapLoaded={handleMapLoaded}
+            onMapIdle={handleMapIdle}
+            onInfoCardClose={hideCard}
+            onViewDetails={handleViewDetails}
+            isMobile={false}
+          />
+        </div>
+        
+        <div className="w-96 border-l border-border bg-card">
+          <MapScreenList
+            listRef={listRef}
+            locations={displayLocations}
+            selectedLocationId={selectedLocationId}
+            onLocationSelect={handleLocationSelect}
+            onScroll={handleScroll}
+            isMobile={false}
+          />
+        </div>
       </main>
     </div>
   );

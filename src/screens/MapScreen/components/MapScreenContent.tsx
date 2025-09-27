@@ -20,6 +20,7 @@ interface MapScreenContentProps {
   onMapIdle: (center: LatLng, zoom: number) => void;
   onInfoCardClose: () => void;
   onViewDetails: (locationId: string) => void;
+  isMobile: boolean;
 }
 
 const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
@@ -35,7 +36,8 @@ const MapScreenContent: React.FC<MapScreenContentProps> = React.memo(({
   onMapLoaded,
   onMapIdle,
   onInfoCardClose,
-  onViewDetails
+  onViewDetails,
+  isMobile
 }) => {
   return (
     <div className="relative">
