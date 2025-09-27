@@ -130,7 +130,7 @@ const MapScreen: React.FC = () => {
       />
 
       <main className="flex-1 flex h-[calc(100vh-80px)] w-full" style={{ marginTop: '30px' }}>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative h-full">
           <MapScreenContent
             mapHeight="100%"
             selectedIngredient={null}
