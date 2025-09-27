@@ -88,22 +88,22 @@ const useLocationCardData = (location: Location | null | undefined) => {
     if (highlightTypes.length === 0) return null;
     
     return (
-      <div className="flex gap-1.5 mt-2">
+      <div className="flex gap-1.5 mt-1.5">
         {highlightTypes.includes("new") && (
-          <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-            <CalendarDays className="w-3 h-3 mr-1" />
+          <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 px-1 py-0">
+            <CalendarDays className="w-2.5 h-2.5 mr-0.5" />
             New
           </Badge>
         )}
         {highlightTypes.includes("popular") && (
-          <Badge variant="secondary" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
-            <Star className="w-3 h-3 mr-1 fill-yellow-500" />
+          <Badge variant="secondary" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200 px-1 py-0">
+            <Star className="w-2.5 h-2.5 mr-0.5 fill-yellow-500" />
             Popular
           </Badge>
         )}
         {highlightTypes.includes("seasonal") && (
-          <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
-            <LeafyGreen className="w-3 h-3 mr-1" />
+          <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200 px-1 py-0">
+            <LeafyGreen className="w-2.5 h-2.5 mr-0.5" />
             Seasonal
           </Badge>
         )}
@@ -116,14 +116,14 @@ const useLocationCardData = (location: Location | null | undefined) => {
     if (!location.dietaryOptions || location.dietaryOptions.length === 0) return null;
     
     return (
-      <div className="flex flex-wrap gap-1 mt-2">
+      <div className="flex flex-wrap gap-0.5 mt-1.5">
         {location.dietaryOptions.slice(0, 3).map((option, idx) => (
-          <Badge key={idx} variant="outline" className="text-xs">
+          <Badge key={idx} variant="outline" className="text-xs px-1 py-0">
             {option}
           </Badge>
         ))}
         {location.dietaryOptions.length > 3 && (
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs px-1 py-0">
             +{location.dietaryOptions.length - 3} more
           </Badge>
         )}
@@ -291,24 +291,23 @@ interface LocationCardHeaderProps {
  * to ensure they remain left-aligned together, as per the refactor plan.
  */
 const LocationCardHeader: React.FC<LocationCardHeaderProps> = React.memo(({ location }) => (
-  <div className="flex flex-col mb-2">
+  <div className="flex flex-col mb-1">
     {/* Title and Rating aligned together on the left */}
-    {/* Removed flex-1 from h4 and flex-shrink-0 from rating div to ensure left-alignment */}
-    <div className="flex items-center gap-2 mb-1">
-      <h4 className="font-semibold text-base sm:text-lg truncate">{location.name}</h4>
-      <div className="flex items-center gap-1">
-        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-        <span className="font-medium text-sm">{location.rating}</span>
+    <div className="flex items-center gap-1 mb-1">
+      <h4 className="font-medium text-sm leading-tight truncate">{location.name}</h4>
+      <div className="flex items-center gap-0.5">
+        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+        <span className="font-medium text-xs">{location.rating}</span>
       </div>
     </div>
     
     {/* Badges and meta info - Left aligned */}
-    <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-      <Badge variant="default" className="text-xs">
+    <div className="flex items-center flex-wrap gap-1 text-xs text-muted-foreground">
+      <Badge variant="default" className="text-xs px-1.5 py-0">
         {location.type}
       </Badge>
       {location.subType && (
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-xs px-1.5 py-0">
           {location.subType}
         </Badge>
       )}
@@ -330,7 +329,7 @@ interface LocationCardImageProps {
  * Renders the image carousel for the location card.
  */
 const LocationCardImage: React.FC<LocationCardImageProps> = React.memo(({ images, name, handleCarouselClick }) => (
-  <div className="w-32 h-28 sm:w-36 sm:h-32 md:w-44 md:h-36 relative overflow-hidden flex-shrink-0 rounded-lg">
+  <div className="w-24 h-20 relative overflow-hidden flex-shrink-0 rounded-lg">
     <Carousel className="w-full h-full">
       <CarouselContent className="h-full">
         {images.map((image, index) => (
@@ -348,11 +347,11 @@ const LocationCardImage: React.FC<LocationCardImageProps> = React.memo(({ images
       </CarouselContent>
       {/* Carousel navigation buttons, click handlers prevent propagation */}
       <CarouselPrevious 
-        className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
+        className="absolute left-0.5 top-1/2 -translate-y-1/2 h-4 w-4 bg-white/80 hover:bg-white shadow-sm z-30" 
         onClick={handleCarouselClick}
       />
       <CarouselNext 
-        className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 bg-white/80 hover:bg-white shadow-sm z-30" 
+        className="absolute right-0.5 top-1/2 -translate-y-1/2 h-4 w-4 bg-white/80 hover:bg-white shadow-sm z-30" 
         onClick={handleCarouselClick}
       />
     </Carousel>
@@ -385,21 +384,21 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
 }) => (
   <div className="flex-1 min-w-0">
     {/* Address and Hours */}
-    <div className="space-y-1 mb-3">
+    <div className="space-y-0.5 mb-2">
       {/* Address is now the primary clickable element for directions */}
       <button
         onClick={handleAddressClick}
-        className="flex items-start gap-2 text-sm text-muted-foreground hover:text-primary transition-colors text-left w-full"
+        className="flex items-start gap-1 text-xs text-muted-foreground hover:text-primary transition-colors text-left w-full"
         aria-label={`Get directions to ${location.address}`}
       >
-        <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <span className="truncate">{location.address}</span>
+        <MapPin className="w-3 h-3 flex-shrink-0 mt-0.5" />
+        <span className="truncate leading-tight">{location.address}</span>
       </button>
       
-      <div className="flex items-center gap-2 text-sm">
-        <Clock className="w-4 h-4 flex-shrink-0" />
+      <div className="flex items-center gap-1 text-xs">
+        <Clock className="w-3 h-3 flex-shrink-0" />
         <span
-          className={`font-medium text-sm ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
+          className={`font-medium text-xs leading-tight ${location.openNow ? 'text-green-600' : 'text-red-600'}`}
           role="status"
           aria-label={
             location.openNow
@@ -414,11 +413,11 @@ const LocationCardDetails: React.FC<LocationCardDetailsProps> = React.memo(({
 
     {/* Popular Items - Now only shows text-based items */}
     {popularItems.length > 0 && (
-      <div className="mb-3">
-        <p className="text-xs font-medium text-muted-foreground mb-1">Popular:</p>
-        <div className="flex flex-wrap gap-1">
+      <div className="mb-2">
+        <p className="text-xs font-medium text-muted-foreground mb-0.5">Popular:</p>
+        <div className="flex flex-wrap gap-0.5">
           {popularItems.slice(0, 2).map((item, idx) => (
-            <span key={idx} className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
+            <span key={idx} className="text-xs bg-accent text-accent-foreground px-1.5 py-0.5 rounded-full leading-tight">
               {item.name}
             </span>
           ))}
@@ -447,15 +446,15 @@ interface LocationCardActionsProps {
  * are handled by clicking the address.
  */
 const LocationCardActions: React.FC<LocationCardActionsProps> = React.memo(({ location, handleCallClick }) => (
-  <div className="flex gap-2 mt-3">
+  <div className="flex gap-1 mt-2">
     {location.phone && (
       <Button
         variant="outline"
         size="sm"
-        className="h-8 px-3 text-xs"
+        className="h-6 px-2 text-xs"
         onClick={handleCallClick}
       >
-        <Phone className="w-3 h-3 mr-1" />
+        <Phone className="w-3 h-3 mr-0.5" />
         Call
       </Button>
     )}
@@ -505,11 +504,11 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
       <Link 
         key={location.id}
         to={detailLink}
-        className="block p-4"
+        className="block p-3"
         onClick={handleCardClick}
       >
-        {/* Changed from flex to grid for a 3-column layout */}
-        <div className="grid grid-cols-[auto_1fr_auto] gap-4">
+        {/* Changed to compact 2-column layout */}
+        <div className="grid grid-cols-[auto_1fr] gap-3">
           {/* Left Column: Image Carousel Sub-component */}
           <LocationCardImage 
             images={location.images} 
@@ -517,7 +516,7 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
             handleCarouselClick={handleCarouselClick} 
           />
           
-          {/* Middle Column: Details Section Sub-component */}
+          {/* Right Column: Details Section Sub-component */}
           <div className="flex-1 min-w-0">
             <LocationCardHeader location={location} />
             
@@ -535,12 +534,6 @@ const LocationCard: React.FC<LocationCardProps> = React.memo(({ location, isHigh
               handleCallClick={handleCallClick}
             />
           </div>
-
-          {/* Right Column: NEW Popular Items/Promotions Sub-component */}
-          <LocationCardPopularHighlights
-            popularItems={popularItems}
-            promotions={promotions}
-          />
         </div>
       </Link>
     </div>

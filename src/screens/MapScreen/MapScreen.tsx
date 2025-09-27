@@ -129,8 +129,8 @@ const MapScreen: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
 
-      <main className="flex-1 flex h-[calc(100vh-80px)] w-full overflow-hidden" style={{ marginTop: '30px' }}>
-        <div className="w-1/2 relative h-full">
+      <main className="flex-1 flex h-[calc(100vh-56px)] w-full overflow-hidden pt-14">
+        <div className="flex-1 relative h-full">
           <MapScreenContent
             mapHeight="100%"
             selectedIngredient={null}
@@ -149,7 +149,7 @@ const MapScreen: React.FC = () => {
           />
         </div>
         
-        <div className="w-1/2 border-l border-border bg-card overflow-hidden">
+        <div className="w-[400px] border-l border-border bg-card overflow-hidden flex-shrink-0">
           <MapScreenList
             listRef={listRef}
             locations={displayLocations}
