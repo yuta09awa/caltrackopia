@@ -122,15 +122,15 @@ const MapScreen: React.FC = () => {
 
   // Desktop layout
   return (
-    <div className="flex flex-col min-h-screen w-full bg-background">
+    <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
       <MapScreenHeader
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={handleSelectIngredient}
         onSearchReset={handleSearchReset}
       />
 
-      <main className="flex-1 flex h-[calc(100vh-80px)] w-full" style={{ marginTop: '30px' }}>
-        <div className="flex-1 relative h-full">
+      <main className="flex-1 flex h-[calc(100vh-80px)] w-full overflow-hidden" style={{ marginTop: '30px' }}>
+        <div className="w-1/2 relative h-full">
           <MapScreenContent
             mapHeight="100%"
             selectedIngredient={null}
@@ -149,7 +149,7 @@ const MapScreen: React.FC = () => {
           />
         </div>
         
-        <div className="w-96 border-l border-border bg-card">
+        <div className="w-1/2 border-l border-border bg-card overflow-hidden">
           <MapScreenList
             listRef={listRef}
             locations={displayLocations}
