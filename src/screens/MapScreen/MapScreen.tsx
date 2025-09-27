@@ -7,6 +7,7 @@ import { useLocations } from '@/features/locations/hooks/useLocations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { Location } from '@/models/Location';
+import { convertLocationsToMarkers } from '@/features/map/utils/locationUtils';
 
 const MapScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const MapScreen: React.FC = () => {
     hideCard,
     clearAll,
     selectLocation,
+    mapCore, // Access to core map functionality
   } = useConsolidatedMap({
     enableSearch: true,
     enableUserLocation: true,
@@ -73,6 +75,14 @@ const MapScreen: React.FC = () => {
 
   // 2. Fetch rich location data
   const { locations } = useLocations(); // This gives us rich Location[]
+
+  // 3. Convert locations to markers when locations load and no search is active
+  useEffect(() => {
+    if (locations.length > 0 && markers.length === 0 && !displayedSearchQuery) {
+      const locationMarkers = convertLocationsToMarkers(locations);
+      mapCore.updateMarkers(locationMarkers);
+    }
+  }, [locations, markers.length, displayedSearchQuery, mapCore]);
 
   // 3. Determine what locations to display
   const displayLocations: Location[] = useMemo(() => {
