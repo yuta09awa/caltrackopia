@@ -35,11 +35,25 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
 
   return (
     <div className="p-3 border-b border-border bg-card">
-      {/* Location count and sort */}
+      {/* Location count, Open Now, and sort */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-foreground leading-tight">
-          {locationCount} Location{locationCount !== 1 ? 's' : ''}
-        </h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-medium text-foreground leading-tight">
+            {locationCount} Location{locationCount !== 1 ? 's' : ''}
+          </h3>
+          
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={isOpenNow}
+              onCheckedChange={handleOpenNowToggle}
+              id="open-now"
+              className="scale-75"
+            />
+            <label htmlFor="open-now" className="text-xs text-muted-foreground cursor-pointer">
+              Open Now
+            </label>
+          </div>
+        </div>
         
         <Select value={sortValue} onValueChange={handleSortChange}>
           <SelectTrigger className="w-28 h-8">
@@ -55,31 +69,19 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-1 mb-3">
-        {tabs.map((tab) => (
-          <Button
-            key={tab}
-            variant={activeTab === tab ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setActiveTab(tab)}
-            className="px-2 py-1 h-7 text-xs rounded-full"
-          >
-            {tab}
-          </Button>
-        ))}
-      </div>
-
-      {/* Controls */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={isOpenNow}
-            onCheckedChange={handleOpenNowToggle}
-            id="open-now"
-          />
-          <label htmlFor="open-now" className="text-xs text-foreground cursor-pointer">
-            Open Now
-          </label>
+        <div className="flex items-center gap-1">
+          {tabs.map((tab) => (
+            <Button
+              key={tab}
+              variant={activeTab === tab ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setActiveTab(tab)}
+              className="px-2 py-1 h-7 text-xs rounded-full"
+            >
+              {tab}
+            </Button>
+          ))}
         </div>
         
         <Button
