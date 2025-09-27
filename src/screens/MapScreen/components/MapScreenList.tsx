@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import LocationList from "@/features/locations/components/LocationList";
 import CacheStatusIndicator from "@/features/map/components/CacheStatusIndicator";
 import LocationSidebarHeader from "./LocationSidebarHeader";
 import { Location } from '@/models/Location';
+import { LocationType } from '@/features/locations/types';
+import { filterLocationsByType, filterLocationsByOpenStatus, sortLocations } from '@/features/locations/utils/locationUtils';
 
 interface MapScreenListProps {
   listRef: React.RefObject<HTMLDivElement>;
@@ -22,6 +24,29 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
   onLocationSelect,
   isMobile
 }) => {
+  const [activeTab, setActiveTab] = useState<LocationType>('all');
+  const [sortOption, setSortOption] = useState('default');
+  const [isOpenNow, setIsOpenNow] = useState(false);
+
+  const filteredLocations = useMemo(() => {
+    let filtered = filterLocationsByType(locations, activeTab);
+    filtered = filterLocationsByOpenStatus(filtered, isOpenNow);
+    filtered = sortLocations(filtered, sortOption as any);
+    
+    return filtered;
+  }, [locations, activeTab, isOpenNow, sortOption]);
+
+  const handleTabChange = (tab: LocationType) => {
+    setActiveTab(tab);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortOption(sort);
+  };
+
+  const handleOpenNowToggle = (enabled: boolean) => {
+    setIsOpenNow(enabled);
+  };
   if (isMobile) {
     return (
       <div
@@ -38,7 +63,7 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
         </div>
 
         <LocationList
-          locations={locations}
+          locations={filteredLocations}
           selectedLocationId={selectedLocationId}
           onLocationSelect={onLocationSelect}
         />
@@ -54,12 +79,16 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
       onScroll={onScroll}
     >
       <LocationSidebarHeader 
-        locationCount={locations.length}
+        locationCount={filteredLocations.length}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onSortChange={handleSortChange}
+        onOpenNowToggle={handleOpenNowToggle}
       />
       
       <div className="flex-1 overflow-y-auto">
         <LocationList
-          locations={locations}
+          locations={filteredLocations}
           selectedLocationId={selectedLocationId}
           onLocationSelect={onLocationSelect}
         />
