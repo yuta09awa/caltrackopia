@@ -83,7 +83,7 @@ const MapScreen: React.FC = () => {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col min-h-screen w-full bg-background">
+      <div className="flex flex-col min-h-screen w-full bg-background overflow-hidden">
         <MapScreenHeader
           displayedSearchQuery={displayedSearchQuery}
           onSelectIngredient={handleSelectIngredient}
