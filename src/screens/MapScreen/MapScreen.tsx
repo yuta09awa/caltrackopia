@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
 import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
@@ -15,20 +15,40 @@ const MapScreen: React.FC = () => {
   const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
   const [navHeight, setNavHeight] = useState(0);
 
-  // Dynamic navbar height measurement
+  // Dynamic navbar height measurement with ResizeObserver
   useLayoutEffect(() => {
-    const measureNavHeight = () => {
-      const navElement = document.querySelector('nav') || document.querySelector('header');
-      if (navElement) {
-        const height = navElement.getBoundingClientRect().height;
-        setNavHeight(height);
-      }
+    const navElement = document.querySelector('nav') || document.querySelector('header');
+    if (!navElement) return;
+
+    const updateNavHeight = () => {
+      const height = Math.ceil(navElement.getBoundingClientRect().height);
+      setNavHeight(height);
     };
 
-    measureNavHeight();
-    window.addEventListener('resize', measureNavHeight);
+    // Initial measurement
+    updateNavHeight();
+
+    // Set up ResizeObserver for continuous tracking
+    const resizeObserver = new ResizeObserver(updateNavHeight);
+    resizeObserver.observe(navElement);
+
+    // Fallback resize listener
+    window.addEventListener('resize', updateNavHeight);
     
-    return () => window.removeEventListener('resize', measureNavHeight);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateNavHeight);
+    };
+  }, []);
+
+  // Lock body scroll on this route
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
   }, []);
 
   // 1. Consolidated hook for map logic
@@ -107,10 +127,13 @@ const MapScreen: React.FC = () => {
         />
 
         <main 
-          className="flex-1 flex flex-col relative w-full overflow-hidden"
+          className="flex flex-col overflow-hidden"
           style={{ 
-            marginTop: `${navHeight}px`, 
-            height: `calc(100vh - ${navHeight}px)` 
+            position: 'fixed',
+            top: `${navHeight}px`,
+            left: 0,
+            right: 0,
+            bottom: 0
           }}
         >
           <MapScreenContent
@@ -152,10 +175,13 @@ const MapScreen: React.FC = () => {
       />
 
       <main 
-        className="flex-1 flex w-full overflow-hidden"
+        className="flex overflow-hidden"
         style={{ 
-          marginTop: `${navHeight}px`, 
-          height: `calc(100vh - ${navHeight}px)` 
+          position: 'fixed',
+          top: `${navHeight}px`,
+          left: 0,
+          right: 0,
+          bottom: 0
         }}
       >
         <div className="flex-1 relative h-full">
