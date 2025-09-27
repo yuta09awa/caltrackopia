@@ -214,22 +214,39 @@ export const mockLocations: Location[] = [
     images: ["/placeholder.svg", "/placeholder.svg"],
   },
 
-  // Additional grocery stores
+  // Farmers Markets
   {
-    id: "gourmet1",
-    name: "Gourmet Garage",
+    id: "fm1",
+    name: "Union Square Greenmarket",
     type: "Grocery",
-    subType: "Gourmet Market",
-    rating: 4.1,
-    distance: "0.9 mi",
-    address: "489 Broome St, New York, NY 10013",
+    subType: "Farmers Market",
+    rating: 4.6,
+    distance: "0.5 mi",
+    address: "Union Square Park, New York, NY 10003",
     openNow: true,
-    price: "$$$",
-    dietaryOptions: ["Gourmet", "Fresh", "Local"],
-    cuisine: "Various",
-    coordinates: { lat: 40.7208, lng: -74.0007 },
+    price: "$$",
+    dietaryOptions: ["Organic", "Local", "Seasonal"],
+    cuisine: "Fresh Produce",
+    coordinates: { lat: 40.7359, lng: -73.9911 },
     images: ["/placeholder.svg", "/placeholder.svg"],
-  }
+  },
+
+  // Convenience Stores
+  {
+    id: "cs1",
+    name: "7-Eleven",
+    type: "Grocery",
+    subType: "Convenience Store",
+    rating: 3.9,
+    distance: "0.2 mi",
+    address: "150 E 14th St, New York, NY 10003",
+    openNow: true,
+    price: "$",
+    dietaryOptions: ["Quick", "24/7"],
+    cuisine: "Various",
+    coordinates: { lat: 40.7334, lng: -73.9879 },
+    images: ["/placeholder.svg", "/placeholder.svg"],
+  },
 ];
 
 // Location spoofing utilities

@@ -28,20 +28,10 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ children }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isAuthenticated, itemCount } = useAppStore();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleAuthNavigation = () => {
     if (isAuthenticated) {
@@ -53,14 +43,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   return (
     <>
-      <header
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-2 pb-3",
-          isScrolled
-            ? "glass shadow-sm border-b border-border/10"
-            : "bg-transparent"
-        )}
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border py-2 pb-3">
         <Container>
           <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
             <Link
@@ -103,7 +86,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
             {isMobile && (
               <HamburgerButton
                 onClick={() => setIsMobileMenuOpen(true)}
-                isScrolled={isScrolled}
+                isScrolled={false}
               />
             )}
           </nav>

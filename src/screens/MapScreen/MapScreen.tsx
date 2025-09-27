@@ -90,7 +90,7 @@ const MapScreen: React.FC = () => {
           onSearchReset={handleSearchReset}
         />
 
-        <main className="flex-1 flex flex-col relative w-full" style={{ marginTop: '30px' }}>
+        <main className="flex-1 flex flex-col relative w-full pt-7">
           <MapScreenContent
             mapHeight={mapHeight}
             selectedIngredient={null}
