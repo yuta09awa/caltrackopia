@@ -12,7 +12,7 @@ const MapScreen: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const listRef = useRef<HTMLDivElement>(null);
-  const [mapHeight, setMapHeight] = useState('calc(100vh - 120px)');
+  const [mapHeight, setMapHeight] = useState('calc(100vh - 80px)');
   const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
 
   // 1. Consolidated hook for map logic
@@ -90,7 +90,7 @@ const MapScreen: React.FC = () => {
           onSearchReset={handleSearchReset}
         />
 
-        <main className="flex-1 flex flex-col relative w-full pt-7">
+        <main className="flex-1 flex flex-col relative w-full pt-1">
           <MapScreenContent
             mapHeight={mapHeight}
             selectedIngredient={null}
@@ -129,7 +129,7 @@ const MapScreen: React.FC = () => {
         onSearchReset={handleSearchReset}
       />
 
-      <main className="flex-1 flex h-[calc(100vh-56px)] w-full overflow-hidden pt-14">
+      <main className="flex-1 flex h-[calc(100vh-40px)] w-full overflow-hidden pt-1">
         <div className="flex-1 relative h-full">
           <MapScreenContent
             mapHeight="100%"
