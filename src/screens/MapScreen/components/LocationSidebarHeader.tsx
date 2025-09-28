@@ -71,35 +71,6 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
           </div>
         </div>
         
-        <Select value={sortValue} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-28 h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="default">Default</SelectItem>
-            <SelectItem value="distance">Distance</SelectItem>
-            <SelectItem value="rating">Rating</SelectItem>
-            <SelectItem value="price">Price</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Filter tabs */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          {tabs.map((tab) => (
-            <Button
-              key={tab.value}
-              variant={activeTab === tab.value ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onTabChange(tab.value)}
-              className="px-2 py-1 h-7 text-xs rounded-full"
-            >
-              {tab.label}
-            </Button>
-          ))}
-        </div>
-        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -206,6 +177,35 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.value}
+              variant={activeTab === tab.value ? "default" : "ghost"}
+              size="sm"
+              onClick={() => onTabChange(tab.value)}
+              className="px-2 py-1 h-7 text-xs rounded-full"
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
+        
+        <Select value={sortValue} onValueChange={handleSortChange}>
+          <SelectTrigger className="w-28 h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Default</SelectItem>
+            <SelectItem value="distance">Distance</SelectItem>
+            <SelectItem value="rating">Rating</SelectItem>
+            <SelectItem value="price">Price</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
