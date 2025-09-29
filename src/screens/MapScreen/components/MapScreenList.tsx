@@ -86,7 +86,7 @@ const MapScreenList: React.FC<MapScreenListProps> = React.memo(({
         onOpenNowToggle={handleOpenNowToggle}
       />
       
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pt-3">
         <LocationList
           locations={filteredLocations}
           selectedLocationId={selectedLocationId}
