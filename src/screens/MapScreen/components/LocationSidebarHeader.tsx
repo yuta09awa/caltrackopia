@@ -76,9 +76,9 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1 h-5 px-1.5 text-[10px]"
+              className="flex items-center gap-1 h-6 px-1.5 text-xs"
             >
-              <Filter className="w-2.5 h-2.5" />
+              <Filter className="w-3 h-3" />
               <span>Filter</span>
             </Button>
           </DropdownMenuTrigger>
@@ -188,7 +188,7 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
               variant={activeTab === tab.value ? "default" : "ghost"}
               size="sm"
               onClick={() => onTabChange(tab.value)}
-              className="px-1.5 py-0.5 h-5 text-[10px] rounded-full"
+              className="px-2 py-0.5 h-6 text-xs rounded-full"
             >
               {tab.label}
             </Button>
@@ -196,7 +196,7 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
         </div>
         
         <Select value={sortValue} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-20 h-5 text-[10px]">
+          <SelectTrigger className="w-24 h-6 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
