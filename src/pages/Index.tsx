@@ -40,7 +40,7 @@ const Index = () => {
         
         {/* Features Section */}
         <section className="py-20 bg-secondary/30">
-          <Container>
+          <Container size="full" className="px-4">
             <div className="text-center mb-16 animate-fade-in">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -65,7 +65,7 @@ const Index = () => {
         
         {/* Map Preview Section */}
         <section className="py-20">
-          <Container>
+          <Container size="full" className="px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1 animate-slide-up">
                 <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
@@ -136,7 +136,7 @@ const Index = () => {
         
         {/* CTA Section */}
         <section className="py-20 bg-primary/5">
-          <Container>
+          <Container size="full" className="px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6 animate-fade-in">
               <h2 className="text-3xl md:text-4xl font-bold">Ready to transform your nutrition?</h2>
               <p className="text-xl text-muted-foreground">
