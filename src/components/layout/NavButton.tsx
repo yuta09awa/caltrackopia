@@ -18,7 +18,7 @@ const NavButton: React.FC<NavButtonProps> = ({ isAuthenticated, onClick }) => {
     <Button
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center rounded-full w-10 h-10 transition-colors",
+        "flex items-center justify-center rounded-full w-8 h-8 transition-colors",
         isActive
           ? "bg-accent text-accent-foreground hover:bg-accent/80"
           : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
@@ -28,7 +28,7 @@ const NavButton: React.FC<NavButtonProps> = ({ isAuthenticated, onClick }) => {
       title={isAuthenticated ? "My Profile" : "Login / Register"}
       aria-label={isAuthenticated ? "Go to profile" : "Login or register"}
     >
-      <User className="w-5 h-5" />
+      <User className="w-4 h-4" />
     </Button>
   );
 };

@@ -19,7 +19,7 @@ const NavItem: React.FC<NavItemProps> = ({ name, path, icon: Icon, badge }) => {
     <Link
       to={path}
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full relative transition-colors",
+        "flex items-center justify-center w-8 h-8 rounded-full relative transition-colors",
         isActive
           ? "bg-accent text-accent-foreground"
           : "hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground"
@@ -27,7 +27,7 @@ const NavItem: React.FC<NavItemProps> = ({ name, path, icon: Icon, badge }) => {
       title={name}
       aria-label={name}
     >
-      <Icon className="w-5 h-5" />
+      <Icon className="w-4 h-4" />
       {badge && badge > 0 && (
         <span 
           className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center"

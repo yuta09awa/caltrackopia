@@ -50,7 +50,7 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
   ];
 
   return (
-    <div className="p-3 border-b border-border bg-card">
+    <div className="px-3 pb-3 pt-5 border-b border-border bg-card">
       {/* Location count, Open Now, and sort */}
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center gap-3">
