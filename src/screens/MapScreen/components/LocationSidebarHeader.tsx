@@ -13,6 +13,7 @@ import {
 import { useAppStore } from "@/store/appStore";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import { LocationType } from "@/features/locations/types";
+import { SPACING } from "@/constants/spacing";
 
 interface LocationSidebarHeaderProps {
   locationCount: number;
@@ -50,9 +51,20 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
   ];
 
   return (
-    <div className="px-3 pb-4 pt-6 border-b border-border bg-card">
+    <div 
+      className="border-b border-border bg-card"
+      style={{
+        paddingLeft: SPACING.sidebar.px,
+        paddingRight: SPACING.sidebar.px,
+        paddingTop: SPACING.sidebar.pt,
+        paddingBottom: SPACING.sidebar.pb
+      }}
+    >
       {/* Location count, Open Now, and sort */}
-      <div className="flex items-center justify-between mb-4 px-1">
+      <div 
+        className="flex items-center justify-between mb-4"
+        style={{ paddingLeft: SPACING.sidebar.innerPx, paddingRight: SPACING.sidebar.innerPx }}
+      >
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-medium text-foreground leading-tight">
             {locationCount} Location{locationCount !== 1 ? 's' : ''}
@@ -180,7 +192,10 @@ const LocationSidebarHeader: React.FC<LocationSidebarHeaderProps> = ({
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center justify-between px-1">
+      <div 
+        className="flex items-center justify-between"
+        style={{ paddingLeft: SPACING.sidebar.innerPx, paddingRight: SPACING.sidebar.innerPx }}
+      >
         <div className="flex items-center gap-1">
           {tabs.map((tab) => (
             <Button

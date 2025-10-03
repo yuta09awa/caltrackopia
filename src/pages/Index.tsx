@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import FeatureCard from "@/components/home/FeatureCard";
+import { SPACING } from "@/constants/spacing";
 
 const Index = () => {
   const features = [
@@ -39,7 +40,10 @@ const Index = () => {
         <Hero />
         
         {/* Features Section */}
-        <section className="py-20 bg-secondary/30">
+        <section 
+          className="bg-secondary/30"
+          style={{ paddingTop: SPACING.section.py, paddingBottom: SPACING.section.py }}
+        >
           <Container size="full" className="px-4">
             <div className="text-center mb-16 animate-fade-in">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
@@ -64,7 +68,7 @@ const Index = () => {
         </section>
         
         {/* Map Preview Section */}
-        <section className="py-20">
+        <section style={{ paddingTop: SPACING.section.py, paddingBottom: SPACING.section.py }}>
           <Container size="full" className="px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1 animate-slide-up">
@@ -135,7 +139,10 @@ const Index = () => {
         </section>
         
         {/* CTA Section */}
-        <section className="py-20 bg-primary/5">
+        <section 
+          className="bg-primary/5"
+          style={{ paddingTop: SPACING.section.py, paddingBottom: SPACING.section.py }}
+        >
           <Container size="full" className="px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6 animate-fade-in">
               <h2 className="text-3xl md:text-4xl font-bold">Ready to transform your nutrition?</h2>

@@ -2,10 +2,14 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Container from "../ui/Container";
+import { SPACING } from "@/constants/spacing";
 
 const Hero = () => {
   return (
-    <section className="relative pt-20 pb-20 overflow-hidden">
+    <section 
+      className="relative overflow-hidden"
+      style={{ paddingTop: SPACING.hero.pt, paddingBottom: SPACING.hero.pb }}
+    >
       {/* Background decorative elements */}
       <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-primary/5 to-transparent -z-10" />
       <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10" />

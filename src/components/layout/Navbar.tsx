@@ -10,6 +10,7 @@ import NavItem from "./NavItem";
 import NavButton from "./NavButton";
 import HamburgerButton from "./HamburgerButton";
 import MobileMenu from "./MobileMenu";
+import { SPACING } from "@/constants/spacing";
 
 interface MenuItem {
   name: string;
@@ -43,7 +44,10 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border py-2">
+      <header 
+        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border"
+        style={{ paddingTop: SPACING.navbar.py, paddingBottom: SPACING.navbar.py }}
+      >
         <Container size="full" className="px-4">
           <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
             <Link

@@ -1,6 +1,6 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
+import { SPACING } from "@/constants/spacing";
 
 interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -29,10 +29,15 @@ export const Container = ({
   return (
     <Component
       className={cn(
-        "mx-auto w-full px-4 sm:px-6 md:px-8",
+        "mx-auto w-full",
         maxWidthClass,
         className
       )}
+      style={{
+        paddingLeft: SPACING.container.base,
+        paddingRight: SPACING.container.base,
+        ...props.style,
+      }}
       {...props}
     >
       {children}
