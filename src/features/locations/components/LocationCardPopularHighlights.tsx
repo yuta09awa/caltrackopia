@@ -2,7 +2,7 @@
 import React from "react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
-import { MenuItem, FeaturedItem, Promotion } from "@/models/Location";
+import { MenuItem, FeaturedItem, Promotion } from "@/entities/location";
 
 interface LocationCardPopularHighlightsProps {
   popularItems: (MenuItem | FeaturedItem)[];

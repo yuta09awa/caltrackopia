@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { cn } from '@/lib/utils';
 import FilterChipsDisplay from './FilterChipsDisplay';
 import FilterChipsResults from './FilterChipsResults';

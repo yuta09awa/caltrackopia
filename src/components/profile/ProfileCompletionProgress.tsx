@@ -3,7 +3,7 @@ import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, Circle } from 'lucide-react';
-import { User } from '@/models/User';
+import { User } from '@/entities/user';
 
 interface ProfileCompletionProgressProps {
   user: User;

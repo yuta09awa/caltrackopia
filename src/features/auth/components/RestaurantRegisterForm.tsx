@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AuthService } from '@/services/authService';
+import { AuthService } from '@/features/auth/services/authService';
 import { toast } from '@/hooks/use-toast';
 
 const restaurantSchema = z.object({

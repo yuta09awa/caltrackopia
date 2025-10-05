@@ -1,6 +1,6 @@
 
 import { StateCreator } from 'zustand';
-import { User } from '@/models/User';
+import { User } from '@/entities/user';
 
 export interface AuthSlice {
   user: User | null;

@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@/models/User';
+import { User } from '@/entities/user';
 
 interface SignUpData {
   userType: 'customer' | 'restaurant_owner';

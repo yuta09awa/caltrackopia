@@ -5,7 +5,7 @@ import { Search, MapPin, Utensils, ShoppingCart, Leaf, CalendarDays, Beef, Apple
 import { Loading } from '@/components/ui/loading';
 import { useIngredientSearch } from '../hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
-import { Ingredient } from '@/models/NutritionalInfo';
+import { Ingredient } from '@/entities/nutrition';
 
 interface IngredientSearchProps {
   onSelectIngredient?: (ingredient: Ingredient) => void;

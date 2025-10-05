@@ -1,39 +1,67 @@
-
 import React, { createContext, useContext, useEffect } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 
-type ThemeContextType = {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
+type Theme = 'dark' | 'light' | 'system';
+
+type ThemeProviderProps = {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
 };
 
-const ThemeContext = createContext<ThemeContextType>({
-  isDarkMode: false,
-  toggleDarkMode: () => {},
+const ThemeProviderContext = createContext<{
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}>({
+  theme: 'system',
+  setTheme: () => null,
 });
 
-export const useTheme = () => useContext(ThemeContext);
-
-interface ThemeProviderProps {
-  children: React.ReactNode;
-}
-
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const { userPreferences, toggleDarkMode } = useAppStore();
-  const isDarkMode = userPreferences.darkMode;
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  ...props
+}: ThemeProviderProps) {
+  const { userPreferences, setUserPreferences } = useAppStore();
+  const theme = userPreferences.theme || defaultTheme;
 
   useEffect(() => {
-    // Apply dark mode class to the document when theme changes
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light';
+      root.classList.add(systemTheme);
+      return;
     }
-  }, [isDarkMode]);
+
+    root.classList.add(theme);
+  }, [theme]);
+
+  const setTheme = (newTheme: Theme) => {
+    setUserPreferences({ theme: newTheme });
+  };
+
+  const value = {
+    theme,
+    setTheme,
+  };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
+    <ThemeProviderContext.Provider {...props} value={value}>
       {children}
-    </ThemeContext.Provider>
+    </ThemeProviderContext.Provider>
   );
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+
+  if (context === undefined)
+    throw new Error('useTheme must be used within a ThemeProvider');
+
+  return context;
 };

@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
 import { CartSlice, CartItem } from '@/types/cart';
-import { MenuItem, FeaturedItem } from '@/models/Location';
+import { MenuItem, FeaturedItem } from '@/entities/location';
 
 // Add UndoAction type
 interface UndoAction {

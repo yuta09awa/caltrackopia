@@ -1,8 +1,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { useAppStore } from "@/store/appStore";
-import { profileService, ProfileUpdateData } from "@/services/profile";
+import { useAppStore } from "@/app/store";
+import { profileService, ProfileUpdateData } from "@/features/profile/services";
 
 export function useProfileMutation() {
   const { user, setUser } = useAppStore();

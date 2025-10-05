@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { Ingredient } from '@/models/NutritionalInfo';
+import { Ingredient } from '@/entities/nutrition';
 import { toast } from 'sonner';
 import { MarkerData } from '../types';
 

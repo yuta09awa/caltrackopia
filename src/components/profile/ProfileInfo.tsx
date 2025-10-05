@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import ProfileCompletionProgress from "./ProfileCompletionProgress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, MapPin, Heart, Shield, Bell } from "lucide-react";

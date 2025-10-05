@@ -1,6 +1,6 @@
 
 import { useCallback, useMemo } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { useUndoSystem } from './useUndoSystem';
 import { useCurrency } from './useCurrency';
 import { toast } from 'sonner';

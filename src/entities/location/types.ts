@@ -1,1 +1,1 @@
-export type { Location, LocationType, SortOption } from './model';
+export type { Location, LocationType, SortOption, MenuItem, FeaturedItem } from './model';

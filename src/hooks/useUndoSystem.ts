@@ -1,6 +1,6 @@
 
 import { useCallback, useMemo } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { CartItem } from '@/types/cart';
 
 interface UndoAction {

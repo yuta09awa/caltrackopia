@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { Ingredient } from '@/models/NutritionalInfo';
+import { Ingredient } from '@/entities/nutrition';
 import { databaseService } from '@/services/databaseService';
 import { hybridLocationService } from '@/services/hybridLocationService';
 

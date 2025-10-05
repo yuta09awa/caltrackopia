@@ -1,8 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, ShoppingCart, Loader2 } from "lucide-react";
-import { useAppStore } from "@/store/appStore";
-import { MenuItem, FeaturedItem } from "@/models/Location";
+import { useAppStore } from "@/app/store";
+import { MenuItem, FeaturedItem } from "@/entities/location";
 import { toast } from "sonner";
 import { useState, useCallback, useMemo } from "react";
 

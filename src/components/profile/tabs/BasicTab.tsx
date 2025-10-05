@@ -3,7 +3,7 @@ import React from "react";
 import AvatarUpload from "../AvatarUpload";
 import BasicInfoForm from "../forms/BasicInfoForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { ProfileFormValues } from "../hooks/useProfileForm";
 import { UseFormReturn } from "react-hook-form";
 

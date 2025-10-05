@@ -1,8 +1,8 @@
 
 import { useCallback, useMemo } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { ConflictMode, ConflictAction } from '@/types/cartConflict';
-import { MenuItem, FeaturedItem } from '@/models/Location';
+import { MenuItem, FeaturedItem } from '@/entities/location';
 import { toast } from 'sonner';
 
 export const useCartConflictResolution = () => {

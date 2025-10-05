@@ -5,7 +5,7 @@ import { MapPin, Utensils, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import NavItem from "./NavItem";
 import NavButton from "./NavButton";
 import HamburgerButton from "./HamburgerButton";

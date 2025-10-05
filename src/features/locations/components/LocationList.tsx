@@ -10,7 +10,7 @@ import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import VirtualizedLocationList from './VirtualizedLocationList';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
-import { Location } from '@/models/Location';
+import { Location } from '@/entities/location';
 
 interface LocationListProps {
   selectedLocationId?: string | null;

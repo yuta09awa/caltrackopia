@@ -3,8 +3,8 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, Loader2 } from "lucide-react";
 import { CartItem } from '@/types/cart';
-import { useAppStore } from '@/store/appStore';
-import { useCurrency } from '@/hooks/useCurrency';
+import { useAppStore } from '@/app/store';
+import { useCurrency } from '@/shared/hooks/useCurrency';
 import { toast } from 'sonner';
 import QuantitySelector from './QuantitySelector';
 

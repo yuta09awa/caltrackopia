@@ -1,1 +1,6 @@
-export type { NutritionalInfo, DietaryRestriction } from './model';
+export type { 
+  NutritionalInfo, 
+  Ingredient,
+  IngredientNutrition,
+  DietaryRestriction 
+} from './model';

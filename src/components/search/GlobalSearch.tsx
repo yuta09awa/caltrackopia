@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Ingredient } from '@/models/NutritionalInfo';
+import { Ingredient } from '@/entities/nutrition';
 import SearchDropdown from './SearchDropdown';
 
 interface GlobalSearchProps {

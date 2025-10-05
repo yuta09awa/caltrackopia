@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Location, RestaurantCustomData, MenuItem } from '@/models/Location';
+import { Location, MenuItem } from '@/entities/location';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

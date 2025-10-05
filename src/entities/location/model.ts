@@ -2,6 +2,39 @@ export type LocationType = "Restaurant" | "Grocery" | "FarmersMarket" | "all";
 
 export type SortOption = "distance" | "rating" | "price" | "name";
 
+export interface MenuItem {
+  id: string;
+  name: string;
+  price: string;
+  description?: string;
+  image: string;
+  imageUrl?: string;
+  dietaryTags?: string[];
+  rating?: number;
+  category?: string;
+  ingredients?: string[];
+  isAvailable: boolean;
+  spice_level?: number;
+  seasonalAvailability?: string;
+  popularityScore?: number;
+  thumbsUp?: number;
+  thumbsDown?: number;
+}
+
+export interface FeaturedItem {
+  id: string;
+  name: string;
+  price: string;
+  description?: string;
+  image: string;
+  imageUrl?: string;
+  dietaryTags?: string[];
+  rating?: number;
+  category?: string;
+  isSpecialOffer: boolean;
+  validUntil?: string;
+}
+
 export interface Location {
   id: string;
   name: string;

@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { MapFilters } from '@/store/slices/mapFiltersSlice';
+import { MapFilters } from '@/features/map/store/mapFiltersSlice';
 
 interface FilterChip {
   key: string;

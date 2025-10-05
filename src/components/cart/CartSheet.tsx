@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { supabase } from '@/integrations/supabase/client';
 import { AppRole, UserRole, RoleCheckResult } from '@/types/roles';
 
