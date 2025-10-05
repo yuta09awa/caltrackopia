@@ -57,6 +57,7 @@ export class AuthService {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             user_type: additionalData.userType,
             first_name: additionalData.firstName,
@@ -86,6 +87,22 @@ export class AuthService {
         if (profileError) {
           console.error('Profile creation error:', profileError);
           throw new Error('Failed to create user profile');
+        }
+
+        // Assign role in user_roles table
+        // restaurant_owner requires approval, others are auto-approved
+        const needsApproval = additionalData.userType === 'restaurant_owner';
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert([{
+            user_id: data.user.id,
+            role: additionalData.userType,
+            approved: !needsApproval,
+          }]);
+
+        if (roleError) {
+          console.error('Role assignment error:', roleError);
+          throw new Error('Failed to assign user role');
         }
 
         // If restaurant owner, create restaurant record

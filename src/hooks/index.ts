@@ -50,6 +50,9 @@ export { useEnhancedCaching } from './useEnhancedCaching';
 export { useIsMobile } from './use-mobile';
 export { useToast } from './use-toast';
 
+// Auth & Roles
+export { useUserRoles } from './useUserRoles';
+
 // === DEPRECATED HOOKS - DO NOT USE ===
 // These will be removed in future versions
 // export { ... } from './use-api.deprecated';

@@ -1,5 +1,8 @@
 // ============= UNIFIED TYPE SYSTEM =============
 
+// Auth & Roles
+export type { AppRole, UserRole, RoleCheckResult } from './roles';
+
 // Base component types
 export interface BaseComponentProps {
   className?: string;
