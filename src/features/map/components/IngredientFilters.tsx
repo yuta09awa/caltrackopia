@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 
 const IngredientFilters: React.FC = () => {

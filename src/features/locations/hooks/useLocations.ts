@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { locationService } from '@/services/locationService';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { 

@@ -1,6 +1,6 @@
 
 import { useMemo, useCallback } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 
 interface CurrencyConfig {
   code: string;

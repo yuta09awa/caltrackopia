@@ -9,7 +9,7 @@ import UserTypeSelection from "@/components/auth/UserTypeSelection";
 import CustomerRegisterForm from "@/components/auth/CustomerRegisterForm";
 import RestaurantRegisterForm from "@/components/auth/RestaurantRegisterForm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { toast } from "@/hooks/use-toast";
 
 type UserType = 'customer' | 'restaurant_owner';

@@ -1,7 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/ui/Container";
 import { ShoppingCart, Trash2, AlertCircle, Undo2 } from "lucide-react";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CartItemDisplay from "@/components/cart/CartItemDisplay";

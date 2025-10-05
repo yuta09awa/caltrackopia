@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { Checkbox } from "@/components/ui/checkbox";
 import IngredientSearch from "@/components/ingredients/IngredientSearch";
 import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";

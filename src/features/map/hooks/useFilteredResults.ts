@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 
 export const useFilteredResults = () => {
   const [resultCount, setResultCount] = useState<number | undefined>(undefined);

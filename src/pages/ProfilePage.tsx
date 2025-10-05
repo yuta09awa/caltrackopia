@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileInfo from "@/components/profile/ProfileInfo";

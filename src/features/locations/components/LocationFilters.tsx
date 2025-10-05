@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from "@/store/appStore";
+import { useAppStore } from "@/app/store";
 import LocationTabs from "./LocationTabs";
 import InlineFilters from "./InlineFilters";
 import FilterActions from "./FilterActions";

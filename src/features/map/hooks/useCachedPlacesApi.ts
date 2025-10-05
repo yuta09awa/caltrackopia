@@ -3,7 +3,7 @@ import { useCallback, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MarkerData } from '../types';
 import { databaseService } from '@/services/databaseService';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { useSearchState } from './useSearchState';
 
 export interface CachedPlaceResult {

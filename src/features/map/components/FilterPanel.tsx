@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore } from '@/app/store';
 import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
 import { DrawerContent } from "@/components/ui/drawer";
