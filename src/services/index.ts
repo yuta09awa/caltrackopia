@@ -26,13 +26,13 @@ export { createDataService, dataService } from './serviceFactory';
 export type { IDataService } from './serviceFactory';
 
 // Authentication Service
-export { AuthService } from './authService';
+export { AuthService } from '@/features/auth/services/authService';
 
 // Profile Services
 export { 
   profileService
-} from './profile';
-export type { ProfileUpdateData } from './profile';
+} from '@/features/profile/services';
+export type { ProfileUpdateData } from '@/features/profile/services';
 
 // Database Services
 export { DatabaseService } from './databaseService';

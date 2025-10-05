@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Ingredient } from '@/entities/nutrition';
+import { Ingredient } from '@/models/NutritionalInfo';
 import { Apple, Beef, Milk, Utensils, ShoppingCart, Search, Leaf, MapPin, CalendarDays } from 'lucide-react';
 
 interface SearchResultsProps {

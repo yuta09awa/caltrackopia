@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Ingredient } from "@/entities/nutrition";
+import { Ingredient } from "@/models/NutritionalInfo";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 

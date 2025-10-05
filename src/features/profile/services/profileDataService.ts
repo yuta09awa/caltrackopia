@@ -57,7 +57,7 @@ export class ProfileDataService {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) throw new Error('User not authenticated');
 
-      const transformedUser = await import('@/services/authService').then(
+      const transformedUser = await import('@/features/auth/services/authService').then(
         ({ AuthService }) => AuthService.transformSupabaseUserToUser(authUser, data)
       );
 

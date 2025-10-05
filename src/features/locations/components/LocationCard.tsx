@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Location, MenuItem, FeaturedItem, Promotion } from "@/entities/location";
+import { Location, HighlightItem, MenuItem as LocationMenuItem, FeaturedItem as LocationFeaturedItem, Promotion } from "@/models/Location";
 import { toast } from "sonner";
 import LocationCardPopularHighlights from './LocationCardPopularHighlights';
 

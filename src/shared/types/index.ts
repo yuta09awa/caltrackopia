@@ -5,7 +5,6 @@ export * from '@/types/cartConflict';
 export * from '@/types/roles';
 
 // Entity types
-export type { User, UserProfile } from '@/entities/user';
-export type { Location, LocationType, SortOption } from '@/entities/location';
-export type { Ingredient } from '@/entities/ingredient';
-export type { NutritionalInfo, DietaryRestriction } from '@/entities/nutrition';
+export type { User } from '@/entities/user';
+export type { Location, LocationType, SortOption } from '@/models/Location';
+export type { Ingredient, NutritionalInfo, DietaryRestriction } from '@/models/NutritionalInfo';

@@ -4,7 +4,7 @@ import { Camera, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
-import { profileService } from '@/services/profile';
+import { profileService } from '@/features/profile/services';
 import { useAppStore } from '@/app/store';
 
 interface AvatarUploadProps {

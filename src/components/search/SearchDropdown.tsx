@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Ingredient } from '@/entities/nutrition';
+import { Ingredient } from '@/models/NutritionalInfo';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import SearchResults from './SearchResults';
 import SearchHistory from './SearchHistory';

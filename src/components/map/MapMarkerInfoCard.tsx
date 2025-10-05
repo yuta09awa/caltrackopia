@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star, Navigation } from 'lucide-react';
-import { Location } from '@/entities/location';
+import { Location } from '@/models/Location';
 
 interface MapMarkerInfoCardProps {
   location: Location;

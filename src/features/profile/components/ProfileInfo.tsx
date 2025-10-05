@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, MapPin, Heart, Shield, Bell } from "lucide-react";
 import { useProfileForm, ProfileFormValues } from "./hooks/useProfileForm";
 import { useProfileMutation } from "./hooks/useProfileMutation";
-import { ProfileUpdateData } from "@/services/profile";
+import { ProfileUpdateData } from "@/features/profile/services";
 import BasicTab from "./tabs/BasicTab";
 import PreferencesTab from "./tabs/PreferencesTab";
 import LocationTab from "./tabs/LocationTab";

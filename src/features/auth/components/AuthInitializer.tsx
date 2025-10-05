@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppStore } from '@/app/store';
-import { AuthService } from './services/authService';
+import { AuthService } from '@/features/auth/services/authService';
 
 interface AuthInitializerProps {
   children: React.ReactNode;

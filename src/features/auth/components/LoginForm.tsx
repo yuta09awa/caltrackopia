@@ -16,7 +16,7 @@ import {
 import { useAppStore } from "@/app/store";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthService } from "@/services/authService";
+import { AuthService } from "@/features/auth/services/authService";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
