@@ -1,9 +1,15 @@
 // Cart feature public API
+
+// API module
+export * from './api';
+
+// Components
 export { default as CartSheet } from './components/CartSheet';
 export { default as AddToCartButton } from './components/AddToCartButton';
 export { default as CartItemDisplay } from './components/CartItemDisplay';
 export { default as QuantitySelector } from './components/QuantitySelector';
 
+// Hooks
 export { useCartOperations } from './hooks/useCartOperations';
 export { useCartAnalytics } from './hooks/useCartAnalytics';
 export { useCartConflictResolution } from './hooks/useCartConflictResolution';

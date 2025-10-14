@@ -17,9 +17,13 @@ export type {
 // Unified Service Management
 export { UnifiedServiceManager, serviceManager } from './core/UnifiedServiceManager';
 
-// Primary API Service
+// Primary API Service (now enhanced with interceptors)
 export { ApiService, apiService } from './api/apiService';
 export type { ApiMethod, ApiRequestOptions } from './api/apiService';
+
+// Re-export centralized API client
+export { apiClient } from '@/shared/api/client';
+export { API_ENDPOINTS } from '@/shared/api/endpoints';
 
 // Data Services - Primary interfaces
 export { createDataService, dataService } from './serviceFactory';

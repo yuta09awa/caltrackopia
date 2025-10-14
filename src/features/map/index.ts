@@ -1,5 +1,8 @@
 // ============= MAP FEATURE UNIFIED EXPORTS =============
 
+// API module
+export * from './api';
+
 // Primary Interfaces
 export { useConsolidatedMap } from './hooks/useConsolidatedMap';
 export type { ConsolidatedMapHook, ConsolidatedMapOptions } from './hooks/useConsolidatedMap';
