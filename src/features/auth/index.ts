@@ -5,6 +5,15 @@ export { RequireRole } from './components/RequireRole';
 export { default as UserTypeSelection } from './components/UserTypeSelection';
 
 export { useUserRoles } from './hooks/useUserRoles';
+
+// Store hooks (Phase 2)
+export { 
+  useAuth,
+  useUser,
+  useAuthStatus,
+  useUserRole
+} from './store/useAuth';
+
 export { AuthService } from './services/authService';
 export { createAuthSlice } from './store/authSlice';
 export type { AuthSlice } from './store/authSlice';

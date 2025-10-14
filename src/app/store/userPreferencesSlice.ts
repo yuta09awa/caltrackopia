@@ -50,3 +50,13 @@ export const createUserPreferencesSlice: StateCreator<
       },
     })),
 });
+
+// Memoized selectors
+export const selectUserPreferences = (state: UserPreferencesSlice) => state.userPreferences;
+export const selectTheme = (state: UserPreferencesSlice) => state.userPreferences.theme;
+export const selectLanguage = (state: UserPreferencesSlice) => state.userPreferences.language;
+export const selectNotifications = (state: UserPreferencesSlice) => state.userPreferences.notifications;
+export const selectUserLocation = (state: UserPreferencesSlice) => state.userPreferences.location;
+export const selectHasUserLocation = (state: UserPreferencesSlice) => 
+  state.userPreferences.location.latitude !== null && 
+  state.userPreferences.location.longitude !== null;

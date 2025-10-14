@@ -17,6 +17,16 @@ export {
   useToastManager
 } from './hooks';
 
+// Store hooks (Phase 2)
+export {
+  useMapFilters,
+  usePriceRangeFilter,
+  useCuisineFilter,
+  useGroceryCategoryFilter,
+  useDietaryFilters,
+  useIngredientFilters
+} from './store/useMapFilters';
+
 // Types
 export type { 
   LatLng, 
@@ -27,3 +37,7 @@ export type {
 
 // Utils
 export * from './utils/placeTypeMapper';
+
+// Store slice
+export { createMapFiltersSlice } from './store/mapFiltersSlice';
+export type { MapFiltersSlice, MapFilters } from './store/mapFiltersSlice';

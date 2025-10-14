@@ -316,4 +316,20 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
   },
 });
 
+// Memoized selectors
+export const selectCartItems = (state: CartSlice) => state.items;
+export const selectCartTotal = (state: CartSlice) => state.total;
+export const selectCartItemCount = (state: CartSlice) => state.itemCount;
+export const selectGroupedByLocation = (state: CartSlice) => state.groupedByLocation;
+export const selectActiveLocationId = (state: CartSlice) => state.activeLocationId;
+export const selectConflictMode = (state: CartSlice) => state.conflictMode;
+export const selectPendingConflict = (state: CartSlice) => state.pendingConflict;
+export const selectCartIsLoading = (state: CartSlice) => state.isLoading;
+export const selectCartError = (state: CartSlice) => state.error;
+export const selectUndoStack = (state: CartSlice) => state.undoStack;
+export const selectCartIsEmpty = (state: CartSlice) => state.items.length === 0;
+export const selectHasMultipleLocations = (state: CartSlice) => 
+  Object.keys(state.groupedByLocation).length > 1;
+export const selectCanUndo = (state: CartSlice) => state.undoStack.length > 0;
+
 export type { CartSlice };

@@ -43,3 +43,12 @@ export const createAuthSlice: StateCreator<
     return user?.userType === 'customer';
   },
 });
+
+// Memoized selectors
+export const selectUser = (state: AuthSlice) => state.user;
+export const selectIsAuthenticated = (state: AuthSlice) => state.isAuthenticated;
+export const selectAuthLoading = (state: AuthSlice) => state.isLoading;
+export const selectAuthError = (state: AuthSlice) => state.error;
+export const selectUserType = (state: AuthSlice) => state.getUserType();
+export const selectIsRestaurantOwner = (state: AuthSlice) => state.isRestaurantOwner();
+export const selectIsCustomer = (state: AuthSlice) => state.isCustomer();

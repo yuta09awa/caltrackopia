@@ -8,5 +8,14 @@ export { useCartOperations } from './hooks/useCartOperations';
 export { useCartAnalytics } from './hooks/useCartAnalytics';
 export { useCartConflictResolution } from './hooks/useCartConflictResolution';
 
+// Store hooks
+export { 
+  useCart,
+  useCartItems,
+  useCartTotals,
+  useCartConflict,
+  useLocationCart
+} from './store/useCart';
+
 export { createCartSlice } from './store/cartSlice';
 export type { CartSlice } from './store/cartSlice';
