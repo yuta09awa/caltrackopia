@@ -3,6 +3,12 @@ import { toast } from "sonner";
 import { httpClient } from "@/utils/http_client/http_client_factory";
 import { ServiceBase } from "../base/ServiceBase";
 import { IEnhancedService } from "../base/ServiceInterface";
+import type { 
+  RequestInterceptor, 
+  ResponseInterceptor, 
+  InterceptorCleanup,
+  ApiRequestConfig 
+} from "@/shared/api/types";
 
 export type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -13,14 +19,82 @@ export interface ApiRequestOptions {
   showErrorToast?: boolean;
   showSuccessToast?: boolean;
   successMessage?: string;
+  params?: Record<string, any>;
 }
 
 export class ApiService extends ServiceBase implements IEnhancedService {
   private baseUrl: string;
+  private requestInterceptors: RequestInterceptor[] = [];
+  private responseInterceptors: ResponseInterceptor[] = [];
 
   constructor(baseUrl: string = '') {
     super();
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * Register a request interceptor
+   * Returns a cleanup function to remove the interceptor
+   */
+  useRequestInterceptor(interceptor: RequestInterceptor): InterceptorCleanup {
+    this.requestInterceptors.push(interceptor);
+    
+    return () => {
+      const index = this.requestInterceptors.indexOf(interceptor);
+      if (index > -1) {
+        this.requestInterceptors.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Register a response interceptor
+   * Returns a cleanup function to remove the interceptor
+   */
+  useResponseInterceptor(interceptor: ResponseInterceptor): InterceptorCleanup {
+    this.responseInterceptors.push(interceptor);
+    
+    return () => {
+      const index = this.responseInterceptors.indexOf(interceptor);
+      if (index > -1) {
+        this.responseInterceptors.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Apply all request interceptors
+   */
+  private async applyRequestInterceptors(config: ApiRequestConfig): Promise<ApiRequestConfig> {
+    let modifiedConfig = config;
+    
+    for (const interceptor of this.requestInterceptors) {
+      try {
+        modifiedConfig = await interceptor(modifiedConfig);
+      } catch (error) {
+        console.error('Request interceptor error:', error);
+      }
+    }
+    
+    return modifiedConfig;
+  }
+
+  /**
+   * Apply all response interceptors
+   */
+  private async applyResponseInterceptors(response: any, error?: any): Promise<any> {
+    let modifiedResponse = response;
+    
+    for (const interceptor of this.responseInterceptors) {
+      try {
+        modifiedResponse = await interceptor(modifiedResponse, error);
+      } catch (interceptorError) {
+        console.error('Response interceptor error:', interceptorError);
+        throw interceptorError;
+      }
+    }
+    
+    return modifiedResponse;
   }
 
   getName(): string {
@@ -40,47 +114,75 @@ export class ApiService extends ServiceBase implements IEnhancedService {
   ): Promise<T> {
     const {
       method = 'GET',
-      headers,
+      headers = {},
       body,
       showErrorToast = true,
       showSuccessToast = false,
-      successMessage = 'Operation completed successfully'
+      successMessage = 'Operation completed successfully',
+      params
     } = options;
     
     const url = this.getFullUrl(endpoint);
 
     return this.executeWithStateManagement(async () => {
-      let response: T;
-      
-      switch (method) {
-        case 'GET':
-          response = await httpClient.get<T>(url, headers);
-          break;
-        case 'POST':
-          response = await httpClient.post<T>(url, body, headers);
-          break;
-        case 'PUT':
-          response = await httpClient.put<T>(url, body, headers);
-          break;
-        case 'DELETE':
-          response = await httpClient.delete<T>(url, headers);
-          break;
-        default:
-          response = await httpClient.request<T>(url, {
-            method,
-            headers,
-            body
+      try {
+        // Apply request interceptors
+        const interceptedConfig = await this.applyRequestInterceptors({
+          headers,
+          params,
+        });
+
+        let response: T;
+        
+        switch (method) {
+          case 'GET':
+            response = await httpClient.get<T>(url, interceptedConfig.headers);
+            break;
+          case 'POST':
+            response = await httpClient.post<T>(url, body, interceptedConfig.headers);
+            break;
+          case 'PUT':
+            response = await httpClient.put<T>(url, body, interceptedConfig.headers);
+            break;
+          case 'DELETE':
+            response = await httpClient.delete<T>(url, interceptedConfig.headers);
+            break;
+          default:
+            response = await httpClient.request<T>(url, {
+              method,
+              headers: interceptedConfig.headers,
+              body
+            });
+        }
+
+        // Apply response interceptors (success case)
+        const interceptedResponse = await this.applyResponseInterceptors(response);
+
+        // Increment API quota usage
+        this.incrementQuotaUsage(1);
+
+        if (showSuccessToast) {
+          this.showSuccessToast(successMessage);
+        }
+        
+        return interceptedResponse;
+      } catch (error: any) {
+        // Apply response interceptors (error case)
+        try {
+          await this.applyResponseInterceptors(null, {
+            message: error.message || 'Request failed',
+            status: error.status,
+            code: error.code,
+            details: error,
           });
+        } catch (interceptorError) {
+          // If interceptor throws, use that error
+          throw interceptorError;
+        }
+        
+        // Re-throw original error if interceptors didn't handle it
+        throw error;
       }
-
-      // Increment API quota usage
-      this.incrementQuotaUsage(1);
-
-      if (showSuccessToast) {
-        this.showSuccessToast(successMessage);
-      }
-      
-      return response;
     }, `API ${method} request to ${endpoint}`);
   }
 

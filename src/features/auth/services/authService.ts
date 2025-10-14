@@ -1,5 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/entities/user';
+import { apiClient } from '@/shared/api/client';
+import { authTokenInterceptor, tokenRefreshInterceptor } from '@/shared/api/interceptors';
+
+// Setup API interceptors on module load
+apiClient.useRequestInterceptor(authTokenInterceptor);
+apiClient.useResponseInterceptor(tokenRefreshInterceptor);
 
 interface SignUpData {
   userType: 'customer' | 'restaurant_owner';
