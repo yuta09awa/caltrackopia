@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/app/store";
 import { Checkbox } from "@/components/ui/checkbox";
-import IngredientSearch from "@/components/ingredients/IngredientSearch";
+import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
 
 interface FilterActionsProps {

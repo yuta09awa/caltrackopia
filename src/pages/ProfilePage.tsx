@@ -7,9 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAppStore } from "@/app/store";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ProfileInfo from "@/components/profile/ProfileInfo";
-import OrderHistory from "@/components/profile/OrderHistory";
-import PaymentMethods from "@/components/profile/PaymentMethods";
+import ProfileInfo from "@/features/profile/components/ProfileInfo";
+import OrderHistory from "@/features/profile/components/OrderHistory";
+import PaymentMethods from "@/features/profile/components/PaymentMethods";
 
 const ProfilePage: React.FC = () => {
   const { isAuthenticated, setIsAuthenticated } = useAppStore();

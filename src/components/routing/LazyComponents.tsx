@@ -7,14 +7,14 @@ export const LazyLocationList = lazy(() => import('@/features/locations/componen
 export const LazyMapInfoCard = lazy(() => import('@/features/map/components/MapInfoCard'));
 
 // Feature-specific lazy components
-export const LazyNutritionTracker = lazy(() => import('@/components/nutrition/NutritionTracker'));
-export const LazyCartSheet = lazy(() => import('@/components/cart/CartSheet'));
+export const LazyNutritionTracker = lazy(() => import('@/features/nutrition/components/NutritionTracker'));
+export const LazyCartSheet = lazy(() => import('@/features/cart/components/CartSheet'));
 export const LazyFilterSheet = lazy(() => import('@/features/map/components/FilterSheet'));
 
 // Profile components
-export const LazyProfileInfo = lazy(() => import('@/components/profile/ProfileInfo'));
-export const LazyOrderHistory = lazy(() => import('@/components/profile/OrderHistory'));
-export const LazyPaymentMethods = lazy(() => import('@/components/profile/PaymentMethods'));
+export const LazyProfileInfo = lazy(() => import('@/features/profile/components/ProfileInfo'));
+export const LazyOrderHistory = lazy(() => import('@/features/profile/components/OrderHistory'));
+export const LazyPaymentMethods = lazy(() => import('@/features/profile/components/PaymentMethods'));
 
 // Market detail components
 export const LazyMarketDetailTabs = lazy(() => import('@/features/markets/components/MarketDetailTabs'));

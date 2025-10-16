@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/app/store";
-import IngredientSearch from "@/components/ingredients/IngredientSearch";
+import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { LocationType } from "@/features/locations/types";
 import { SPACING } from "@/constants/spacing";
 

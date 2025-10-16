@@ -8,7 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import PriceRangeFilter from './filters/PriceRangeFilter';
 import CuisineFilter from './filters/CuisineFilter';
 import CategoryFilter from './filters/CategoryFilter';
-import IngredientSearch from '@/components/ingredients/IngredientSearch';
+import IngredientSearch from '@/features/ingredients/components/IngredientSearch';
 import { filterCategories, defaultFilterValues, cuisineOptions } from '../config/filterConfig';
 
 type FilterSheetProps = {

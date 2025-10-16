@@ -4,11 +4,11 @@ import { ShoppingCart, Trash2, AlertCircle, Undo2 } from "lucide-react";
 import { useAppStore } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import CartItemDisplay from "@/components/cart/CartItemDisplay";
+import CartItemDisplay from "@/features/cart/components/CartItemDisplay";
 import { useCartOperations } from "@/hooks/useCartOperations";
 import { useMemo, useCallback, useEffect } from "react";
-import CartErrorBoundary from "@/components/cart/CartErrorBoundary";
-import EnhancedCartConflictDialog from "@/components/cart/EnhancedCartConflictDialog";
+import CartErrorBoundary from "@/features/cart/components/CartErrorBoundary";
+import EnhancedCartConflictDialog from "@/features/cart/components/EnhancedCartConflictDialog";
 import { useInternationalization } from "@/hooks/useInternationalization";
 import { useCartAnalytics } from "@/hooks/useCartAnalytics";
 

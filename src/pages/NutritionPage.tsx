@@ -1,6 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/ui/Container";
-import NutritionTracker from "@/components/nutrition/NutritionTracker";
+import NutritionTracker from "@/features/nutrition/components/NutritionTracker";
 import { Utensils, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
 const NutritionPage = () => {
