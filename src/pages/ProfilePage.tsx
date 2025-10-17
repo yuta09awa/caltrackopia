@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
@@ -12,7 +12,7 @@ import OrderHistory from "@/features/profile/components/OrderHistory";
 import PaymentMethods from "@/features/profile/components/PaymentMethods";
 
 const ProfilePage: React.FC = () => {
-  const { isAuthenticated, setIsAuthenticated } = useAppStore();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {

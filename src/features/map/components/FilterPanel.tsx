@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map/store/useMapFilters';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PriceRangeFilter from '@/features/map/components/filters/PriceRangeFilter';
@@ -27,7 +27,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   activeTab = 'all',
   onApplyFilters,
 }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
   
   // Fetch dynamic filter data
   const { data: dietaryOptions = [], isLoading: dietaryLoading } = useDietaryRestrictions();

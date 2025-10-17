@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
 import { profileService } from '@/features/profile/services';
-import { useAppStore } from '@/app/store';
+import { useAuth } from '@/features/auth';
 
 interface AvatarUploadProps {
   currentAvatarUrl?: string;
@@ -16,7 +16,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
   currentAvatarUrl, 
   onAvatarUpdate 
 }) => {
-  const { user, setUser } = useAppStore();
+  const { user, setUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

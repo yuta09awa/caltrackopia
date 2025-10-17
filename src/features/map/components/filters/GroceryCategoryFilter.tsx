@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map/store/useMapFilters';
 import {
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ interface GroceryCategoryFilterProps {
 }
 
 const GroceryCategoryFilter: React.FC<GroceryCategoryFilterProps> = ({ categoryOptions }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
 
   const handleCategoryChange = (value: string) => {
     updateMapFilters({ groceryCategory: value });

@@ -5,7 +5,8 @@ import { MapPin, Utensils, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
+import { useCart } from "@/features/cart";
 import NavItem from "./NavItem";
 import NavButton from "./NavButton";
 import HamburgerButton from "./HamburgerButton";
@@ -32,7 +33,8 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isAuthenticated, itemCount } = useAppStore();
+  const { isAuthenticated } = useAuth();
+  const { itemCount } = useCart();
 
   const handleAuthNavigation = () => {
     if (isAuthenticated) {

@@ -3,7 +3,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, Loader2 } from "lucide-react";
 import { CartItem } from '@/types/cart';
-import { useAppStore } from '@/app/store';
+import { useCart } from '@/features/cart';
 import { useCurrency } from '@/hooks/useCurrency';
 import { toast } from 'sonner';
 import QuantitySelector from './QuantitySelector';
@@ -15,7 +15,7 @@ interface CartItemDisplayProps {
 }
 
 const CartItemDisplay = React.memo(({ item, isCompact = false, useQuickSelector = false }: CartItemDisplayProps) => {
-  const { updateQuantity, removeItem } = useAppStore();
+  const { updateQuantity, removeItem } = useCart();
   const { format } = useCurrency();
   const [optimisticQuantity, setOptimisticQuantity] = useState(item.quantity);
   const [isUpdating, setIsUpdating] = useState(false);

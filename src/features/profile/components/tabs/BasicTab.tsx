@@ -3,7 +3,7 @@ import React from "react";
 import AvatarUpload from "../AvatarUpload";
 import BasicInfoForm from "../forms/BasicInfoForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 import { ProfileFormValues } from "../hooks/useProfileForm";
 import { UseFormReturn } from "react-hook-form";
 
@@ -14,7 +14,7 @@ interface BasicTabProps {
 }
 
 const BasicTab: React.FC<BasicTabProps> = ({ form, onSubmit, isLoading }) => {
-  const { user } = useAppStore();
+  const { user } = useAuth();
 
   return (
     <div className="grid gap-6 md:grid-cols-2">

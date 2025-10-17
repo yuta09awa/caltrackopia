@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map/store/useMapFilters';
 import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 
 const IngredientFilters: React.FC = () => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
   const [currentExcludeInput, setCurrentExcludeInput] = useState('');
   const [currentIncludeInput, setCurrentIncludeInput] = useState('');
 

@@ -9,7 +9,7 @@ import UserTypeSelection from "@/features/auth/components/UserTypeSelection";
 import CustomerRegisterForm from "@/features/auth/components/CustomerRegisterForm";
 import RestaurantRegisterForm from "@/features/auth/components/RestaurantRegisterForm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 import { toast } from "@/hooks/use-toast";
 
 type UserType = 'customer' | 'restaurant_owner';
@@ -19,7 +19,7 @@ const AuthPage: React.FC = () => {
   const [selectedUserType, setSelectedUserType] = useState<UserType | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, isLoading } = useAppStore();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
     // Redirect authenticated users

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map/store/useMapFilters';
 import { cn } from '@/lib/utils';
 import FilterChipsDisplay from './FilterChipsDisplay';
 import FilterChipsResults from './FilterChipsResults';
@@ -12,7 +12,7 @@ interface FilterChipsProps {
 }
 
 const FilterChips: React.FC<FilterChipsProps> = ({ className, resultCount }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
   const { activeFilters, removeFilter, clearAllFilters } = useFilterChips(mapFilters, updateMapFilters);
 
   const hasActiveFilters = activeFilters.length > 0;

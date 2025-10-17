@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Plus, ShoppingCart, Loader2 } from "lucide-react";
-import { useAppStore } from "@/app/store";
+import { useCart } from "@/features/cart";
 import { MenuItem, FeaturedItem } from "@/models/Location";
 import { toast } from "sonner";
 import { useState, useCallback, useMemo } from "react";
@@ -25,7 +25,7 @@ const AddToCartButton = ({
   size = 'default',
   className 
 }: AddToCartButtonProps) => {
-  const { addItem, items, error, clearError } = useAppStore();
+  const { addItem, items, error, clearError } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   
   const existingItem = useMemo(() => {

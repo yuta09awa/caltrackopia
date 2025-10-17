@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 import ProfileCompletionProgress from "./ProfileCompletionProgress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, MapPin, Heart, Shield, Bell } from "lucide-react";
@@ -15,7 +15,7 @@ import PrivacyTab from "./tabs/PrivacyTab";
 import NotificationsTab from "./tabs/NotificationsTab";
 
 const ProfileInfo: React.FC = () => {
-  const { user } = useAppStore();
+  const { user } = useAuth();
   const {
     form,
     dietaryRestrictions,

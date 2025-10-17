@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthService } from "@/features/auth/services/authService";
@@ -26,7 +26,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm: React.FC = () => {
-  const { setUser, setAuthLoading, setAuthError } = useAppStore();
+  const { setUser, setAuthLoading, setAuthError } = useAuth();
   const [isResetEmailSent, setIsResetEmailSent] = useState(false);
 
   const form = useForm<LoginFormValues>({

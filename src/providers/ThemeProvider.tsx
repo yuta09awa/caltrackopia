@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect } from 'react';
-import { useAppStore } from '@/app/store';
+import { useUserPreferences } from '@/app/store/useUserPreferences';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -22,8 +22,8 @@ export function ThemeProvider({
   defaultTheme = 'system',
   ...props
 }: ThemeProviderProps) {
-  const { userPreferences, setUserPreferences } = useAppStore();
-  const theme = userPreferences.theme || defaultTheme;
+  const { theme: currentTheme, setTheme: setThemePreference } = useUserPreferences();
+  const theme = currentTheme || defaultTheme;
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -42,7 +42,7 @@ export function ThemeProvider({
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    setUserPreferences({ theme: newTheme });
+    setThemePreference(newTheme);
   };
 
   const value = {

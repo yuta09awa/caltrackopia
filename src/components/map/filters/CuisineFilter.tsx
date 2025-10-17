@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map/store/useMapFilters';
 import {
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ interface CuisineFilterProps {
 }
 
 const CuisineFilter: React.FC<CuisineFilterProps> = ({ cuisineOptions }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
 
   const handleCuisineChange = (value: string) => {
     updateMapFilters({ cuisine: value });
