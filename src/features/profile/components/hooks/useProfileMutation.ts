@@ -1,16 +1,18 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
+import { profileApi } from "@/features/profile/api/profileApi";
 import { profileService, ProfileUpdateData } from "@/features/profile/services";
 
 export function useProfileMutation() {
-  const { user, setUser } = useAppStore();
+  const { user, setUser } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: ProfileUpdateData) => {
       if (!user) throw new Error('User not found');
+      // Use profileService which returns full User object with transformations
       return profileService.updateProfile(user.id, data);
     },
     onMutate: async (newData) => {

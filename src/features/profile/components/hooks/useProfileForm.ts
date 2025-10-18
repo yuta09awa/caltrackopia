@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useAppStore } from "@/app/store";
+import { useAuth } from "@/features/auth";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
@@ -17,7 +17,7 @@ const profileSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function useProfileForm() {
-  const { user } = useAppStore();
+  const { user } = useAuth();
   
   // Local state for complex preferences
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);

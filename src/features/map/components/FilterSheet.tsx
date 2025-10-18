@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map';
 import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
 import { DrawerContent } from "@/components/ui/drawer";
@@ -22,7 +22,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
   setPriceFilter,
   onApplyFilters,
 }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
   const [selectedFilters, setSelectedFilters] = React.useState<Record<string, string[]>>({
     sources: mapFilters.sources || [],
     dietary: mapFilters.dietary || [],

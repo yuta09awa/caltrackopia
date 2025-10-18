@@ -1,15 +1,15 @@
 
 import React, { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAppStore } from '@/app/store';
-import { AuthService } from '@/features/auth/services/authService';
+import { useAuth } from '@/features/auth';
+import { authApi } from '@/features/auth/api/authApi';
 
 interface AuthInitializerProps {
   children: React.ReactNode;
 }
 
 const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
-  const { setUser, setAuthLoading, setAuthError } = useAppStore();
+  const { setUser, setAuthLoading, setAuthError } = useAuth();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -17,18 +17,20 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
         setAuthLoading(true);
         setAuthError(null);
         
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const session = await authApi.getSession();
 
-        if (error) {
-          console.error('Session error:', error);
-          setAuthError(error.message);
+        if (!session) {
           setUser(null);
           return;
         }
 
-        if (session?.user) {
-          const profileData = await AuthService.fetchUserProfile(session.user.id);
-          const user = await AuthService.transformSupabaseUserToUser(session.user, profileData);
+        // Get current user with profile data already transformed
+        const currentUser = await authApi.getCurrentUser();
+        if (currentUser) {
+          // Transform to app user format (this will be handled by authApi in future)
+          const { AuthService } = await import('@/features/auth/services/authService');
+          const profileData = await AuthService.fetchUserProfile(currentUser.id);
+          const user = await AuthService.transformSupabaseUserToUser(currentUser, profileData);
           setUser(user);
         } else {
           setUser(null);
@@ -52,6 +54,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
         try {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             if (session?.user) {
+              const { AuthService } = await import('@/features/auth/services/authService');
               const profileData = await AuthService.fetchUserProfile(session.user.id);
               const user = await AuthService.transformSupabaseUserToUser(session.user, profileData);
               setUser(user);

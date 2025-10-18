@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAppStore } from "@/app/store";
+import { useMapFilters } from "@/features/map";
 import { Checkbox } from "@/components/ui/checkbox";
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import OpenNowFilter from "@/features/map/components/filters/OpenNowFilter";
@@ -22,7 +22,7 @@ const FilterActions: React.FC<FilterActionsProps> = ({
   isOpenNow,
   setIsOpenNow
 }) => {
-  const { mapFilters, updateMapFilters } = useAppStore();
+  const { mapFilters, updateMapFilters } = useMapFilters();
 
   return (
     <div className="flex items-center gap-2 flex-shrink-0">

@@ -3,7 +3,7 @@ import { useCallback, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MarkerData } from '../types';
 import { databaseService } from '@/services/databaseService';
-import { useAppStore } from '@/app/store';
+import { useMapFilters } from '@/features/map';
 import { useSearchState } from './useSearchState';
 
 export interface CachedPlaceResult {
@@ -22,7 +22,7 @@ export interface CachedPlaceResult {
 }
 
 export const useCachedPlacesApi = () => {
-  const { mapFilters } = useAppStore();
+  const { mapFilters } = useMapFilters();
   const searchState = useSearchState();
   const [cacheHitRate, setCacheHitRate] = useState<number | null>(null);
   const cacheHits = useRef(0);

@@ -1,7 +1,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useAppStore } from '@/app/store';
-import { locationService } from '@/services/locationService';
+import { useMapFilters } from '@/features/map';
+import { locationsApi } from '@/features/locations/api/locationsApi';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { 
   filterLocationsByType, 
@@ -26,7 +26,7 @@ export function useLocations(options?: { disabled?: boolean }) {
   const [activeTab, setActiveTab] = useState<LocationType>('all');
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [isOpenNow, setIsOpenNow] = useState(false);
-  const { mapFilters } = useAppStore();
+  const { mapFilters } = useMapFilters();
 
   // Fetch all locations from the database on component mount
   useEffect(() => {
@@ -34,8 +34,8 @@ export function useLocations(options?: { disabled?: boolean }) {
       setLoading(true);
       setError(null);
       try {
-        console.log('Fetching locations from database...');
-        const fetchedLocations = await locationService.getLocations();
+        console.log('Fetching locations from database via locationsApi...');
+        const fetchedLocations = await locationsApi.search({ limit: 1000 });
         console.log('Fetched locations:', fetchedLocations.length, 'items');
         
         if (fetchedLocations.length === 0) {
