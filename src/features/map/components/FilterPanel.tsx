@@ -13,13 +13,14 @@ import { defaultFilterValues, cuisineOptions, groceryCategoryOptions } from '../
 import { useDietaryRestrictions } from '../hooks/filters/useDietaryRestrictions';
 import { useIngredientSources } from '../hooks/filters/useIngredientSources';
 import { useNutritionGoals } from '../hooks/filters/useNutritionGoals';
+import { StandardComponentProps } from '@/types/standardProps';
 
-type FilterPanelProps = {
+interface FilterPanelProps extends Omit<StandardComponentProps, 'children'> {
   priceFilter: string | null;
   setPriceFilter: (price: string | null) => void;
   activeTab?: LocationType;
   onApplyFilters: () => void;
-};
+}
 
 const FilterPanel: React.FC<FilterPanelProps> = ({
   priceFilter,

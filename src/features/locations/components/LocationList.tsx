@@ -11,8 +11,9 @@ import VirtualizedLocationList from './VirtualizedLocationList';
 import { useLocations } from '../hooks/useLocations';
 import { useLocationSpoof } from '../hooks/useLocationSpoof';
 import { Location } from '@/models/Location';
+import { StandardComponentProps } from '@/types/standardProps';
 
-interface LocationListProps {
+interface LocationListProps extends Omit<StandardComponentProps, 'children'> {
   selectedLocationId?: string | null;
   locations?: Location[];
   onLocationSelect?: (locationId: string | null) => void;

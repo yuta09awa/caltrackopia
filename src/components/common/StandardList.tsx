@@ -10,7 +10,13 @@ import { Card } from '@/components/ui/card';
 /**
  * Standard list component with virtualization support
  */
-export interface StandardListProps<T = any> extends ListComponentProps<T> {
+export interface StandardListProps<T = any> {
+  items: T[];
+  keyExtractor?: (item: T, index: number) => string;
+  renderItem: (item: T, index: number) => React.ReactNode;
+  emptyState?: React.ReactNode;
+  loadingState?: React.ReactNode;
+  onItemClick?: (item: T, index: number) => void;
   variant?: 'default' | 'cards' | 'compact';
   showSearch?: boolean;
   searchPlaceholder?: string;
@@ -22,6 +28,11 @@ export interface StandardListProps<T = any> extends ListComponentProps<T> {
   virtualized?: boolean;
   itemHeight?: number;
   containerHeight?: number;
+  loading?: boolean;
+  error?: Error | string | null;
+  disabled?: boolean;
+  className?: string;
+  testId?: string;
 }
 
 export function StandardList<T = any>({

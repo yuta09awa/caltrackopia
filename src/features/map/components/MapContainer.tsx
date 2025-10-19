@@ -3,8 +3,9 @@ import React from 'react';
 import MapRenderer from './core/MapRenderer';
 import { MapState, LatLng } from '@/features/map/hooks/useMapState';
 import { UnifiedMapState } from '../types/unified';
+import { StandardComponentProps } from '@/types/standardProps';
 
-interface MapContainerProps {
+interface MapContainerProps extends Omit<StandardComponentProps, 'children'> {
   height: string;
   selectedLocationId?: string | null;
   onMarkerClick?: (locationId: string, position: { x: number; y: number }) => void;

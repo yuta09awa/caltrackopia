@@ -6,8 +6,9 @@ import InlineFilters from "./InlineFilters";
 import FilterActions from "./FilterActions";
 import { LocationType } from '../types';
 import { cuisineOptions, groceryCategoryOptions } from '@/features/map/config/filterConfig';
+import { StandardComponentProps } from '@/types/standardProps';
 
-interface LocationFiltersProps {
+interface LocationFiltersProps extends Omit<StandardComponentProps, 'children'> {
   activeTab: LocationType;
   onTabChange: (type: LocationType) => void;
   isOpenNow: boolean;

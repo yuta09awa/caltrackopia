@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 /**
  * Standard form wrapper with validation and error handling
  */
-export interface StandardFormProps<T extends FieldValues = FieldValues> extends Omit<StandardComponentProps, 'children'> {
+export interface StandardFormProps<T extends FieldValues = FieldValues> {
   onSubmit: (data: T) => void | Promise<void>;
   defaultValues?: Partial<T>;
   children: (form: UseFormReturn<T>) => React.ReactNode;
@@ -21,6 +21,11 @@ export interface StandardFormProps<T extends FieldValues = FieldValues> extends 
   resetText?: string;
   showReset?: boolean;
   formClassName?: string;
+  loading?: boolean;
+  error?: Error | string | null;
+  disabled?: boolean;
+  className?: string;
+  testId?: string;
 }
 
 export function StandardForm<T extends FieldValues = FieldValues>({

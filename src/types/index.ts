@@ -3,31 +3,23 @@
 // Auth & Roles
 export type { AppRole, UserRole, RoleCheckResult } from './roles';
 
-// Base component types
+// Standard Props (Phase 4)
+export type {
+  StandardComponentProps,
+  LoadingProps,
+  AsyncState
+} from './standardProps';
+
+// Import for use in interfaces below
+import { StandardComponentProps } from './standardProps';
+
+// Legacy base component props (deprecated - use StandardComponentProps)
 export interface BaseComponentProps {
   className?: string;
   children?: React.ReactNode;
 }
 
-export interface LoadingProps {
-  loading?: boolean;
-  error?: Error | string | null;
-}
-
-export interface AsyncState<T> {
-  data: T | null;
-  loading: boolean;
-  error: Error | string | null;
-  lastUpdated: Date | null;
-}
-
-// Standard component prop patterns
-export interface StandardComponentProps extends BaseComponentProps, LoadingProps {
-  disabled?: boolean;
-  testId?: string;
-}
-
-export interface FormComponentProps<T = any> extends StandardComponentProps {
+export interface FormComponentProps<T = any> {
   value?: T;
   onChange?: (value: T) => void;
   onSubmit?: (value: T) => void | Promise<void>;
@@ -38,6 +30,11 @@ export interface FormComponentProps<T = any> extends StandardComponentProps {
     pattern?: RegExp;
     custom?: (value: T) => string | null;
   };
+  loading?: boolean;
+  error?: Error | string | null;
+  disabled?: boolean;
+  className?: string;
+  testId?: string;
 }
 
 export interface ListComponentProps<T = any> extends StandardComponentProps {
