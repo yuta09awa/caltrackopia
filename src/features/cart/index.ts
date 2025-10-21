@@ -13,6 +13,7 @@ export { default as QuantitySelector } from './components/QuantitySelector';
 export { useCartOperations } from './hooks/useCartOperations';
 export { useCartAnalytics } from './hooks/useCartAnalytics';
 export { useCartConflictResolution } from './hooks/useCartConflictResolution';
+export { useCartPersistence } from './hooks/useCartPersistence';
 
 // Store hooks
 export { 

@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand';
 import { CartSlice, CartItem } from '@/types/cart';
 import { MenuItem, FeaturedItem } from '@/models/Location';
+import { cartPersistenceService } from '../services/cartPersistenceService';
 
 // Add UndoAction type
 interface UndoAction {
@@ -271,6 +272,16 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
       });
       
       set({ total, itemCount, groupedByLocation, error: null });
+      
+      // Persist cart to IndexedDB
+      cartPersistenceService.saveCart({
+        items: state.items,
+        total,
+        itemCount,
+        lastModified: Date.now()
+      }).catch(error => {
+        console.error('Failed to persist cart:', error);
+      });
     } catch (error) {
       console.error('Error calculating totals:', error);
       set({ error: 'Error calculating cart totals. Please refresh the page.' });

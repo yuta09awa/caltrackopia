@@ -5,6 +5,8 @@ import { ThemeProvider } from './ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { GlobalErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
 import AuthInitializer from '@/features/auth/components/AuthInitializer';
+import { useCartPersistence } from '@/features/cart/hooks/useCartPersistence';
+import { OfflineIndicator } from '@/components/layout/OfflineIndicator';
 
 // Create a single QueryClient instance
 const queryClient = new QueryClient({
@@ -21,6 +23,12 @@ interface AppProvidersProps {
   children: React.ReactNode;
 }
 
+// Component to initialize offline features
+const OfflineInitializer: React.FC = () => {
+  useCartPersistence();
+  return null;
+};
+
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <GlobalErrorBoundary>
@@ -28,7 +36,9 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         <BrowserRouter>
           <ThemeProvider defaultTheme="light" storageKey="caltrackopia-theme">
             <AuthInitializer>
+              <OfflineInitializer />
               {children}
+              <OfflineIndicator />
             </AuthInitializer>
             <Toaster position="top-center" />
           </ThemeProvider>
