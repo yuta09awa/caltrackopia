@@ -6,10 +6,13 @@ export { default as AuthInitializer } from './components/AuthInitializer';
 export { default as LoginForm } from './components/LoginForm';
 export { default as RegisterForm } from './components/RegisterForm';
 export { RequireRole } from './components/RequireRole';
+export { ProtectedRoute } from './components/ProtectedRoute';
+export { Can } from './components/Can';
 export { default as UserTypeSelection } from './components/UserTypeSelection';
 
 // Hooks
 export { useUserRoles } from './hooks/useUserRoles';
+export { usePermissions } from './hooks/usePermissions';
 
 // Store hooks (Phase 2)
 export { 

@@ -1,4 +1,4 @@
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, lazy } from 'react';
 import { Flame, Map, Home, UserRound } from 'lucide-react';
 import { 
   LazyMapPage, 
@@ -12,7 +12,10 @@ import {
   RouteLoadingFallback 
 } from '@/shared/routing/LazyRoutes';
 import ShoppingPage from '@/pages/ShoppingPage';
+import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { AppRoute } from './types';
+
+const LazyUnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 
 // Wrapper component for lazy routes with suspense
 const LazyWrapper = ({ children }: { children: ReactNode }) => (
@@ -93,14 +96,25 @@ export const routes: AppRoute[] = [
   {
     path: '/profile',
     element: (
-      <LazyWrapper>
-        <LazyProfilePage />
-      </LazyWrapper>
+      <ProtectedRoute requireAuth={true}>
+        <LazyWrapper>
+          <LazyProfilePage />
+        </LazyWrapper>
+      </ProtectedRoute>
     ),
     title: 'My Profile',
     navLabel: 'Profile',
     icon: <UserRound className="w-4 h-4" />,
     showInNav: true,
+  },
+  {
+    path: '/unauthorized',
+    element: (
+      <LazyWrapper>
+        <LazyUnauthorizedPage />
+      </LazyWrapper>
+    ),
+    title: 'Access Denied',
   },
   {
     path: '*',
