@@ -1,9 +1,7 @@
-/**
- * Shared module exports
- * Public API for shared utilities, components, and services
- */
+// ============= SHARED MODULE CONSOLIDATED EXPORTS =============
+// Central export point for all shared utilities and infrastructure
 
-// API - Export specific items to avoid conflicts
+// API Client & Endpoints
 export { apiClient } from './api/client';
 export { API_ENDPOINTS } from './api/endpoints';
 export type { ApiEndpoints } from './api/endpoints';
@@ -26,8 +24,15 @@ export type {
   InterceptorCleanup
 } from './api/types';
 
-// Hooks
+// Shared Hooks
 export * from './hooks';
 
-// Utils
+// Shared Types
+export * from './types';
+
+// Utilities (from @/lib)
 export * from './lib';
+
+// Routing Components
+export * from './routing/LazyComponents';
+export * from './routing/LazyRoutes';
