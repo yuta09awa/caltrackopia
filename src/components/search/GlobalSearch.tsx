@@ -8,6 +8,7 @@ import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Ingredient } from '@/models/NutritionalInfo';
 import SearchDropdown from './SearchDropdown';
+import { security } from '@/services/security/SecurityService';
 
 interface GlobalSearchProps {
   className?: string;
@@ -44,7 +45,18 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
-    setSearchTerm(query);
+    
+    // Security: Detect suspicious activity in search queries
+    if (query.length > 0 && security.detectSuspiciousActivity(query, 'search')) {
+      console.warn('Suspicious search query detected');
+      return;
+    }
+
+    // Security: Validate and sanitize search input
+    const validation = security.validateInput(query, 'text');
+    const sanitized = validation.sanitized;
+    
+    setSearchTerm(sanitized);
     setIsOpen(true);
   }, []);
 

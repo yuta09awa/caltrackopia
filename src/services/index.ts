@@ -73,6 +73,16 @@ export {
   getUserFriendlyErrorMessage
 } from './errors/DatabaseError';
 
+// Phase 8: Production Services
+export { LoggingService, logger } from './logging/LoggingService';
+export type { LogLevel, LogEntry } from './logging/LoggingService';
+
+export { SecurityService, security } from './security/SecurityService';
+
+export { PWAService, pwa } from './pwa/PWAService';
+
+export { AccessibilityService, accessibility, useAccessibility } from './accessibility/AccessibilityService';
+
 // Type Exports
 export type {
   EnhancedPlace,

@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { routes } from './routeConfig';
 import { AppRoute } from './types';
+import { PageErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
 
 // Helper function to recursively generate routes
 const generateRoutes = (routes: AppRoute[]): React.ReactNode => {
@@ -10,7 +11,7 @@ const generateRoutes = (routes: AppRoute[]): React.ReactNode => {
     const routeProps: Record<string, any> = {
       key: route.path,
       path: route.path,
-      element: route.element,
+      element: route.element ? <PageErrorBoundary>{route.element}</PageErrorBoundary> : undefined,
     };
 
     // Only add the index prop if it's explicitly true

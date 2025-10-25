@@ -3,6 +3,7 @@ import React from 'react';
 import { Marker } from '@react-google-maps/api';
 import { MarkerData } from '../types';
 import { useMapMarkers } from '../hooks/useMapMarkers';
+import { ComponentErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
 
 interface MapMarkersProps {
   markers: MarkerData[];
@@ -26,19 +27,21 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   });
 
   return (
-    <>
-      {memoizedMarkers.map((marker) => (
-        <Marker
-          key={marker.id}
-          position={marker.position}
-          icon={marker.markerIcon}
-          onClick={handleMarkerClick(marker.id, onMarkerClick)}
-          onMouseOver={() => onMarkerHover?.(marker.id)}
-          onMouseOut={() => onMarkerHover?.(null)}
-          zIndex={marker.isSelected ? 1000 : marker.isHovered ? 999 : 1}
-        />
-      ))}
-    </>
+    <ComponentErrorBoundary>
+      <>
+        {memoizedMarkers.map((marker) => (
+          <Marker
+            key={marker.id}
+            position={marker.position}
+            icon={marker.markerIcon}
+            onClick={handleMarkerClick(marker.id, onMarkerClick)}
+            onMouseOver={() => onMarkerHover?.(marker.id)}
+            onMouseOut={() => onMarkerHover?.(null)}
+            zIndex={marker.isSelected ? 1000 : marker.isHovered ? 999 : 1}
+          />
+        ))}
+      </>
+    </ComponentErrorBoundary>
   );
 };
 

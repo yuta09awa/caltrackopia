@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AuthService } from '../services/authService';
 import { toast } from '@/hooks/use-toast';
+import { security } from '@/services/security/SecurityService';
 
 const customerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -45,10 +46,24 @@ const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({ onSuccess, 
       setIsLoading(true);
       setError(null);
 
-      await AuthService.signUp(data.email, data.password, {
+      // Security validation
+      const emailValidation = security.validateInput(data.email, 'email');
+      const firstNameValidation = security.validateInput(data.firstName, 'text');
+      const lastNameValidation = security.validateInput(data.lastName, 'text');
+
+      if (!emailValidation.isValid || !firstNameValidation.isValid || !lastNameValidation.isValid) {
+        throw new Error('Invalid input data');
+      }
+
+      // Check for suspicious activity
+      if (security.detectSuspiciousActivity(data.firstName + data.lastName, 'registration')) {
+        throw new Error('Invalid registration data');
+      }
+
+      await AuthService.signUp(emailValidation.sanitized, data.password, {
         userType: 'customer',
-        firstName: data.firstName,
-        lastName: data.lastName,
+        firstName: firstNameValidation.sanitized,
+        lastName: lastNameValidation.sanitized,
       });
 
       toast({

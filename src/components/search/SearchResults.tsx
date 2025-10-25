@@ -2,6 +2,8 @@
 import React from 'react';
 import { Ingredient } from '@/models/NutritionalInfo';
 import { Apple, Beef, Milk, Utensils, ShoppingCart, Search, Leaf, MapPin, CalendarDays } from 'lucide-react';
+import { accessibility } from '@/services/accessibility/AccessibilityService';
+import { ComponentErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
 
 interface SearchResultsProps {
   results: Ingredient[];
@@ -34,17 +36,38 @@ const getCategoryIcon = (category?: string) => {
 };
 
 const SearchResults: React.FC<SearchResultsProps> = React.memo(({ results, onSelectIngredient }) => {
+  // Announce results to screen readers
+  React.useEffect(() => {
+    if (results.length > 0) {
+      accessibility.announce(`Found ${results.length} result${results.length !== 1 ? 's' : ''}`, 'polite');
+    }
+  }, [results.length]);
+
+  // Keyboard navigation for results
+  const handleKeyDown = (e: React.KeyboardEvent, ingredient: Ingredient) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelectIngredient(ingredient);
+    }
+  };
+
   if (results.length === 0) return null;
 
   return (
-    <div className="p-2">
-      <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Search Results</div>
-      {results.map((ingredient) => (
-        <button
-          key={ingredient.id}
-          className="w-full text-left p-2 hover:bg-muted rounded-sm transition-colors flex items-center gap-3"
-          onClick={() => onSelectIngredient(ingredient)}
-        >
+    <ComponentErrorBoundary>
+      <div className="p-2" role="listbox" aria-label="Search results">
+        <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Search Results</div>
+        {results.map((ingredient, index) => (
+          <button
+            key={ingredient.id}
+            data-result-index={index}
+            role="option"
+            aria-selected="false"
+            tabIndex={0}
+            className="w-full text-left p-2 hover:bg-muted rounded-sm transition-colors flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary"
+            onClick={() => onSelectIngredient(ingredient)}
+            onKeyDown={(e) => handleKeyDown(e, ingredient)}
+          >
           <div className="flex-shrink-0 text-muted-foreground">
             {getCategoryIcon(ingredient.category)}
           </div>
@@ -92,6 +115,7 @@ const SearchResults: React.FC<SearchResultsProps> = React.memo(({ results, onSel
         </button>
       ))}
     </div>
+    </ComponentErrorBoundary>
   );
 });
 

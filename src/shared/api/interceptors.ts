@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/services/logging/LoggingService';
 import type { RequestInterceptor, ResponseInterceptor } from './types';
 
 /**
@@ -70,9 +71,15 @@ export const tokenRefreshInterceptor: ResponseInterceptor = async (response, err
 
 /**
  * Logging Request Interceptor
- * Logs all requests in development mode
+ * Logs all requests and adds start time for duration tracking
  */
 export const loggingRequestInterceptor: RequestInterceptor = (config) => {
+  // Add metadata for duration tracking
+  if (!config.metadata) {
+    config.metadata = {};
+  }
+  config.metadata.startTime = Date.now();
+
   if (import.meta.env.DEV) {
     console.log('API Request:', {
       url: config.params?.url,
@@ -85,22 +92,43 @@ export const loggingRequestInterceptor: RequestInterceptor = (config) => {
 
 /**
  * Logging Response Interceptor
- * Logs all responses/errors in development mode
+ * Logs all responses/errors using the LoggingService
  */
 export const loggingResponseInterceptor: ResponseInterceptor = (response, error) => {
-  if (import.meta.env.DEV) {
-    if (error) {
+  // Calculate duration
+  const startTime = response?.config?.metadata?.startTime || error?.config?.metadata?.startTime || Date.now();
+  const duration = Date.now() - startTime;
+
+  if (error) {
+    if (import.meta.env.DEV) {
       console.error('API Error:', {
         status: error.status,
         message: error.message,
         details: error.details,
       });
-    } else {
+    }
+    // Use LoggingService
+    logger.apiCall(
+      error.config?.params?.url || 'unknown',
+      error.config?.params?.method || 'unknown',
+      duration,
+      error.status || 0,
+      { error: error.message, details: error.details }
+    );
+  } else {
+    if (import.meta.env.DEV) {
       console.log('API Response:', {
         status: response?.status,
         data: response?.data,
       });
     }
+    // Use LoggingService
+    logger.apiCall(
+      response?.config?.params?.url || 'unknown',
+      response?.config?.params?.method || 'unknown',
+      duration,
+      response?.status || 200
+    );
   }
   return response;
 };

@@ -1,5 +1,6 @@
 
 import { toast as sonnerToast, type ToasterProps, type ToastT } from "sonner";
+import { logger } from '@/services/logging/LoggingService';
 
 // Define the toast props type for better TypeScript support
 export interface ToastProps {
@@ -13,13 +14,16 @@ export interface ToastProps {
 export function toast(opts: ToastProps | string) {
   // Handle string case
   if (typeof opts === "string") {
+    logger.info(`Toast: ${opts}`);
     return sonnerToast(opts);
   }
   
   const { title, description, action, variant = "default" } = opts;
+  const logMessage = `Toast (${variant}): ${title || ''} ${description || ''}`.trim();
 
   // Use the appropriate variant method based on the variant prop
   if (variant === "success") {
+    logger.info(logMessage);
     return sonnerToast.success(title, {
       description,
       action,
@@ -27,6 +31,7 @@ export function toast(opts: ToastProps | string) {
   }
   
   if (variant === "info") {
+    logger.info(logMessage);
     return sonnerToast.info(title, {
       description,
       action,
@@ -34,6 +39,7 @@ export function toast(opts: ToastProps | string) {
   }
   
   if (variant === "warning") {
+    logger.warn(logMessage);
     return sonnerToast.warning(title, {
       description,
       action,
@@ -41,6 +47,7 @@ export function toast(opts: ToastProps | string) {
   }
   
   if (variant === "destructive") {
+    logger.error(logMessage);
     return sonnerToast.error(title, {
       description,
       action,
@@ -48,6 +55,7 @@ export function toast(opts: ToastProps | string) {
   }
 
   // Default toast
+  logger.info(logMessage);
   return sonnerToast(title, {
     description,
     action,

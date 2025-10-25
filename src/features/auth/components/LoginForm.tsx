@@ -17,6 +17,7 @@ import { useAuth } from "@/features/auth";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthService } from "@/features/auth/services/authService";
+import { security } from "@/services/security/SecurityService";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -42,8 +43,19 @@ const LoginForm: React.FC = () => {
       setAuthLoading(true);
       setAuthError(null);
 
+      // Security validation
+      const emailValidation = security.validateInput(data.email, 'email');
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.errors.join(', '));
+      }
+
+      // Check for suspicious activity
+      if (security.detectSuspiciousActivity(data.email, 'login-email')) {
+        throw new Error('Invalid email format');
+      }
+
       const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
+        email: emailValidation.sanitized,
         password: data.password,
       });
 

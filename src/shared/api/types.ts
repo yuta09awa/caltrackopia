@@ -8,6 +8,7 @@ export interface ApiRequestConfig {
   params?: Record<string, any>;
   timeout?: number;
   signal?: AbortSignal;
+  metadata?: Record<string, any>;
 }
 
 export interface ApiResponse<T = any> {
@@ -15,6 +16,7 @@ export interface ApiResponse<T = any> {
   status: number;
   statusText: string;
   headers: Record<string, string>;
+  config?: ApiRequestConfig;
 }
 
 export interface ApiError {
@@ -22,6 +24,7 @@ export interface ApiError {
   status?: number;
   code?: string;
   details?: any;
+  config?: ApiRequestConfig;
 }
 
 export interface PaginationParams {
