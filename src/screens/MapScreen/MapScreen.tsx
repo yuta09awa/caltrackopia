@@ -1,231 +1,53 @@
-
-import React, { useState, useRef, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MapScreenHeader, MapScreenContent, MapScreenList } from './components';
-import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
-import { useLocations } from '@/features/locations/hooks/useLocations';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Ingredient } from '@/models/NutritionalInfo';
-import { Location } from '@/models/Location';
-import { convertLocationsToMarkers } from '@/features/map/utils/locationUtils';
+import React from 'react';
+import { useMapScreen } from './hooks/useMapScreen';
+import MobileLayout from './layouts/MobileLayout';
+import DesktopLayout from './layouts/DesktopLayout';
 
 const MapScreen: React.FC = () => {
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const listRef = useRef<HTMLDivElement>(null);
-  const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
-  const [navHeight, setNavHeight] = useState(0);
-
-  // Dynamic navbar height measurement with ResizeObserver
-  useLayoutEffect(() => {
-    const navElement = document.querySelector('nav') || document.querySelector('header');
-    if (!navElement) return;
-
-    const updateNavHeight = () => {
-      const height = Math.ceil(navElement.getBoundingClientRect().height);
-      setNavHeight(height);
-    };
-
-    // Initial measurement
-    updateNavHeight();
-
-    // Set up ResizeObserver for continuous tracking
-    const resizeObserver = new ResizeObserver(updateNavHeight);
-    resizeObserver.observe(navElement);
-
-    // Fallback resize listener
-    window.addEventListener('resize', updateNavHeight);
-    
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateNavHeight);
-    };
-  }, []);
-
-  // Lock body scroll on this route
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
-  // 1. Consolidated hook for map logic
   const {
+    isMobile,
+    listRef,
+    displayedSearchQuery,
+    navHeight,
     mapState,
     infoCardVisible,
     infoCardPosition,
     selectedLocationId,
-    markers, // This gives us basic MarkerData[]
-    performSearch,
+    displayLocations,
+    selectedLocation,
+    handleSelectIngredient,
+    handleSearchReset,
+    handleLocationSelect,
+    handleViewDetails,
+    handleScroll,
     handleMarkerClick,
     handleMapLoaded,
     handleMapIdle,
     hideCard,
-    clearAll,
-    selectLocation,
-    mapCore, // Access to core map functionality
-  } = useConsolidatedMap({
-    enableSearch: true,
-    enableUserLocation: true,
-    enableInfoCard: true,
-  });
+  } = useMapScreen();
 
-  // 2. Fetch rich location data
-  const { locations } = useLocations(); // This gives us rich Location[]
+  const layoutProps = {
+    displayedSearchQuery,
+    navHeight,
+    mapState,
+    infoCardVisible,
+    infoCardPosition,
+    selectedLocation,
+    selectedLocationId,
+    displayLocations,
+    listRef,
+    onSelectIngredient: handleSelectIngredient,
+    onSearchReset: handleSearchReset,
+    onLocationSelect: handleLocationSelect,
+    onMarkerClick: handleMarkerClick,
+    onMapLoaded: handleMapLoaded,
+    onMapIdle: handleMapIdle,
+    onInfoCardClose: hideCard,
+    onViewDetails: handleViewDetails,
+    onScroll: handleScroll,
+  };
 
-  // 3. Convert locations to markers when locations load and no search is active
-  useEffect(() => {
-    if (locations.length > 0 && markers.length === 0 && !displayedSearchQuery) {
-      const locationMarkers = convertLocationsToMarkers(locations);
-      mapCore.updateMarkers(locationMarkers);
-    }
-  }, [locations, markers.length, displayedSearchQuery, mapCore]);
-
-  // 3. Determine what locations to display
-  const displayLocations: Location[] = useMemo(() => {
-    // If no search is active (no markers), show default locations
-    if (markers.length === 0) {
-      return locations;
-    }
-    
-    // If search is active, show enriched markers that match our location data
-    return markers.map(marker => {
-      const fullLocation = locations.find(loc => loc.id === marker.id);
-      return fullLocation;
-    }).filter((location): location is Location => location !== undefined);
-  }, [markers, locations]);
-
-  const selectedLocation: Location | null = useMemo(() => {
-    return displayLocations.find(location => location.id === selectedLocationId) || null;
-  }, [displayLocations, selectedLocationId]);
-
-  const handleSelectIngredient = useCallback((ingredient: Ingredient) => {
-    const query = ingredient.name;
-    setDisplayedSearchQuery(query);
-    performSearch(query);
-  }, [performSearch]);
-
-  const handleSearchReset = useCallback(() => {
-    setDisplayedSearchQuery('');
-    clearAll();
-  }, [clearAll]);
-
-  const handleLocationSelect = useCallback((locationId: string | null) => {
-    selectLocation(locationId);
-  }, [selectLocation]);
-
-  const handleViewDetails = useCallback((locationId: string) => {
-    if (locationId) {
-        navigate(`/location/${locationId}`);
-    }
-  }, [navigate]);
-
-  const handleScroll = useCallback(() => {
-    // Placeholder for scroll handling logic
-  }, []);
-
-  if (isMobile) {
-    return (
-      <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
-        <MapScreenHeader
-          displayedSearchQuery={displayedSearchQuery}
-          onSelectIngredient={handleSelectIngredient}
-          onSearchReset={handleSearchReset}
-        />
-
-        <main 
-          className="flex flex-col overflow-hidden"
-          style={{ 
-            position: 'fixed',
-            top: `${navHeight}px`,
-            left: 0,
-            right: 0,
-            bottom: 0
-          }}
-        >
-          <MapScreenContent
-            mapHeight="60%"
-            selectedIngredient={null}
-            currentSearchQuery={displayedSearchQuery}
-            mapState={mapState}
-            showInfoCard={infoCardVisible}
-            selectedLocation={selectedLocation}
-            infoCardPosition={infoCardPosition}
-            onLocationSelect={handleLocationSelect}
-            onMarkerClick={handleMarkerClick}
-            onMapLoaded={handleMapLoaded}
-            onMapIdle={handleMapIdle}
-            onInfoCardClose={hideCard}
-            onViewDetails={handleViewDetails}
-            isMobile={true}
-          />
-          <MapScreenList
-            listRef={listRef}
-            locations={displayLocations}
-            selectedLocationId={selectedLocationId}
-            onLocationSelect={handleLocationSelect}
-            onScroll={handleScroll}
-            isMobile={true}
-          />
-        </main>
-      </div>
-    );
-  }
-
-  // Desktop layout
-  return (
-    <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
-      <MapScreenHeader
-        displayedSearchQuery={displayedSearchQuery}
-        onSelectIngredient={handleSelectIngredient}
-        onSearchReset={handleSearchReset}
-      />
-
-      <main 
-        className="flex overflow-hidden"
-        style={{ 
-          position: 'fixed',
-          top: `${navHeight}px`,
-          left: 0,
-          right: 0,
-          bottom: 0
-        }}
-      >
-        <div className="flex-1 relative h-full">
-          <MapScreenContent
-            mapHeight="100%"
-            selectedIngredient={null}
-            currentSearchQuery={displayedSearchQuery}
-            mapState={mapState}
-            showInfoCard={infoCardVisible}
-            selectedLocation={selectedLocation}
-            infoCardPosition={infoCardPosition}
-            onLocationSelect={handleLocationSelect}
-            onMarkerClick={handleMarkerClick}
-            onMapLoaded={handleMapLoaded}
-            onMapIdle={handleMapIdle}
-            onInfoCardClose={hideCard}
-            onViewDetails={handleViewDetails}
-            isMobile={false}
-          />
-        </div>
-        
-        <div className="w-[400px] border-l border-border bg-card overflow-hidden flex-shrink-0">
-          <MapScreenList
-            listRef={listRef}
-            locations={displayLocations}
-            selectedLocationId={selectedLocationId}
-            onLocationSelect={handleLocationSelect}
-            onScroll={handleScroll}
-            isMobile={false}
-          />
-        </div>
-      </main>
-    </div>
-  );
+  return isMobile ? <MobileLayout {...layoutProps} /> : <DesktopLayout {...layoutProps} />;
 };
 
 export default MapScreen;

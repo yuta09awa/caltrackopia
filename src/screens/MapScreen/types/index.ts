@@ -60,3 +60,24 @@ export interface MapScreenProps {
   contentProps: ContentProps;
   listProps: ListProps;
 }
+
+export interface MapScreenLayoutProps {
+  displayedSearchQuery: string;
+  navHeight: number;
+  mapState: MapState;
+  infoCardVisible: boolean;
+  infoCardPosition: { x: number; y: number } | null;
+  selectedLocation: Location | null;
+  selectedLocationId: string | null;
+  displayLocations: Location[];
+  listRef: React.RefObject<HTMLDivElement>;
+  onSelectIngredient: (ingredient: Ingredient) => void;
+  onSearchReset: () => void;
+  onLocationSelect: (locationId: string | null) => void;
+  onMarkerClick: (locationId: string, position: { x: number; y: number }) => void;
+  onMapLoaded: (map: google.maps.Map) => void;
+  onMapIdle: (center: { lat: number; lng: number }, zoom: number) => void;
+  onInfoCardClose: () => void;
+  onViewDetails: (locationId: string) => void;
+  onScroll: () => void;
+}
