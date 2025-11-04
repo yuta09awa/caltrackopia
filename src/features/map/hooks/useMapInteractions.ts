@@ -12,9 +12,9 @@ export const useMapInteractions = () => {
   const navigationActions = useNavigationActions();
 
   const markerInteractions = useMarkerInteractions({
-    onLocationSelect: locationSelection.handleLocationSelect,
+    onLocationSelect: (id: string) => locationSelection.handleLocationSelect(id, [], () => {}),
     onShowCard: infoCardState.showCard,
-    setSelectedLocation: locationSelection.setSelectedLocation
+    setSelectedLocation: (id: string | null) => {}
   });
 
   const handleInfoCardClose = useCallback((selectLocation: (id: string | null) => void) => {

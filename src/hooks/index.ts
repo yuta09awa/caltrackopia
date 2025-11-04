@@ -31,10 +31,10 @@ export { useSearchHistory } from './useSearchHistory';
 export { useUndoSystem } from './useUndoSystem';
 export { useInfiniteScroll } from './useInfiniteScroll';
 
-// Cart & Shopping Hooks
-export { useCartOperations } from './useCartOperations';
-export { useCartAnalytics } from './useCartAnalytics';
-export { useCartConflictResolution } from './useCartConflictResolution';
+// Cart & Shopping Hooks - Re-exported from cart feature
+export { useCartOperations } from '@/features/cart/hooks/useCartOperations';
+export { useCartAnalytics } from '@/features/cart/hooks/useCartAnalytics';
+export { useCartConflictResolution } from '@/features/cart/hooks/useCartConflictResolution';
 
 // Location & Map Hooks
 export { useHybridLocation } from './useHybridLocation';

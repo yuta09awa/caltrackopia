@@ -12,11 +12,11 @@ import { ShoppingCart, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CartItemDisplay from "./CartItemDisplay";
-import { useCartOperations } from "@/hooks/useCartOperations";
+import { useCartOperations } from "@/hooks";
 import { useMemo, useCallback } from "react";
 import CartErrorBoundary from "./CartErrorBoundary";
 import EnhancedCartConflictDialog from "./EnhancedCartConflictDialog";
-import { useInternationalization } from "@/hooks/useInternationalization";
+import { useInternationalization } from "@/hooks";
 
 interface CartSheetProps {
   children: React.ReactNode;

@@ -5,12 +5,10 @@ import { useCart } from "@/features/cart";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import CartItemDisplay from "@/features/cart/components/CartItemDisplay";
-import { useCartOperations } from "@/hooks/useCartOperations";
+import { useCartOperations, useCartAnalytics, useInternationalization } from "@/hooks";
 import { useMemo, useCallback, useEffect } from "react";
 import CartErrorBoundary from "@/features/cart/components/CartErrorBoundary";
 import EnhancedCartConflictDialog from "@/features/cart/components/EnhancedCartConflictDialog";
-import { useInternationalization } from "@/hooks/useInternationalization";
-import { useCartAnalytics } from "@/hooks/useCartAnalytics";
 
 const ShoppingPage = () => {
   const { 

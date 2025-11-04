@@ -37,17 +37,16 @@ export { useTextSearch } from './useTextSearch';
 export { useNearbySearch } from './useNearbySearch';
 export { useIngredientSearch } from './useIngredientSearch';
 
-// === LEGACY HOOKS - Will be removed ===
-// Use useConsolidatedMap instead
+// === LEGACY HOOKS - Deprecated, will be removed in future versions ===
+// Use useConsolidatedMap instead for new code
+
+// Still in use by UnifiedMapView - will be migrated
+export { useMapRendering } from './useMapRendering';
+
+// Still in use by SimpleMapView - will be migrated
+export { useSimpleMapState } from './useSimpleMapState';
+
+// Kept for backward compatibility - consider migrating to useConsolidatedMap
 export { useMapApi } from './useMapApi';
 export { useMapCamera } from './useMapCamera';
-export { useMapRendering } from './useMapRendering';
 export { useLocationSelection } from './useLocationSelection';
-export { useMarkerInteractions } from './useMarkerInteractions';
-export { useNavigationActions } from './useNavigationActions';
-export { usePlaceFilters } from './usePlaceFilters';
-export { usePlacesApiService } from './usePlacesApiService';
-export { useCachedPlacesApi } from './useCachedPlacesApi';
-export { useFilteredResults } from './useFilteredResults';
-export { useSimpleMapState } from './useSimpleMapState';
-export { useCoreMapState } from './useCoreMapState';
