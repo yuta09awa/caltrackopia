@@ -1,7 +1,11 @@
-
 import { useCallback } from 'react';
 import { MarkerData } from '../types';
 
+/**
+ * @deprecated This hook is legacy. Please migrate to useConsolidatedMap instead.
+ * @see useConsolidatedMap
+ * @see {@link file://./docs/migrations/legacy-map-hooks.md Migration Guide}
+ */
 export const useMapApi = () => {
   const waitForPlacesApi = useCallback(async (): Promise<boolean> => {
     const maxAttempts = 10;

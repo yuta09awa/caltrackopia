@@ -1,8 +1,12 @@
-
 import { useCallback, useState, useMemo } from 'react';
 import { useMapOptions } from './useMapOptions';
 import { LatLng } from '../types';
 
+/**
+ * @deprecated This hook is legacy. Please migrate to useConsolidatedMap instead.
+ * @see useConsolidatedMap
+ * @see {@link file://./docs/migrations/legacy-map-hooks.md Migration Guide}
+ */
 export const useMapRendering = () => {
   const { mapOptions } = useMapOptions();
   const [map, setMap] = useState<google.maps.Map | null>(null);

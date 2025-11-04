@@ -10,6 +10,11 @@ interface UseMapCameraProps {
   onMapIdle?: (center: LatLng, zoom: number) => void;
 }
 
+/**
+ * @deprecated This hook is legacy. Please migrate to useConsolidatedMap instead.
+ * @see useConsolidatedMap
+ * @see {@link file://./docs/migrations/legacy-map-hooks.md Migration Guide}
+ */
 export const useMapCamera = ({ mapState, onMapIdle }: UseMapCameraProps) => {
   const mapRef = useRef<google.maps.Map | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);

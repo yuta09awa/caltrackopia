@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+- `useMapRendering` - Use `useConsolidatedMap` instead (see [migration guide](docs/migrations/legacy-map-hooks.md))
+- `useSimpleMapState` - Use `useConsolidatedMap` instead
+- `useMapApi` - Use `useConsolidatedMap` or `usePlacesApi` instead
+- `useMapCamera` - Use `useConsolidatedMap` instead
+- `useLocationSelection` - Use `useConsolidatedMap` instead
+
 ### Changed
 - Cleaned up project structure and consolidated documentation
 - Moved phase documentation to `docs/phases/` directory

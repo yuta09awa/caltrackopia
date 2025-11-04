@@ -22,6 +22,11 @@ export interface SimpleMapState {
 const DEFAULT_CENTER = { lat: 40.7589, lng: -73.9851 }; // NYC
 const DEFAULT_ZOOM = 12;
 
+/**
+ * @deprecated This hook is legacy. Please migrate to useConsolidatedMap instead.
+ * @see useConsolidatedMap
+ * @see {@link file://./docs/migrations/legacy-map-hooks.md Migration Guide}
+ */
 export const useSimpleMapState = (initialCenter?: LatLng, initialZoom?: number) => {
   const [mapState, setMapState] = useState<SimpleMapState>({
     center: initialCenter || DEFAULT_CENTER,

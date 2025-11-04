@@ -1,8 +1,12 @@
-
 import { useState, useCallback } from 'react';
 import { Location } from '@/features/locations/types';
 import { toast } from 'sonner';
 
+/**
+ * @deprecated This hook is legacy. Please migrate to useConsolidatedMap instead.
+ * @see useConsolidatedMap
+ * @see {@link file://./docs/migrations/legacy-map-hooks.md Migration Guide}
+ */
 export const useLocationSelection = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
