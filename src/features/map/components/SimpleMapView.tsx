@@ -2,8 +2,15 @@
 import React, { useCallback } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
 import MapMarkers from './MapMarkers';
-import { SimpleMapState, LatLng } from '@/features/map/hooks/useSimpleMapState';
+import { LatLng, MarkerData } from '@/features/map/types';
 import { useMapOptions } from '../hooks/useMapOptions';
+
+export interface SimpleMapState {
+  center: LatLng;
+  zoom: number;
+  markers: MarkerData[];
+  selectedLocationId: string | null;
+}
 
 interface SimpleMapViewProps {
   mapState: SimpleMapState;

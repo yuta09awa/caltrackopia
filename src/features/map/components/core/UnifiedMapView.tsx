@@ -1,9 +1,10 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { GoogleMap } from '@react-google-maps/api';
 import OptimizedMapMarkers from '../OptimizedMapMarkers';
-import { useMapRendering } from '../../hooks/useMapRendering';
+import { useMapOptions } from '../../hooks/useMapOptions';
 import { MapViewProps } from '../../types/unified';
+import { LatLng } from '../../types';
 
 const UnifiedMapView: React.FC<MapViewProps> = ({
   mapState,
@@ -14,16 +15,28 @@ const UnifiedMapView: React.FC<MapViewProps> = ({
   onMapIdle,
   viewportBounds
 }) => {
-  const { mapOptions, handleMapLoad, handleMapIdle, getCurrentViewportBounds } = useMapRendering();
+  const { mapOptions } = useMapOptions();
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  // Get current viewport bounds
+  const getCurrentViewportBounds = useMemo(() => {
+    return map?.getBounds() || null;
+  }, [map]);
 
   const handleMapLoadComplete = useCallback((mapInstance: google.maps.Map) => {
-    handleMapLoad(mapInstance);
+    setMap(mapInstance);
     onMapLoaded?.(mapInstance);
-  }, [handleMapLoad, onMapLoaded]);
+  }, [onMapLoaded]);
 
   const handleMapIdleComplete = useCallback(() => {
-    handleMapIdle(onMapIdle);
-  }, [handleMapIdle, onMapIdle]);
+    if (map && onMapIdle) {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      if (center && zoom !== undefined) {
+        onMapIdle({ lat: center.lat(), lng: center.lng() }, zoom);
+      }
+    }
+  }, [map, onMapIdle]);
 
   const handleMapClick = useCallback(() => {
     onLocationSelect?.('');
