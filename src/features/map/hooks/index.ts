@@ -47,5 +47,4 @@ export { useSimpleMapState } from './useSimpleMapState';
 
 // Kept for backward compatibility - consider migrating to useConsolidatedMap
 export { useMapApi } from './useMapApi';
-export { useMapCamera } from './useMapCamera';
 export { useLocationSelection } from './useLocationSelection';

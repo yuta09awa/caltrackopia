@@ -5,11 +5,12 @@
 The following map hooks are deprecated in favor of `useConsolidatedMap`, which provides a unified, more maintainable interface for all map functionality.
 
 ### Deprecated Hooks
-- `useMapRendering`
-- `useSimpleMapState`
-- `useMapApi`
-- `useMapCamera`
-- `useLocationSelection`
+- ~~`useMapRendering`~~ ✅ Migrated from `UnifiedMapView.tsx`
+- ~~`useSimpleMapState`~~ ✅ Migrated from `SimpleMapView.tsx`
+- `useMapApi` ⚠️ Still in use by `usePlacesApi.ts`
+- ~~`useMapCamera`~~ ✅ Removed (unused)
+- ~~`useLocationSelection`~~ ✅ Removed (unused)
+- ~~`useMapInteractions`~~ ✅ Removed (unused)
 
 ## Why Migrate?
 
@@ -135,85 +136,44 @@ import { usePlacesApi } from '@/features/map';
 const { getPlaceDetails } = usePlacesApi();
 ```
 
-### useMapCamera → useConsolidatedMap
+### useMapCamera (Removed - Unused)
 
-**Before:**
-```typescript
-import { useMapCamera } from '@/features/map/hooks/useMapCamera';
+This hook was not being used anywhere in the codebase and has been removed.
 
-const { mapRef, onLoad, onCameraChanged } = useMapCamera({ 
-  mapState, 
-  onMapIdle 
-});
-```
+### useLocationSelection (Removed - Unused)
 
-**After:**
-```typescript
-import { useConsolidatedMap } from '@/features/map';
+This hook was not being used anywhere in the codebase and has been removed.
 
-const { handleMapLoad, handleMapIdle } = useConsolidatedMap({
-  initialCenter: mapState.center,
-  initialZoom: mapState.zoom,
-  onMapIdle: (center, zoom) => {
-    // Your idle handler
-  }
-});
+### useMapInteractions (Removed - Unused)
 
-// Use handleMapLoad and handleMapIdle directly
-```
-
-### useLocationSelection → useConsolidatedMap
-
-**Before:**
-```typescript
-import { useLocationSelection } from '@/features/map/hooks/useLocationSelection';
-
-const { 
-  selectedLocation, 
-  setSelectedLocation, 
-  handleLocationSelect 
-} = useLocationSelection();
-```
-
-**After:**
-```typescript
-import { useConsolidatedMap } from '@/features/map';
-
-const { 
-  mapState, 
-  selectLocation 
-} = useConsolidatedMap({
-  initialCenter: { lat: 40.7589, lng: -73.9851 },
-  initialZoom: 12
-});
-
-// Access selected location ID via mapState.selectedLocationId
-// Select location via selectLocation(locationId)
-```
+This hook and its related helpers (`useMarkerInteractions`, `useNavigationActions`) were not being used anywhere in the codebase and have been removed.
 
 ## Migration Timeline
 
-### Phase 1: Deprecation Warnings (Current)
+### Phase 1: Deprecation Warnings ✅ COMPLETE
 - ✅ JSDoc deprecation warnings added to all legacy hooks
 - ✅ Migration guide created
-- IDEs will show strikethrough on usage
+- ✅ `UnifiedMapView.tsx` migrated away from `useMapRendering`
+- ✅ `SimpleMapView.tsx` migrated away from `useSimpleMapState`
+- ✅ `useMapInteractions.ts` deleted (unused)
+- ✅ `useMarkerInteractions.ts` deleted (unused)
+- ✅ `useNavigationActions.ts` deleted (unused)
+- ✅ `useLocationSelection.ts` deleted (unused)
+- ✅ `useMapCamera.ts` deleted (unused)
 
-### Phase 2: Component Migration (Next Sprint)
-**High Priority:**
-1. `SimpleMapView.tsx` - Migrate from `useSimpleMapState`
-2. `UnifiedMapView.tsx` - Migrate from `useMapRendering`
+### Phase 2: Final Cleanup 🚧 IN PROGRESS
+**Remaining Task:**
+- `usePlacesApi.ts` - Migrate away from `useMapApi` dependency
 
-**Medium Priority:**
-3. `useMapInteractions.ts` - Remove `useLocationSelection` dependency
-4. `usePlacesApi.ts` - Remove `useMapApi` dependency
+**After Migration:**
+- Delete `useMapApi.ts`
+- Remove legacy hook export from `src/features/map/hooks/index.ts`
 
-**Low Priority:**
-5. Audit `useMapCamera` usage - may already be unused
-
-### Phase 3: Removal (Future)
-- Delete legacy hook files
-- Remove exports from `src/features/map/hooks/index.ts`
-- Celebrate clean, maintainable code! 🎉
+### Phase 3: Complete 🎯
+Once `useMapApi` is migrated:
+- All legacy hooks removed ✅
+- Clean, consolidated map architecture ✅
+- Celebrate! 🎉
 
 ## Need Help?
 

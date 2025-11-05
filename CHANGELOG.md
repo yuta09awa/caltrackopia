@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Deprecated
-- `useMapRendering` - Use `useConsolidatedMap` instead (see [migration guide](docs/migrations/legacy-map-hooks.md))
-- `useSimpleMapState` - Use `useConsolidatedMap` instead
-- `useMapApi` - Use `useConsolidatedMap` or `usePlacesApi` instead
-- `useMapCamera` - Use `useConsolidatedMap` instead
-- `useLocationSelection` - Use `useConsolidatedMap` instead
+- `useMapApi` - Use `useConsolidatedMap` or `usePlacesApi` instead (remaining hook to be migrated)
+
+### Removed
+- `useMapCamera` - Hook was unused and has been deleted
+- `useLocationSelection` - Hook was unused and has been deleted  
+- `useMapInteractions` - Hook was unused and has been deleted
+- `useMarkerInteractions` - Hook was unused and has been deleted
+- `useNavigationActions` - Hook was unused and has been deleted
+- Duplicate cart hooks in favor of feature-specific versions
 
 ### Changed
 - Cleaned up project structure and consolidated documentation
@@ -20,10 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Consolidated refactoring guidelines into `docs/refactoring/`
 - Removed duplicate cart hook files from `src/hooks/`
 - Updated hook exports to use feature-first organization
-
-### Removed
-- Duplicate cart hooks in favor of feature-specific versions
-- Unused legacy map hooks
+- Migrated `UnifiedMapView` away from deprecated `useMapRendering` hook
+- Migrated `SimpleMapView` away from deprecated `useSimpleMapState` hook
+- Updated migration documentation to reflect completed component migrations and hook removals
 
 ---
 
