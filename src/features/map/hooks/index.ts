@@ -24,7 +24,6 @@ export { useNutritionGoals } from './filters/useNutritionGoals';
 // These are used internally by consolidated hooks
 export { useMapState } from './useMapState';
 export { useMapSearch } from './useMapSearch';
-export { useMapInteractions } from './useMapInteractions';
 export { useMapUI } from './useMapUI';
 export { useMapMarkers } from './useMapMarkers';
 export { useMapOptions } from './useMapOptions';
