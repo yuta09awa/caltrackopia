@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { MarkerData } from '../types';
 import { usePlaceSearch } from './usePlaceSearch';
-import { useMapApi } from './useMapApi';
+import { usePlacesApiService } from './usePlacesApiService';
 
 export const usePlacesApi = () => {
   const { 
@@ -14,7 +14,7 @@ export const usePlacesApi = () => {
     resultCount
   } = usePlaceSearch();
 
-  const { getPlaceDetails } = useMapApi();
+  const { getPlaceDetails } = usePlacesApiService();
 
   const searchNearbyPlaces = useCallback(async (
     map: google.maps.Map,

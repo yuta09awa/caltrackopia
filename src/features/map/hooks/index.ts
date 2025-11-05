@@ -30,6 +30,9 @@ export { useMapOptions } from './useMapOptions';
 export { useInfoCardState } from './useInfoCardState';
 export { useSearchState } from './useSearchState';
 
+// Places API utilities (internal)
+export { usePlacesApiService } from './usePlacesApiService';
+
 // Search implementation hooks
 export { usePlaceSearch } from './usePlaceSearch';
 export { useTextSearch } from './useTextSearch';
@@ -46,5 +49,4 @@ export { useMapRendering } from './useMapRendering';
 export { useSimpleMapState } from './useSimpleMapState';
 
 // Kept for backward compatibility - consider migrating to useConsolidatedMap
-export { useMapApi } from './useMapApi';
 export { useLocationSelection } from './useLocationSelection';

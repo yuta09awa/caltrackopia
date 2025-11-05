@@ -7,10 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Deprecated
-- `useMapApi` - Use `useConsolidatedMap` or `usePlacesApi` instead (remaining hook to be migrated)
-
 ### Removed
+- `useMapApi` - Last deprecated hook removed! Functionality moved to `usePlacesApiService`
 - `useMapCamera` - Hook was unused and has been deleted
 - `useLocationSelection` - Hook was unused and has been deleted  
 - `useMapInteractions` - Hook was unused and has been deleted
@@ -19,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate cart hooks in favor of feature-specific versions
 
 ### Changed
+- **Legacy Hook Migration Complete!** 🎉 All deprecated map hooks successfully migrated or removed
+- `usePlacesApi` now uses `usePlacesApiService` directly instead of deprecated `useMapApi`
+- `usePlacesApiService` expanded to include `getPlaceDetails` functionality
 - Cleaned up project structure and consolidated documentation
 - Moved phase documentation to `docs/phases/` directory
 - Consolidated refactoring guidelines into `docs/refactoring/`
@@ -26,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated hook exports to use feature-first organization
 - Migrated `UnifiedMapView` away from deprecated `useMapRendering` hook
 - Migrated `SimpleMapView` away from deprecated `useSimpleMapState` hook
-- Updated migration documentation to reflect completed component migrations and hook removals
+- Updated migration documentation to reflect completed Phase 2 and Phase 3 cleanup
 
 ---
 

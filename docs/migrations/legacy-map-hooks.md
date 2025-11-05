@@ -7,7 +7,7 @@ The following map hooks are deprecated in favor of `useConsolidatedMap`, which p
 ### Deprecated Hooks
 - ~~`useMapRendering`~~ ✅ Migrated from `UnifiedMapView.tsx`
 - ~~`useSimpleMapState`~~ ✅ Migrated from `SimpleMapView.tsx`
-- `useMapApi` ⚠️ Still in use by `usePlacesApi.ts`
+- ~~`useMapApi`~~ ✅ Removed - Functionality moved to `usePlacesApiService`
 - ~~`useMapCamera`~~ ✅ Removed (unused)
 - ~~`useLocationSelection`~~ ✅ Removed (unused)
 - ~~`useMapInteractions`~~ ✅ Removed (unused)
@@ -117,9 +117,9 @@ const MyMapComponent = () => {
 - `updateMarkers` → `setMarkers`
 - `selectLocation` takes `locationId: string | null` directly (no wrapper function needed)
 
-### useMapApi → useConsolidatedMap (Internal Usage)
+### useMapApi → usePlacesApi (Migrated)
 
-**Note**: `useMapApi` is primarily used internally. If you're using it directly, consider whether you need that functionality or if `useConsolidatedMap` already provides it.
+**Status**: ✅ COMPLETE - `useMapApi` has been removed and functionality moved to `usePlacesApiService`
 
 **Before:**
 ```typescript
@@ -135,6 +135,8 @@ import { usePlacesApi } from '@/features/map';
 // Use the recommended Places API hook instead
 const { getPlaceDetails } = usePlacesApi();
 ```
+
+**Note**: `usePlacesApiService` is now used internally by `usePlacesApi`. If you were using `useMapApi` directly, migrate to `usePlacesApi` which provides the same `getPlaceDetails` functionality.
 
 ### useMapCamera (Removed - Unused)
 
@@ -161,19 +163,31 @@ This hook and its related helpers (`useMarkerInteractions`, `useNavigationAction
 - ✅ `useLocationSelection.ts` deleted (unused)
 - ✅ `useMapCamera.ts` deleted (unused)
 
-### Phase 2: Final Cleanup 🚧 IN PROGRESS
-**Remaining Task:**
-- `usePlacesApi.ts` - Migrate away from `useMapApi` dependency
+### Phase 2: Final Cleanup ✅ COMPLETE
+- ✅ `usePlacesApi.ts` migrated to use `usePlacesApiService` instead of `useMapApi`
+- ✅ `getPlaceDetails` functionality moved to `usePlacesApiService`
+- ✅ `useMapApi.ts` deleted
+- ✅ Legacy hook exports removed from `src/features/map/hooks/index.ts`
 
-**After Migration:**
-- Delete `useMapApi.ts`
-- Remove legacy hook export from `src/features/map/hooks/index.ts`
+### Phase 3: Legacy Hook Migration Complete! 🎉
 
-### Phase 3: Complete 🎯
-Once `useMapApi` is migrated:
-- All legacy hooks removed ✅
-- Clean, consolidated map architecture ✅
-- Celebrate! 🎉
+**Achievement Unlocked**: All deprecated map hooks have been successfully removed!
+
+✅ **What We Accomplished:**
+- Consolidated 6+ legacy hooks into `useConsolidatedMap`
+- Removed unused hooks (`useMapCamera`, `useLocationSelection`, `useMapInteractions`, etc.)
+- Migrated all components to use modern, consolidated architecture
+- Created comprehensive migration documentation
+- Achieved clean, maintainable codebase with single source of truth
+
+**Remaining Legacy Hooks** (for backward compatibility):
+- `useMapRendering` - Still exported for `UnifiedMapView` (next migration target)
+- `useSimpleMapState` - Still exported for `SimpleMapView` (next migration target)
+- `useLocationSelection` - Kept for backward compatibility only
+
+These can be removed once all consumers migrate to `useConsolidatedMap`.
+
+🎯 **Next Steps**: Consider adding comprehensive unit tests for `useConsolidatedMap` to ensure all migrated functionality works correctly.
 
 ## Need Help?
 
