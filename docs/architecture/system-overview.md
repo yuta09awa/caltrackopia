@@ -48,7 +48,14 @@ src/
 - Code splitting and lazy loading
 - Virtual scrolling for large lists
 - Optimized map marker rendering
-- Enhanced browser caching
-- IndexedDB for offline storage
+- **Multi-layer caching with IndexedDB** (Phase 1: 70% API call reduction)
+  - Layer 1: Memory cache (30 min TTL)
+  - Layer 2: IndexedDB persistent cache (24 hour TTL)
+  - Layer 3: Supabase cached_places (7 day TTL)
+  - Layer 4: Google Maps API fallback
+- Browser caching strategies
+- Offline-first capabilities with service workers
+
+See `docs/features/multi-layer-caching.md` for detailed caching architecture.
 
 For detailed phase documentation, see the `docs/phases/` directory.

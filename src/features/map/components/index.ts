@@ -30,6 +30,7 @@ export { default as IngredientFilters } from './IngredientFilters';
 export { default as MapLoadingState } from './MapLoadingState';
 export { default as MapErrorState } from './MapErrorState';
 export { default as CacheStatusIndicator } from './CacheStatusIndicator';
+export { CacheMetricsPanel } from './CacheMetricsPanel';
 
 // Loader Components
 export { useApiKeyState as ApiKeyLoader } from './ApiKeyLoader';

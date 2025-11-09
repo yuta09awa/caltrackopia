@@ -1,9 +1,10 @@
 /**
  * Locations API Module
- * Handles location/places data retrieval
+ * Handles location/places data retrieval with multi-layer caching
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { locationService } from '@/services/locationService';
 import { API_ENDPOINTS } from '@/shared/api/endpoints';
 import type { Location } from '@/features/locations/types';
 
@@ -23,28 +24,37 @@ export interface NearbySearchParams {
 
 export const locationsApi = {
   /**
-   * Search for locations
+   * Search for locations with 4-tier caching
+   * Layer 1: Memory cache (30 min)
+   * Layer 2: IndexedDB (24 hours)
+   * Layer 3: Supabase cached_places (7 days)
+   * Layer 4: Fallback to mock data
    */
   search: async (params: LocationSearchParams): Promise<Location[]> => {
-    let query = supabase
-      .from('cached_places')
-      .select('*');
-
-    if (params.query) {
-      query = query.ilike('name', `%${params.query}%`);
+    // If no query, get all locations (uses full caching hierarchy)
+    if (!params.query || params.query === '') {
+      const locations = await locationService.getLocations();
+      
+      // Apply type filter if specified
+      if (params.type) {
+        return locations.filter(loc => loc.primaryType === params.type);
+      }
+      
+      // Apply limit
+      return locations.slice(0, params.limit || 1000);
     }
-
+    
+    // For search queries, use locationService.searchLocations
+    const locations = await locationService.searchLocations(params.query);
+    
+    // Apply type filter if specified
+    let filtered = locations;
     if (params.type) {
-      // Type is passed as string, will be used directly
-      query = query.eq('primary_type', params.type as any);
+      filtered = locations.filter(loc => loc.primaryType === params.type);
     }
-
-    query = query.limit(params.limit || 20);
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-    return data.map(transformToLocation);
+    
+    // Apply limit
+    return filtered.slice(0, params.limit || 20);
   },
 
   /**

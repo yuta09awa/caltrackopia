@@ -13,7 +13,7 @@ export interface StoredItem<T = any> {
   expiresAt?: number;
 }
 
-export type StoreName = 'cart' | 'searches' | 'favorites' | 'preferences' | 'offline_queue' | 'sync_metadata';
+export type StoreName = 'cart' | 'searches' | 'favorites' | 'preferences' | 'offline_queue' | 'sync_metadata' | 'map_locations' | 'map_searches';
 
 class IndexedDBService {
   private db: IDBDatabase | null = null;
@@ -36,7 +36,7 @@ class IndexedDBService {
         const db = (event.target as IDBOpenDBRequest).result;
         
         // Create object stores
-        const stores: StoreName[] = ['cart', 'searches', 'favorites', 'preferences', 'offline_queue', 'sync_metadata'];
+        const stores: StoreName[] = ['cart', 'searches', 'favorites', 'preferences', 'offline_queue', 'sync_metadata', 'map_locations', 'map_searches'];
         
         stores.forEach(storeName => {
           if (!db.objectStoreNames.contains(storeName)) {

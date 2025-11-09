@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from '../components';
+import { CacheMetricsPanel } from '@/features/map/components';
 import { MapScreenLayoutProps } from '../types';
 
 const MobileLayout: React.FC<MapScreenLayoutProps> = ({
@@ -22,6 +23,8 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
   onViewDetails,
   onScroll,
 }) => {
+  const isDev = import.meta.env.DEV;
+
   return (
     <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
       <MapScreenHeader
@@ -65,6 +68,13 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
           isMobile={true}
         />
       </main>
+
+      {/* Cache Metrics Panel - Dev Mode Only */}
+      {isDev && (
+        <div className="fixed bottom-4 right-4 z-50 w-72">
+          <CacheMetricsPanel />
+        </div>
+      )}
     </div>
   );
 };

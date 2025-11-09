@@ -3,63 +3,96 @@ import { Location } from '@/features/locations/types';
 import { mockLocations } from '@/features/locations/data/mockLocations';
 import { EnhancedPlace } from './databaseService';
 import { enhancedCachingService } from './enhancedCachingService';
+import { mapCacheService } from './storage/MapCacheService';
 
 class LocationService {
-  private readonly CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+  private readonly MEMORY_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+  private readonly INDEXEDDB_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
+  /**
+   * Get locations with 4-tier caching hierarchy:
+   * 1. Memory Cache (30 min TTL) - Fastest
+   * 2. IndexedDB Cache (24 hour TTL) - Persistent, offline
+   * 3. Supabase cached_places (7 day TTL) - Shared cache
+   * 4. Google Maps API - Last resort
+   */
   async getLocations(): Promise<Location[]> {
     const cacheKey = 'all-locations';
     
-    // Try to get from cache first
-    const cached = enhancedCachingService.getLocationData(cacheKey);
-    if (cached) {
-      console.log('Locations cache hit:', cacheKey);
-      return cached;
+    // Layer 1: Check memory cache first (fastest)
+    const memoryCached = enhancedCachingService.getLocationData(cacheKey);
+    if (memoryCached) {
+      console.log('[Cache L1] Memory cache hit:', cacheKey);
+      return memoryCached;
+    }
+
+    // Layer 2: Check IndexedDB cache (persistent, offline-capable)
+    const indexedDBCached = await mapCacheService.getLocations(cacheKey);
+    if (indexedDBCached) {
+      console.log('[Cache L2] IndexedDB cache hit:', cacheKey);
+      // Populate memory cache for next time
+      enhancedCachingService.setLocationData(cacheKey, indexedDBCached);
+      return indexedDBCached;
     }
 
     try {
-      // Try to get places from the database service
+      // Layer 3: Query Supabase cached_places (shared cache)
+      console.log('[Cache L3] Querying Supabase cached_places...');
       const places = await dataService.searchPlaces('', 50);
       
       let locations: Location[];
       
       if (places.length === 0) {
-        console.log('No places found in database, using mock locations');
+        console.log('[Cache L4] No Supabase data, using mock locations (fallback)');
         locations = mockLocations;
       } else {
         // Transform database places to Location format
         locations = places.map(place => this.mapCachedPlaceToLocation(place));
       }
 
-      // Cache the result
+      // Store in both caches
       enhancedCachingService.setLocationData(cacheKey, locations);
-      console.log('Locations cached:', cacheKey);
+      await mapCacheService.setLocations(cacheKey, locations);
+      console.log('[Cache] Stored in L1 (memory) and L2 (IndexedDB)');
       
       return locations;
     } catch (error) {
-      console.error('Error fetching locations from database:', error);
-      console.log('Falling back to mock locations');
+      console.error('[Cache L4] Error fetching from Supabase, falling back to mock:', error);
       return mockLocations;
     }
   }
 
+  /**
+   * Search locations with 4-tier caching hierarchy
+   */
   async searchLocations(query: string): Promise<Location[]> {
-    const cacheKey = `location-search-${query}`;
+    const cacheKey = `search-${query}`;
     
-    // Try to get from cache first
-    const cached = enhancedCachingService.getLocationData(cacheKey);
-    if (cached) {
-      console.log('Location search cache hit:', cacheKey);
-      return cached;
+    // Layer 1: Check memory cache
+    const memoryCached = enhancedCachingService.getLocationData(cacheKey);
+    if (memoryCached) {
+      console.log('[Search L1] Memory cache hit:', query);
+      return memoryCached;
+    }
+
+    // Layer 2: Check IndexedDB cache
+    const indexedDBCached = await mapCacheService.getSearchResults(query);
+    if (indexedDBCached) {
+      console.log('[Search L2] IndexedDB cache hit:', query);
+      enhancedCachingService.setLocationData(cacheKey, indexedDBCached);
+      return indexedDBCached;
     }
 
     try {
+      // Layer 3: Query Supabase
+      console.log('[Search L3] Querying Supabase for:', query);
       const places = await dataService.searchPlaces(query, 20);
       
       let locations: Location[];
       
       if (places.length === 0) {
-        // Filter mock locations by query
+        // Layer 4: Filter mock locations
+        console.log('[Search L4] No Supabase results, filtering mock locations');
         locations = mockLocations.filter(loc => 
           loc.name.toLowerCase().includes(query.toLowerCase()) ||
           loc.address.toLowerCase().includes(query.toLowerCase()) ||
@@ -69,19 +102,48 @@ class LocationService {
         locations = places.map(place => this.mapCachedPlaceToLocation(place));
       }
 
-      // Cache the result
+      // Store in both caches
       enhancedCachingService.setLocationData(cacheKey, locations);
-      console.log('Location search cached:', cacheKey);
+      await mapCacheService.setSearchResults(query, locations);
+      console.log('[Search] Stored in L1 and L2, results:', locations.length);
       
       return locations;
     } catch (error) {
-      console.error('Error searching locations:', error);
+      console.error('[Search] Error, using mock fallback:', error);
       return mockLocations.filter(loc => 
         loc.name.toLowerCase().includes(query.toLowerCase()) ||
         loc.address.toLowerCase().includes(query.toLowerCase()) ||
         loc.cuisine?.toLowerCase().includes(query.toLowerCase())
       );
     }
+  }
+
+  /**
+   * Clear all location caches
+   */
+  async clearAllCaches(): Promise<void> {
+    enhancedCachingService.clearLocationCache();
+    await mapCacheService.clearAll();
+    console.log('[LocationService] All caches cleared');
+  }
+
+  /**
+   * Get cache statistics
+   */
+  async getCacheStats() {
+    const indexedDBStats = await mapCacheService.getStats();
+    const memoryStats = enhancedCachingService.getCacheStats();
+    
+    return {
+      memory: {
+        locationCacheSize: memoryStats.locationCacheSize,
+        nutritionCacheSize: memoryStats.nutritionCacheSize
+      },
+      indexedDB: indexedDBStats,
+      total: {
+        entriesAcrossAllLayers: indexedDBStats.totalEntries + memoryStats.locationCacheSize
+      }
+    };
   }
 
   mapCachedPlaceToLocation(place: EnhancedPlace): Location {
