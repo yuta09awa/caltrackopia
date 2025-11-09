@@ -1,36 +1,27 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
+import { LocationProviderFactory } from '@/services/providers';
+import { GoogleMapsProvider } from '@/services/providers/GoogleMapsProvider';
 
 /**
  * @internal - Used internally by search hooks
- * Provides utilities for working with Google Places API
+ * Provides utilities for working with location provider (abstracted from Google Places API)
  */
 export const usePlacesApiService = () => {
+  const providerRef = useRef(LocationProviderFactory.getProvider());
+
+  useEffect(() => {
+    // Initialize provider on mount
+    providerRef.current.initialize();
+  }, []);
+
   const waitForPlacesApi = useCallback(async (): Promise<boolean> => {
-    // Check if Google Maps Places API is loaded
-    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+    const provider = providerRef.current;
+    
+    if (provider.isReady()) {
       return true;
     }
 
-    // Wait for API to load (max 5 seconds)
-    return new Promise((resolve) => {
-      let attempts = 0;
-      const maxAttempts = 50;
-
-      const checkInterval = setInterval(() => {
-        attempts++;
-        
-        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-          clearInterval(checkInterval);
-          resolve(true);
-        }
-        
-        if (attempts >= maxAttempts) {
-          clearInterval(checkInterval);
-          console.error('Google Places API failed to load');
-          resolve(false);
-        }
-      }, 100);
-    });
+    return provider.initialize();
   }, []);
 
   const getPlaceDetails = useCallback(async (
@@ -43,36 +34,54 @@ export const usePlacesApiService = () => {
     }
 
     try {
-      const placesReady = await waitForPlacesApi();
-      if (!placesReady) {
-        throw new Error('Places API not available');
+      const provider = providerRef.current;
+      
+      // Set map instance for Google Maps provider
+      if (provider instanceof GoogleMapsProvider) {
+        provider.setMap(map);
       }
 
-      const service = new google.maps.places.PlacesService(map);
-      
-      return new Promise<google.maps.places.PlaceResult | null>((resolve) => {
-        const request: google.maps.places.PlaceDetailsRequest = {
-          placeId: placeId,
-          fields: ['place_id', 'name', 'formatted_address', 'geometry', 'rating', 'photos', 'price_level', 'types', 'opening_hours']
-        };
+      const ready = await provider.initialize();
+      if (!ready) {
+        throw new Error('Location provider not available');
+      }
 
-        service.getDetails(request, (place, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-            resolve(place);
-          } else {
-            console.error('Place details request failed:', status);
-            resolve(null);
-          }
-        });
-      });
+      const result = await provider.getPlaceDetails({ placeId });
+      
+      // Convert to Google Maps format for backward compatibility
+      if (result) {
+        return {
+          place_id: result.place_id,
+          name: result.name,
+          formatted_address: result.formatted_address,
+          geometry: {
+            location: new google.maps.LatLng(
+              result.geometry.location.lat,
+              result.geometry.location.lng
+            )
+          },
+          types: result.types,
+          rating: result.rating,
+          price_level: result.price_level,
+          photos: result.photos as any,
+          opening_hours: result.opening_hours as any
+        };
+      }
+      
+      return null;
     } catch (err) {
       console.error('Place details request failed:', err);
       return null;
     }
-  }, [waitForPlacesApi]);
+  }, []);
+
+  const getProvider = useCallback(() => {
+    return providerRef.current;
+  }, []);
 
   return {
     waitForPlacesApi,
-    getPlaceDetails
+    getPlaceDetails,
+    getProvider
   };
 };

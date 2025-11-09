@@ -6,12 +6,13 @@ import { useEdgeFunctionApi } from './useEdgeFunctionApi';
 import { usePlaceFilters } from './usePlaceFilters';
 import { usePlacesApiService } from './usePlacesApiService';
 import { mapPlaceTypeToMarkerType } from '../utils/placeTypeMapper';
+import { GoogleMapsProvider } from '@/services/providers/GoogleMapsProvider';
 
 export const useNearbySearch = () => {
   const searchState = useSearchState();
   const { callEdgeFunction } = useEdgeFunctionApi();
   const { applyFilters } = usePlaceFilters();
-  const { waitForPlacesApi } = usePlacesApiService();
+  const { waitForPlacesApi, getProvider } = usePlacesApiService();
 
   const searchNearbyPlaces = useCallback(async (
     map: google.maps.Map,
@@ -53,57 +54,48 @@ export const useNearbySearch = () => {
         return [];
       }
 
-      console.log('No cached nearby results, falling back to Google Places API');
+      console.log('No cached nearby results, falling back to location provider API');
       
-      const placesReady = await waitForPlacesApi();
-      if (!placesReady) {
-        throw new Error('Places API not available');
+      const provider = getProvider();
+      const ready = await waitForPlacesApi();
+      
+      if (!ready) {
+        throw new Error('Location provider not available');
       }
 
-      const service = new google.maps.places.PlacesService(map);
-      
-      return new Promise<MarkerData[]>((resolve) => {
-        const request: google.maps.places.PlaceSearchRequest = {
-          location: new google.maps.LatLng(center.lat, center.lng),
-          radius: radius,
-          type: 'restaurant'
-        };
+      // Set map instance for Google Maps provider
+      if (provider instanceof GoogleMapsProvider) {
+        provider.setMap(map);
+      }
 
-        service.nearbySearch(request, (results, status) => {
-          console.log('Google Places nearby API response:', { status, resultsCount: results?.length });
-          
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            const filteredResults = applyFilters(results);
-
-            const markers: MarkerData[] = filteredResults
-              .filter(place => place.geometry?.location && place.place_id)
-              .slice(0, 6)
-              .map(place => ({
-                position: {
-                  lat: place.geometry!.location!.lat(),
-                  lng: place.geometry!.location!.lng()
-                },
-                id: place.place_id!,
-                type: 'restaurant'
-              }));
-            
-            console.log(`Found ${markers.length} filtered nearby places from Google API`);
-            searchState.completeSearch(markers.length);
-            resolve(markers);
-          } else {
-            console.log('Google nearby search failed or no results:', status);
-            searchState.completeSearch(0);
-            resolve([]);
-          }
-        });
+      const results = await provider.searchNearbyPlaces({
+        center,
+        radius,
+        type: 'restaurant'
       });
+
+      console.log('Location provider nearby API response:', { resultsCount: results.length });
+      
+      const filteredResults = applyFilters(results);
+
+      const markers: MarkerData[] = filteredResults
+        .slice(0, 6)
+        .map(place => ({
+          position: place.geometry.location,
+          id: place.place_id,
+          type: 'restaurant'
+        }));
+      
+      console.log(`Found ${markers.length} filtered nearby places from provider API`);
+      searchState.completeSearch(markers.length);
+      return markers;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search nearby places';
       searchState.errorSearch(errorMessage);
       console.error('Error searching nearby places:', err);
       return [];
     }
-  }, [callEdgeFunction, applyFilters, waitForPlacesApi, searchState]);
+  }, [callEdgeFunction, applyFilters, waitForPlacesApi, getProvider, searchState]);
 
   return {
     searchNearbyPlaces,

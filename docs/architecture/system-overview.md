@@ -1,5 +1,7 @@
 # System Architecture Overview
 
+Last Updated: 2025-01-09 - Added Provider Abstraction Layer
+
 ## Technology Stack
 
 - **Frontend**: React 18, TypeScript, Vite
@@ -42,6 +44,34 @@ src/
 4. **Nutrition Tracking**: Integration with nutrition APIs
 5. **Offline Support**: PWA with offline-first capabilities
 6. **Security**: RLS policies, input validation, XSS protection
+
+## Provider Abstraction Layer
+
+### Overview
+The Provider Abstraction Layer decouples NutriMap from specific map/location API vendors (Google Maps, Mapbox, etc.), enabling cost optimization, vendor independence, and regional optimization.
+
+### Architecture
+```
+Application Code → LocationProviderFactory → ILocationProvider → [GoogleMapsProvider | MapboxProvider]
+```
+
+### Provider Interface
+All providers implement `ILocationProvider` with methods: `initialize()`, `searchPlacesByText()`, `searchNearbyPlaces()`, `getPlaceDetails()`.
+
+### Swapping Providers
+Set `VITE_MAP_PROVIDER=google-maps` or `VITE_MAP_PROVIDER=mapbox` in `.env`, then restart dev server.
+
+### Current Providers
+1. **Google Maps** (Default) - ✅ Fully implemented
+2. **Mapbox** (Alternative) - 🚧 Skeleton only
+
+### Benefits
+- ✅ Zero code changes to swap providers
+- ✅ Normalized API responses
+- ✅ Easy to add new providers
+- ✅ Testable with mock providers
+
+See [Map Provider Swap Guide](../guides/map-provider-swap.md) for details.
 
 ## Performance Optimizations
 
