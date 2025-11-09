@@ -31,6 +31,7 @@ export { default as MapLoadingState } from './MapLoadingState';
 export { default as MapErrorState } from './MapErrorState';
 export { default as CacheStatusIndicator } from './CacheStatusIndicator';
 export { CacheMetricsPanel } from './CacheMetricsPanel';
+export { FeatureFlagsPanel } from './FeatureFlagsPanel';
 
 // Loader Components
 export { useApiKeyState as ApiKeyLoader } from './ApiKeyLoader';

@@ -91,7 +91,7 @@ export type Database = {
           action_type: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_values: Json | null
           old_values: Json | null
           record_id: string | null
@@ -103,7 +103,7 @@ export type Database = {
           action_type: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           record_id?: string | null
@@ -115,7 +115,7 @@ export type Database = {
           action_type?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           record_id?: string | null
@@ -167,7 +167,7 @@ export type Database = {
           last_updated_at: string
           last_verified_at: string | null
           latitude: number
-          location: unknown | null
+          location: unknown
           longitude: number
           name: string
           opening_hours: Json | null
@@ -181,7 +181,7 @@ export type Database = {
           raw_google_data: Json | null
           refresh_interval_hours: number | null
           refresh_priority: number | null
-          search_vector: unknown | null
+          search_vector: unknown
           website: string | null
         }
         Insert: {
@@ -198,7 +198,7 @@ export type Database = {
           last_updated_at?: string
           last_verified_at?: string | null
           latitude: number
-          location?: unknown | null
+          location?: unknown
           longitude: number
           name: string
           opening_hours?: Json | null
@@ -212,7 +212,7 @@ export type Database = {
           raw_google_data?: Json | null
           refresh_interval_hours?: number | null
           refresh_priority?: number | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           website?: string | null
         }
         Update: {
@@ -229,7 +229,7 @@ export type Database = {
           last_updated_at?: string
           last_verified_at?: string | null
           latitude?: number
-          location?: unknown | null
+          location?: unknown
           longitude?: number
           name?: string
           opening_hours?: Json | null
@@ -243,7 +243,7 @@ export type Database = {
           raw_google_data?: Json | null
           refresh_interval_hours?: number | null
           refresh_priority?: number | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           website?: string | null
         }
         Relationships: []
@@ -310,6 +310,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          enabled: boolean
+          flag_name: string
+          id: string
+          regions: string[] | null
+          rollout_percentage: number | null
+          updated_at: string
+          user_ids: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          flag_name: string
+          id?: string
+          regions?: string[] | null
+          rollout_percentage?: number | null
+          updated_at?: string
+          user_ids?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          enabled?: boolean
+          flag_name?: string
+          id?: string
+          regions?: string[] | null
+          rollout_percentage?: number | null
+          updated_at?: string
+          user_ids?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_flags_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       master_ingredients: {
         Row: {
@@ -399,7 +446,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
-          location: unknown | null
+          location: unknown
           location_address: string | null
           notification_email: boolean | null
           notification_marketing: boolean | null
@@ -421,7 +468,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
-          location?: unknown | null
+          location?: unknown
           location_address?: string | null
           notification_email?: boolean | null
           notification_marketing?: boolean | null
@@ -443,7 +490,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
-          location?: unknown | null
+          location?: unknown
           location_address?: string | null
           notification_email?: boolean | null
           notification_marketing?: boolean | null
@@ -532,7 +579,7 @@ export type Database = {
       search_areas: {
         Row: {
           center_latitude: number
-          center_location: unknown | null
+          center_location: unknown
           center_longitude: number
           id: string
           is_active: boolean
@@ -543,7 +590,7 @@ export type Database = {
         }
         Insert: {
           center_latitude: number
-          center_location?: unknown | null
+          center_location?: unknown
           center_longitude: number
           id?: string
           is_active?: boolean
@@ -554,7 +601,7 @@ export type Database = {
         }
         Update: {
           center_latitude?: number
-          center_location?: unknown | null
+          center_location?: unknown
           center_longitude?: number
           id?: string
           is_active?: boolean
@@ -603,33 +650,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      check_profile_completion: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      check_rate_limit: {
-        Args:
-          | {
+      check_profile_completion: { Args: { user_id: string }; Returns: boolean }
+      check_rate_limit:
+        | {
+            Args: {
+              identifier: string
+              max_requests?: number
+              window_seconds?: number
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
               action_type: string
               max_attempts?: number
               user_id: string
               window_minutes?: number
             }
-          | {
-              identifier: string
-              max_requests?: number
-              window_seconds?: number
-            }
-        Returns: boolean
-      }
-      cleanup_old_audit_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      expire_stale_cache: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+            Returns: boolean
+          }
+      cleanup_old_audit_logs: { Args: never; Returns: undefined }
+      expire_stale_cache: { Args: never; Returns: number }
       find_places_within_radius: {
         Args: {
           limit_count?: number
@@ -662,10 +703,7 @@ export type Database = {
         Args: { p_amount?: number; p_service_name: string }
         Returns: undefined
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       log_login_attempt: {
         Args: {
           email: string
@@ -718,7 +756,7 @@ export type Database = {
       location_data: {
         latitude: number | null
         longitude: number | null
-        geometry: unknown | null
+        geometry: unknown
       }
     }
   }

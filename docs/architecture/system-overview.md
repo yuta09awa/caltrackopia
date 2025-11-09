@@ -53,9 +53,14 @@ src/
   - Layer 2: IndexedDB persistent cache (24 hour TTL)
   - Layer 3: Supabase cached_places (7 day TTL)
   - Layer 4: Google Maps API fallback
+- **Feature flags for safe rollouts** (Phase 2: Zero-downtime deployments)
+  - User-specific rollouts (beta testers, internal team)
+  - Regional rollouts (launch by geography)
+  - Percentage-based gradual rollouts (10% → 50% → 100%)
+  - A/B testing support
 - Browser caching strategies
 - Offline-first capabilities with service workers
 
-See `docs/features/multi-layer-caching.md` for detailed caching architecture.
+See `docs/features/multi-layer-caching.md` and `docs/features/feature-flags.md` for details.
 
 For detailed phase documentation, see the `docs/phases/` directory.

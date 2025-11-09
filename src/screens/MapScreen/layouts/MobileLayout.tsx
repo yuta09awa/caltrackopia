@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from '../components';
-import { CacheMetricsPanel } from '@/features/map/components';
+import { CacheMetricsPanel, FeatureFlagsPanel } from '@/features/map/components';
 import { MapScreenLayoutProps } from '../types';
 
 const MobileLayout: React.FC<MapScreenLayoutProps> = ({
@@ -69,11 +69,14 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
         />
       </main>
 
-      {/* Cache Metrics Panel - Dev Mode Only */}
+      {/* Dev Panels - Dev Mode Only */}
       {isDev && (
-        <div className="fixed bottom-4 right-4 z-50 w-72">
-          <CacheMetricsPanel />
-        </div>
+        <>
+          <div className="fixed bottom-4 right-4 z-50 w-72 space-y-2">
+            <CacheMetricsPanel />
+            <FeatureFlagsPanel />
+          </div>
+        </>
       )}
     </div>
   );
