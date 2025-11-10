@@ -1,15 +1,28 @@
 
 import { MapPin, Utensils, Filter, Heart, MapPinned } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Container from "@/components/ui/Container";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import FeatureCard from "@/components/home/FeatureCard";
 import TechnicalStats from "@/components/home/TechnicalStats";
+import GlobalSearch from "@/components/search/GlobalSearch";
 import { SPACING } from "@/constants/spacing";
+import { Ingredient } from "@/models/NutritionalInfo";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleSelectIngredient = (ingredient: Ingredient) => {
+    // Navigate to map page when ingredient is selected
+    navigate('/map');
+  };
+
+  const handleSearchReset = () => {
+    // No action needed on home page
+  };
+
   const features = [
     {
       title: "Map",
@@ -35,7 +48,17 @@ const Index = () => {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+      <Navbar>
+        <div className="flex-1 max-w-2xl mx-4">
+          <GlobalSearch 
+            onSelectIngredient={handleSelectIngredient}
+            onSearchReset={handleSearchReset}
+            displayValue=""
+            className="w-full"
+            compact={true}
+          />
+        </div>
+      </Navbar>
       
       <main className="flex-1">
         <Hero />
