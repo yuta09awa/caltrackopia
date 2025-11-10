@@ -8,15 +8,15 @@ const Footer = () => {
     <footer className="mt-auto py-12 bg-secondary/30">
       <Container className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
+          <div className="space-y-4 text-center">
             <h3 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Nutrackr
             </h3>
-            <p className="text-sm text-muted-foreground max-w-xs">
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               The ultimate nutrition tracking app with location-based services
               to help you maintain a healthy lifestyle.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 justify-center">
               <a
                 href="#"
                 className="text-foreground/70 hover:text-primary transition-colors"
