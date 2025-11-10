@@ -17,17 +17,17 @@ const Hero = () => {
       <Container size="full" className="relative z-10 px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
           <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
-            70% Cost Reduction • Sub-500ms Response • Enterprise Architecture
+            Fast • Reliable • Always Available
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
-            Nutrition tracking
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"> reimagined </span>
-            for everyone
+            Track nutrition & discover
+            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"> healthy food </span>
+            near you
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Production-ready platform with multi-layer caching and provider abstraction. Track nutrition, discover healthy food, and scale to millions of users.
+            Find restaurants, markets, and grocery stores that match your dietary preferences. Track your nutrition effortlessly.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

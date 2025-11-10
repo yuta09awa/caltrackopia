@@ -1,35 +1,35 @@
-import { Zap, Shield, TrendingDown, Layers } from "lucide-react";
+import { Zap, Shield, Heart, MapPin } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
 const TechnicalStats = () => {
   const stats = [
     {
-      value: "70%",
-      label: "API Cost Reduction",
-      description: "Multi-layer caching saves thousands monthly",
-      icon: TrendingDown,
+      value: "10K+",
+      label: "Healthy Locations",
+      description: "Restaurants, markets, and grocery stores",
+      icon: MapPin,
       color: "text-green-600"
     },
     {
-      value: "<500ms",
-      label: "Response Time",
-      description: "Memory, IndexedDB, and Supabase caching",
+      value: "Instant",
+      label: "Results",
+      description: "Lightning-fast search and recommendations",
       icon: Zap,
       color: "text-yellow-600"
     },
     {
-      value: "99.9%",
-      label: "Uptime",
-      description: "Instant provider failover to Mapbox",
+      value: "Always On",
+      label: "Availability",
+      description: "Works offline when you need it most",
       icon: Shield,
       color: "text-blue-600"
     },
     {
-      value: "3-Tier",
-      label: "Cache Architecture",
-      description: "Enterprise-grade infrastructure",
-      icon: Layers,
+      value: "100%",
+      label: "Personalized",
+      description: "Tailored to your dietary preferences",
+      icon: Heart,
       color: "text-purple-600"
     }
   ];
@@ -42,11 +42,11 @@ const TechnicalStats = () => {
       <Container size="full" className="px-4">
         <div className="text-center mb-12 animate-fade-in">
           <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
-            Enterprise Architecture
+            Why Choose Us
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for Scale</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Production-ready infrastructure designed to serve millions of users while minimizing operational costs
+            Fast, reliable, and always available to help you make healthier choices
           </p>
         </div>
 
@@ -76,26 +76,26 @@ const TechnicalStats = () => {
           })}
         </div>
 
-        {/* Technical Features Grid */}
+        {/* Benefits Grid */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass rounded-xl p-6 border border-border/50 bg-background/50">
-            <h3 className="font-semibold mb-2">Multi-Layer Caching</h3>
+            <h3 className="font-semibold mb-2">Smart Filters</h3>
             <p className="text-sm text-muted-foreground">
-              Intelligent caching strategy with Memory → IndexedDB → Supabase fallback reduces Google Maps API costs by $4,000/month for 100K searches
+              Find exactly what you're looking for with dietary restrictions, cuisine preferences, and nutrition goals
             </p>
           </div>
           
           <div className="glass rounded-xl p-6 border border-border/50 bg-background/50">
-            <h3 className="font-semibold mb-2">Provider Abstraction</h3>
+            <h3 className="font-semibold mb-2">Works Everywhere</h3>
             <p className="text-sm text-muted-foreground">
-              Seamless switching between Google Maps and Mapbox ensures business continuity and 75% cost optimization when needed
+              Access your data anytime, anywhere—even without an internet connection
             </p>
           </div>
           
           <div className="glass rounded-xl p-6 border border-border/50 bg-background/50">
-            <h3 className="font-semibold mb-2">Feature Flags</h3>
+            <h3 className="font-semibold mb-2">Your Privacy First</h3>
             <p className="text-sm text-muted-foreground">
-              Deploy features safely with A/B testing and instant rollback capability, reducing deployment risk by 90%
+              Your health data stays private and secure. You're always in control
             </p>
           </div>
         </div>
