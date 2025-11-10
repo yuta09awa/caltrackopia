@@ -58,8 +58,8 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
               aria-label="Home"
             >
               <img 
-                src="/lovable-uploads/0b3bf1b1-20e6-4b84-a220-f978cdf6b783.png" 
-                alt="Recipe Book" 
+                src="/nutrimap-icon.png" 
+                alt="NutriMap Logo"
                 className={cn(
                   "h-10 w-auto object-contain max-w-[120px]",
                   isMobile ? "h-8 max-w-[100px]" : "h-10 max-w-[120px]"

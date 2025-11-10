@@ -1,7 +1,7 @@
 {
-  "name": "Food Finder - Local Food Discovery",
-  "short_name": "Food Finder",
-  "description": "Discover local restaurants, markets, and fresh ingredients in your area",
+  "name": "NutriMap - Local Food Discovery",
+  "short_name": "NutriMap",
+  "description": "Track nutrition & discover healthy food locations near you",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -16,55 +16,55 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Food Finder app on desktop"
+      "label": "NutriMap app on desktop"
     },
     {
       "src": "/screenshot-narrow.png", 
       "sizes": "540x960",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Food Finder app on mobile"
+      "label": "NutriMap app on mobile"
     }
   ],
   "icons": [
     {
-      "src": "/icon-72x72.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-96x96.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "96x96", 
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-128x128.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-144x144.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-152x152.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192x192.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-384x384.png",
+      "src": "/nutrimap-icon.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
@@ -85,7 +85,7 @@
       "icons": [
         {
           "src": "/shortcut-restaurant.png",
-          "sizes": "192x192"
+          "sizes": "512x512"
         }
       ]
     },
@@ -97,7 +97,7 @@
       "icons": [
         {
           "src": "/shortcut-market.png",
-          "sizes": "192x192"
+          "sizes": "512x512"
         }
       ]
     },
@@ -109,7 +109,7 @@
       "icons": [
         {
           "src": "/shortcut-search.png", 
-          "sizes": "192x192"
+          "sizes": "512x512"
         }
       ]
     }

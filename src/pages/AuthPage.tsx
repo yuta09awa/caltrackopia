@@ -81,8 +81,8 @@ const AuthPage: React.FC = () => {
             aria-label="Go to home page"
           >
             <img 
-              src="/lovable-uploads/0b3bf1b1-20e6-4b84-a220-f978cdf6b783.png" 
-              alt="Logo" 
+              src="/nutrimap-icon.png" 
+              alt="NutriMap Logo"
               className="h-16 w-auto mx-auto mb-4" 
             />
           </Link>
