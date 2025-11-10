@@ -2,6 +2,7 @@ import { StateCreator } from 'zustand';
 import { CartSlice, CartItem } from '@/types/cart';
 import { MenuItem, FeaturedItem } from '@/models/Location';
 import { cartPersistenceService } from '../services/cartPersistenceService';
+import { CartCommandHandler, CartQueryHandler } from '@/domains/core/cart';
 
 // Add UndoAction type
 interface UndoAction {
@@ -59,87 +60,26 @@ const createCartItem = (
   };
 };
 
-export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
-  items: [],
-  groupedByLocation: {},
-  activeLocationId: null,
-  conflictMode: 'separate',
-  total: 0,
-  itemCount: 0,
-  isLoading: false,
-  error: null,
-  pendingConflict: null,
-  undoStack: [],
+export const createCartSlice: StateCreator<CartSlice> = (set, get) => {
+  // Initialize CQRS handlers
+  const commandHandler = new CartCommandHandler(get, set);
+  const queryHandler = new CartQueryHandler(get);
 
-  addItem: (item, locationId, locationName, locationType) => {
+  return {
+    items: [],
+    groupedByLocation: {},
+    activeLocationId: null,
+    conflictMode: 'separate',
+    total: 0,
+    itemCount: 0,
+    isLoading: false,
+    error: null,
+    pendingConflict: null,
+    undoStack: [],
+
+  addItem: async (item, locationId, locationName, locationType) => {
     try {
-      const state = get();
-      
-      // Check for location conflicts based on conflict mode
-      if (state.items.length > 0 && state.activeLocationId && state.activeLocationId !== locationId) {
-        const storedPreference = localStorage.getItem('cart-conflict-preference');
-        let conflictMode = state.conflictMode;
-        
-        if (storedPreference) {
-          try {
-            const { mode } = JSON.parse(storedPreference);
-            conflictMode = mode;
-          } catch (error) {
-            console.warn('Failed to parse stored conflict preference:', error);
-          }
-        }
-
-        if (conflictMode === 'replace') {
-          // Auto-replace without dialog
-          get().clearCart();
-        } else if (conflictMode === 'merge') {
-          // Auto-merge items to new location
-          const existingItems = [...state.items];
-          get().clearCart();
-          
-          existingItems.forEach(existingItem => {
-            const cartItem = createCartItem(existingItem.originalItem, locationId, locationName, locationType);
-            set(state => ({ items: [...state.items, cartItem] }));
-          });
-        } else {
-          // Show conflict dialog for 'separate' mode or when no preference is stored
-          set({
-            pendingConflict: {
-              item,
-              locationId,
-              locationName,
-              locationType,
-              currentLocationName: state.items[0]?.locationName || 'Unknown Location'
-            }
-          });
-          return;
-        }
-      }
-      
-      const existingItemIndex = state.items.findIndex(cartItem => cartItem.id === `${locationId}-${item.id}`);
-      
-      let newItems: CartItem[];
-      
-      if (existingItemIndex >= 0) {
-        newItems = [...state.items];
-        newItems[existingItemIndex].quantity += 1;
-      } else {
-        const cartItem = createCartItem(item, locationId, locationName, locationType);
-        
-        if (cartItem.price === 0 && item.price !== '0' && item.price !== '$0' && item.price !== '$0.00') {
-          set({ error: `Unable to add ${item.name}: Invalid price format` });
-          return;
-        }
-        
-        newItems = [...state.items, cartItem];
-      }
-      
-      set({ 
-        items: newItems, 
-        activeLocationId: locationId, 
-        error: null,
-        pendingConflict: null 
-      });
+      await commandHandler.handleAddItem({ item, locationId, locationName, locationType });
       get().calculateTotals();
     } catch (error) {
       console.error('Error adding item to cart:', error);
@@ -147,7 +87,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     }
   },
 
-  removeItem: (itemId) => {
+  removeItem: async (itemId) => {
     try {
       const state = get();
       const itemToRemove = state.items.find(item => item.id === itemId);
@@ -161,9 +101,8 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
           timestamp: Date.now()
         });
       }
-      
-      const newItems = state.items.filter(item => item.id !== itemId);
-      set({ items: newItems, error: null });
+
+      await commandHandler.handleRemoveItem({ itemId });
       get().calculateTotals();
     } catch (error) {
       console.error('Error removing item from cart:', error);
@@ -171,21 +110,15 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     }
   },
 
-  updateQuantity: (itemId, quantity) => {
+  updateQuantity: async (itemId, quantity) => {
     try {
-      const state = get();
-      
-      if (quantity <= 0) {
-        get().removeItem(itemId);
-        return;
-      }
-      
       // Validate quantity is a positive number
       if (!Number.isInteger(quantity) || quantity < 1) {
         set({ error: 'Invalid quantity. Please enter a valid number.' });
         return;
       }
       
+      const state = get();
       const existingItem = state.items.find(item => item.id === itemId);
       if (existingItem && existingItem.quantity !== quantity) {
         // Add to undo stack for quantity changes
@@ -196,11 +129,8 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
           timestamp: Date.now()
         });
       }
-      
-      const newItems = state.items.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
-      );
-      set({ items: newItems, error: null });
+
+      await commandHandler.handleUpdateQuantity({ itemId, quantity });
       get().calculateTotals();
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -208,7 +138,7 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     }
   },
 
-  clearCart: () => {
+  clearCart: async () => {
     try {
       const state = get();
       
@@ -220,27 +150,26 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
           timestamp: Date.now()
         });
       }
+
+      await commandHandler.handleClearCart({});
       
       set({
-        items: [],
-        groupedByLocation: {},
-        activeLocationId: null,
         total: 0,
         itemCount: 0,
-        error: null,
-        pendingConflict: null,
+        groupedByLocation: {},
       });
+
+      // Clear persisted cart
+      cartPersistenceService.clearCart().catch(console.error);
     } catch (error) {
       console.error('Error clearing cart:', error);
       set({ error: 'Failed to clear cart. Please try again.' });
     }
   },
 
-  clearLocation: (locationId) => {
+  clearLocation: async (locationId) => {
     try {
-      const state = get();
-      const newItems = state.items.filter(item => item.locationId !== locationId);
-      set({ items: newItems, error: null });
+      await commandHandler.handleClearLocation({ locationId });
       get().calculateTotals();
     } catch (error) {
       console.error('Error clearing location from cart:', error);
@@ -288,18 +217,14 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
     }
   },
 
-  resolveConflict: (action: 'replace' | 'cancel') => {
-    const state = get();
-    
-    if (!state.pendingConflict) return;
-    
-    if (action === 'replace') {
-      get().clearCart();
-      const { item, locationId, locationName, locationType } = state.pendingConflict;
-      get().addItem(item, locationId, locationName, locationType);
+  resolveConflict: async (action: 'replace' | 'cancel') => {
+    try {
+      await commandHandler.handleResolveConflict({ action });
+      get().calculateTotals();
+    } catch (error) {
+      console.error('Error resolving conflict:', error);
+      set({ error: 'Failed to resolve conflict. Please try again.' });
     }
-    
-    set({ pendingConflict: null });
   },
 
   setConflictMode: (mode: 'replace' | 'separate' | 'merge') => {
@@ -325,7 +250,8 @@ export const createCartSlice: StateCreator<CartSlice> = (set, get) => ({
   clearUndoStack: () => {
     set({ undoStack: [] });
   },
-});
+  };
+};
 
 // Memoized selectors
 export const selectCartItems = (state: CartSlice) => state.items;
