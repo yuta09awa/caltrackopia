@@ -46,7 +46,7 @@ const Footer = () => {
                   to="/map"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Location Map
+                  Map
                 </Link>
               </li>
               <li>
@@ -54,7 +54,7 @@ const Footer = () => {
                   to="/nutrition"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Nutrition Tracking
+                  Nutrition
                 </Link>
               </li>
               <li>
@@ -62,7 +62,7 @@ const Footer = () => {
                   href="#"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Restaurant Menus
+                  Local Menus
                 </a>
               </li>
               <li>
