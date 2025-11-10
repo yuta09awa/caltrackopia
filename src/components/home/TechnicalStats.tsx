@@ -56,10 +56,10 @@ const TechnicalStats = () => {
             return (
               <div
                 key={stat.label}
-                className="glass rounded-2xl p-6 border border-border/50 bg-background/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover-scale animate-scale-in"
+                className="glass rounded-2xl p-6 border border-border/50 bg-background/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover-scale animate-scale-in text-center"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center ${stat.color}`}>
                     <Icon className="w-6 h-6" />
                   </div>
