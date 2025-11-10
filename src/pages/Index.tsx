@@ -12,18 +12,18 @@ import { SPACING } from "@/constants/spacing";
 const Index = () => {
   const features = [
     {
-      title: "Nutrition Tracking",
-      description: "Track your daily nutrition, calories, and macros with an intuitive interface.",
-      icon: Utensils
-    },
-    {
-      title: "Location Services",
+      title: "Map",
       description: "Find healthy food options nearby with our integrated mapping system.",
       icon: MapPin
     },
     {
-      title: "Advanced Filtering",
-      description: "Filter ingredients and restaurants based on your dietary preferences.",
+      title: "Nutrition",
+      description: "Track your daily nutrition, calories, and macros with an intuitive interface.",
+      icon: Utensils
+    },
+    {
+      title: "Local Menus",
+      description: "Browse restaurant menus and discover local dining options.",
       icon: Filter
     },
     {
