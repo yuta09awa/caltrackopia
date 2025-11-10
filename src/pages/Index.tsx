@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import FeatureCard from "@/components/home/FeatureCard";
+import TechnicalStats from "@/components/home/TechnicalStats";
 import { SPACING } from "@/constants/spacing";
 
 const Index = () => {
@@ -39,6 +40,9 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         
+        {/* Technical Stats Section */}
+        <TechnicalStats />
+        
         {/* Features Section */}
         <section 
           className="bg-secondary/30"
@@ -55,7 +59,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, index) => (
                 <FeatureCard
-                  key={index}
+                  key={feature.title}
                   title={feature.title}
                   description={feature.description}
                   icon={feature.icon}

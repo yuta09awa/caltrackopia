@@ -17,7 +17,7 @@ const Hero = () => {
       <Container size="full" className="relative z-10 px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
           <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
-            Track your nutrition. Find healthy options nearby.
+            70% Cost Reduction • Sub-500ms Response • Enterprise Architecture
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
@@ -27,7 +27,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Track your nutrition, discover restaurants with healthy options, and make informed choices about your diet, all in one place.
+            Production-ready platform with multi-layer caching and provider abstraction. Track nutrition, discover healthy food, and scale to millions of users.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
