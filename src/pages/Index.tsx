@@ -9,19 +9,9 @@ import FeatureCard from "@/components/home/FeatureCard";
 import TechnicalStats from "@/components/home/TechnicalStats";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import { SPACING } from "@/constants/spacing";
-import { Ingredient } from "@/models/NutritionalInfo";
 
 const Index = () => {
   const navigate = useNavigate();
-
-  const handleSelectIngredient = (ingredient: Ingredient) => {
-    // Navigate to map page when ingredient is selected
-    navigate('/map');
-  };
-
-  const handleSearchReset = () => {
-    // No action needed on home page
-  };
 
   const features = [
     {
@@ -51,9 +41,7 @@ const Index = () => {
       <Navbar>
         <div className="flex-1 max-w-2xl mx-4">
           <GlobalSearch 
-            onSelectIngredient={handleSelectIngredient}
-            onSearchReset={handleSearchReset}
-            displayValue=""
+            onSelectIngredient={() => navigate('/map')}
             className="w-full"
             compact={true}
           />
