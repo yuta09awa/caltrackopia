@@ -1,6 +1,5 @@
 import React from 'react';
 import { MapScreenHeader, MapScreenContent, MapScreenList } from '../components';
-import { CacheMetricsPanel, FeatureFlagsPanel } from '@/features/map/components';
 import { MapScreenLayoutProps } from '../types';
 
 const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
@@ -23,8 +22,6 @@ const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
   onViewDetails,
   onScroll,
 }) => {
-  const isDev = import.meta.env.DEV;
-
   return (
     <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
       <MapScreenHeader
@@ -73,18 +70,6 @@ const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
           />
         </div>
       </main>
-
-      {/* Dev Panels - Dev Mode Only */}
-      {isDev && (
-        <>
-          <div className="fixed bottom-4 left-4 z-50 w-80">
-            <CacheMetricsPanel />
-          </div>
-          <div className="fixed bottom-4 right-4 z-50 w-80">
-            <FeatureFlagsPanel />
-          </div>
-        </>
-      )}
     </div>
   );
 };
