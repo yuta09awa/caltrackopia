@@ -129,6 +129,7 @@ export { enhancedNutritionService } from './enhancedNutritionService';
 // Caching Services
 export { browserCachingService } from './browserCachingService';
 export { enhancedCachingService } from './enhancedCachingService';
+export { unifiedCacheService } from './cache';
 
 // Data Processing Services
 /**

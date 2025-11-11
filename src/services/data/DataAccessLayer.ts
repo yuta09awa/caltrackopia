@@ -2,6 +2,7 @@ import { ServiceBase } from '../base/ServiceBase';
 import { DatabaseService, type EnhancedPlace, type Ingredient, type MenuItem, type DietaryRestriction, type PlaceIngredient } from '../databaseService';
 import { MockDataService } from '../mockDataService';
 import { DatabaseError } from '../errors/DatabaseError';
+import { unifiedCacheService } from '../cache/UnifiedCacheService';
 
 /**
  * Unified Data Access Layer
@@ -47,37 +48,58 @@ export class DataAccessLayer extends ServiceBase {
   
   /**
    * Get a place by its ID
+   * Uses 3-tier caching: Memory → IndexedDB → Supabase
    */
   async getPlace(id: string): Promise<EnhancedPlace | null> {
     return this.executeWithStateManagement(async () => {
       if (this.useMockData) {
-        return null; // Mock service doesn't have getPlace yet
+        return null;
       }
-      return this.dbService.getPlaceById(id);
+
+      return unifiedCacheService.get(
+        'places',
+        `place:${id}`,
+        async () => this.dbService.getPlaceById(id),
+        { ttl: 5 * 60 * 1000 } // 5 min cache
+      );
     }, 'Getting place by ID');
   }
 
   /**
    * Search places by query string
+   * Uses 3-tier caching with query-based keys
    */
   async searchPlaces(query: string, limit?: number): Promise<EnhancedPlace[]> {
     return this.executeWithStateManagement(async () => {
       if (this.useMockData) {
         return this.mockService.searchPlaces(query, limit);
       }
-      return this.dbService.searchPlaces(query, limit);
+
+      return unifiedCacheService.get(
+        'searches',
+        `search:${query}:${limit || 'all'}`,
+        async () => this.dbService.searchPlaces(query, limit),
+        { ttl: 2 * 60 * 1000 } // 2 min cache for searches
+      );
     }, 'Searching places');
   }
 
   /**
    * Get places by type
+   * Uses 3-tier caching
    */
   async getPlacesByType(placeType: string, limit?: number): Promise<EnhancedPlace[]> {
     return this.executeWithStateManagement(async () => {
       if (this.useMockData) {
         return this.mockService.getPlacesByType(placeType, limit);
       }
-      return this.dbService.getPlacesByType(placeType, limit);
+
+      return unifiedCacheService.get(
+        'places',
+        `type:${placeType}:${limit || 'all'}`,
+        async () => this.dbService.getPlacesByType(placeType, limit),
+        { ttl: 5 * 60 * 1000 } // 5 min cache
+      );
     }, 'Getting places by type');
   }
 
@@ -145,6 +167,7 @@ export class DataAccessLayer extends ServiceBase {
 
   /**
    * Get all ingredients
+   * Uses 3-tier caching (ingredients rarely change)
    */
   async getAllIngredients(): Promise<Ingredient[]> {
     return this.executeWithStateManagement(async () => {
@@ -152,20 +175,28 @@ export class DataAccessLayer extends ServiceBase {
         return this.mockService.getAllIngredients();
       }
       
-      try {
-        return await this.dbService.getAllIngredients();
-      } catch (error) {
-        if (error instanceof DatabaseError && error.code === 'TABLE_NOT_AVAILABLE') {
-          console.warn('Ingredients table not available, falling back to mock data');
-          return this.mockService.getAllIngredients();
-        }
-        throw error;
-      }
+      return unifiedCacheService.get(
+        'ingredients',
+        'all',
+        async () => {
+          try {
+            return await this.dbService.getAllIngredients();
+          } catch (error) {
+            if (error instanceof DatabaseError && error.code === 'TABLE_NOT_AVAILABLE') {
+              console.warn('Ingredients table not available, falling back to mock data');
+              return this.mockService.getAllIngredients();
+            }
+            throw error;
+          }
+        },
+        { ttl: 10 * 60 * 1000 } // 10 min cache
+      );
     }, 'Getting all ingredients');
   }
 
   /**
    * Search ingredients by query
+   * Uses 3-tier caching
    */
   async searchIngredients(query: string, limit?: number): Promise<Ingredient[]> {
     return this.executeWithStateManagement(async () => {
@@ -173,15 +204,22 @@ export class DataAccessLayer extends ServiceBase {
         return this.mockService.searchIngredients(query, limit);
       }
       
-      try {
-        return await this.dbService.searchIngredients(query, limit);
-      } catch (error) {
-        if (error instanceof DatabaseError && error.code === 'TABLE_NOT_AVAILABLE') {
-          console.warn('Ingredients table not available, falling back to mock data');
-          return this.mockService.searchIngredients(query, limit);
-        }
-        throw error;
-      }
+      return unifiedCacheService.get(
+        'ingredients',
+        `search:${query}:${limit || 'all'}`,
+        async () => {
+          try {
+            return await this.dbService.searchIngredients(query, limit);
+          } catch (error) {
+            if (error instanceof DatabaseError && error.code === 'TABLE_NOT_AVAILABLE') {
+              console.warn('Ingredients table not available, falling back to mock data');
+              return this.mockService.searchIngredients(query, limit);
+            }
+            throw error;
+          }
+        },
+        { ttl: 5 * 60 * 1000 } // 5 min cache
+      );
     }, 'Searching ingredients');
   }
 
