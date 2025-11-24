@@ -2,15 +2,17 @@ name = "nutrimap-api"
 main = "src/index.ts"
 compatibility_date = "2024-11-01"
 
-# Environment variables (set these via: wrangler secret put SECRET_NAME)
+# Environment variables
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 
 # Secrets to set via CLI:
 # wrangler secret put TURSO_DB_URL
 # wrangler secret put TURSO_AUTH_TOKEN
 # wrangler secret put SUPABASE_URL
 # wrangler secret put SUPABASE_ANON_KEY
+# wrangler secret put SYNC_SECRET_KEY           # Generate: openssl rand -hex 32
+# wrangler secret put SLACK_WEBHOOK_URL         # Optional: Slack webhook for alerts
 
 # Example routes configuration (uncomment when ready to deploy)
 # [[routes]]

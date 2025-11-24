@@ -1,22 +1,24 @@
 {
   "name": "nutrimap-workers",
   "version": "1.0.0",
-  "description": "Cloudflare Workers API for NutriMap",
+  "description": "Cloudflare Workers Edge API for NutriMap",
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "migrate:restaurants": "tsx scripts/migrate-restaurants.ts"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@libsql/client": "^0.14.0",
-    "hono": "^4.6.3"
+    "@libsql/client": "^0.14.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
+    "@supabase/supabase-js": "^2.49.8",
+    "tsx": "^4.7.0",
     "wrangler": "^3.84.1"
   }
 }
