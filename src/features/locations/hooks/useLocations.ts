@@ -1,7 +1,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useMapFilters } from '@/features/map';
-import { locationsApi } from '@/features/locations/api/locationsApi';
+import { EdgeAPIClient } from '@/lib/edge-api-client';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { 
   filterLocationsByType, 
@@ -28,33 +28,59 @@ export function useLocations(options?: { disabled?: boolean }) {
   const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useMapFilters();
 
-  // Fetch all locations from the database on component mount
+  // Fetch all locations from the edge API
   useEffect(() => {
     const fetchLocations = async () => {
       setLoading(true);
       setError(null);
       try {
-        console.log('Fetching locations from database via locationsApi...');
-        const fetchedLocations = await locationsApi.search({ limit: 1000 });
-        console.log('Fetched locations:', fetchedLocations.length, 'items');
+        const edgeClient = new EdgeAPIClient();
+        console.log('Fetching locations from edge API...');
         
-        if (fetchedLocations.length === 0) {
-          console.log('No locations found in database, falling back to mock data');
-          // If database returns empty array, use mock data
+        const result = await edgeClient.searchRestaurants({
+          limit: 1000
+        });
+        
+        console.log('Fetched locations:', result.results.length, 'items from edge');
+        
+        if (result.results.length === 0) {
+          console.log('No locations found from edge, falling back to mock data');
           const { mockLocations } = await import('../data/mockLocations');
           setAllLocations(mockLocations);
         } else {
-          setAllLocations(fetchedLocations);
+          // Map edge API results to Location type
+          const mappedLocations: Location[] = result.results.map(place => ({
+            id: place.id,
+            place_id: place.place_id,
+            name: place.name,
+            type: place.primary_type === 'restaurant' ? 'Restaurant' : 'Grocery',
+            latitude: place.latitude,
+            longitude: place.longitude,
+            address: place.formatted_address || '',
+            rating: place.rating || 0,
+            priceLevel: place.price_level || 2,
+            price: ['$', '$$', '$$$', '$$$$'][place.price_level || 1] as "$" | "$$" | "$$$" | "$$$$",
+            isOpen: place.is_open_now || false,
+            openNow: place.is_open_now || false,
+            cuisine: place.cuisine_types?.[0] || 'Various',
+            hours: place.opening_hours as any,
+            phone: place.phone_number,
+            website: place.website,
+            distance: place.distance_meters ? `${(place.distance_meters / 1000).toFixed(1)} km` : '0 km',
+            dietaryOptions: [],
+            images: place.photo_references || [],
+            coordinates: { lat: place.latitude, lng: place.longitude }
+          }));
+          setAllLocations(mappedLocations);
         }
       } catch (err) {
-        console.error('Error fetching locations in useLocations:', err);
-        setError('Failed to load locations from database');
-        // Fallback to mock data if database fetch fails
+        console.error('Error fetching locations from edge API:', err);
+        setError('Failed to load locations');
+        // Fallback to mock data if edge fetch fails
         try {
           const { mockLocations } = await import('../data/mockLocations');
           console.log('Falling back to mock locations due to error');
           setAllLocations(mockLocations);
-          // Clear error since we have fallback data
           setError(null);
         } catch (mockErr) {
           console.error('Error loading mock locations:', mockErr);
@@ -65,8 +91,10 @@ export function useLocations(options?: { disabled?: boolean }) {
       }
     };
 
-    fetchLocations();
-  }, []);
+    if (!disabled) {
+      fetchLocations();
+    }
+  }, [disabled]);
 
   // Filter and sort locations based on current filters
   const filteredAndSortedLocations = useMemo(() => {

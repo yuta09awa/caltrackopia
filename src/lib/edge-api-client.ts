@@ -6,7 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-interface SearchParams {
+export interface SearchParams {
   q?: string;
   lat?: number;
   lng?: number;
@@ -14,9 +14,10 @@ interface SearchParams {
   cuisine?: string;
   priceLevel?: number;
   allergens?: string[];
+  limit?: number;
 }
 
-interface Restaurant {
+export interface EdgeRestaurant {
   id: string;
   place_id: string;
   name: string;
@@ -25,23 +26,25 @@ interface Restaurant {
   longitude: number;
   primary_type?: string;
   place_types?: string[];
+  cuisine_types?: string[];
   rating?: number;
   price_level?: number;
   phone_number?: string;
   website?: string;
   photo_references?: string[];
   is_open_now?: boolean;
+  opening_hours?: any;
   has_supply_chain_data?: boolean;
   distance_meters?: number;
 }
 
-interface SearchResponse {
-  restaurants: Restaurant[];
+export interface SearchResponse {
+  results: EdgeRestaurant[];
   count: number;
   query: SearchParams;
 }
 
-class EdgeAPIClient {
+export class EdgeAPIClient {
   private edgeURL = import.meta.env.PROD 
     ? 'https://nutrimap-api.your-username.workers.dev' // TODO: Replace with your Worker URL
     : 'http://localhost:8787';
@@ -130,4 +133,5 @@ class EdgeAPIClient {
   }
 }
 
+// Singleton instance for convenience
 export const edgeAPI = new EdgeAPIClient();
