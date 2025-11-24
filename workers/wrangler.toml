@@ -1,0 +1,18 @@
+name = "nutrimap-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+# Environment variables (set these via: wrangler secret put SECRET_NAME)
+[vars]
+ENVIRONMENT = "development"
+
+# Secrets to set via CLI:
+# wrangler secret put TURSO_DB_URL
+# wrangler secret put TURSO_AUTH_TOKEN
+# wrangler secret put SUPABASE_URL
+# wrangler secret put SUPABASE_ANON_KEY
+
+# Example routes configuration (uncomment when ready to deploy)
+# [[routes]]
+# pattern = "api.nutrimap.com/*"
+# zone_name = "nutrimap.com"
