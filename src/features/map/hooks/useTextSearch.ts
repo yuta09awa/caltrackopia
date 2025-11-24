@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { MarkerData } from '../types';
 import { useSearchState } from './useSearchState';
-import { useEdgeFunctionApi } from './useEdgeFunctionApi';
+import { EdgeAPIClient } from '@/lib/edge-api-client';
 import { usePlaceFilters } from './usePlaceFilters';
 import { usePlacesApiService } from './usePlacesApiService';
 import { mapPlaceTypeToMarkerType } from '../utils/placeTypeMapper';
@@ -10,7 +10,7 @@ import { GoogleMapsProvider } from '@/services/providers/GoogleMapsProvider';
 
 export const useTextSearch = () => {
   const searchState = useSearchState();
-  const { callEdgeFunction } = useEdgeFunctionApi();
+  const edgeClient = new EdgeAPIClient();
   const { applyFilters } = usePlaceFilters();
   const { waitForPlacesApi, getProvider } = usePlacesApiService();
 
@@ -28,24 +28,22 @@ export const useTextSearch = () => {
     searchState.startSearch();
 
     try {
-      console.log(`Text search: ${query} at ${center.lat},${center.lng}`);
+      console.log(`Text search via Edge API: ${query} at ${center.lat},${center.lng}`);
       
-      // Try cached results first
-      const cachedResults = await callEdgeFunction('places-cache-manager', {
-        action: 'search_and_cache',
-        search_query: query,
-        latitude: center.lat,
-        longitude: center.lng,
+      // Use Edge API for fast global search
+      const edgeResults = await edgeClient.searchRestaurants({
+        q: query,
+        lat: center.lat,
+        lng: center.lng,
         radius: radius
       });
       
-      if (cachedResults?.success && cachedResults.results?.length > 0) {
-        const filteredResults = applyFilters(cachedResults.results);
-        console.log(`Found ${filteredResults.length} filtered results from cache`);
+      if (edgeResults.results?.length > 0) {
+        console.log(`Found ${edgeResults.results.length} results from Edge API (cached at edge)`);
         
-        const markers: MarkerData[] = filteredResults.map((place: any) => ({
-          position: { lat: Number(place.latitude), lng: Number(place.longitude) },
-          id: place.place_id || place.id,
+        const markers: MarkerData[] = edgeResults.results.map((place) => ({
+          position: { lat: place.latitude, lng: place.longitude },
+          id: place.id,
           type: mapPlaceTypeToMarkerType(place.primary_type)
         }));
 
@@ -102,7 +100,7 @@ export const useTextSearch = () => {
       console.error('Error searching places:', err);
       return [];
     }
-  }, [callEdgeFunction, applyFilters, waitForPlacesApi, getProvider, searchState]);
+  }, [applyFilters, waitForPlacesApi, getProvider, searchState]);
 
   return {
     searchPlacesByText,
