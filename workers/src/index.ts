@@ -1,7 +1,6 @@
 import { handleSupabaseSync } from './webhooks/sync-supabase';
 import { searchRestaurants } from './api/restaurants/search';
 import { handleDisclaimerAcceptance } from './api/disclaimer';
-import { handleMetrics } from './api/metrics';
 
 export interface Env {
   TURSO_DB_URL: string;
@@ -44,12 +43,6 @@ export default {
       // Route: Disclaimer Acceptance (Edge Write)
       if (url.pathname === '/api/disclaimer' && request.method === 'POST') {
         const response = await handleDisclaimerAcceptance(request, env);
-        return addCors(response);
-      }
-
-      // Route: Metrics (Admin endpoint)
-      if (url.pathname === '/api/metrics' && request.method === 'GET') {
-        const response = await handleMetrics(env);
         return addCors(response);
       }
 

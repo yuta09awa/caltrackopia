@@ -131,19 +131,6 @@ export class EdgeAPIClient {
     const response = await fetch(`${this.edgeURL}/health`);
     return response.json();
   }
-
-  /**
-   * Generic GET request
-   */
-  async get<T = any>(path: string): Promise<T> {
-    const response = await fetch(`${this.edgeURL}${path}`);
-    
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.statusText}`);
-    }
-    
-    return response.json();
-  }
 }
 
 // Singleton instance for convenience
