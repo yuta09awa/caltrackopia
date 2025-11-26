@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MapPin, Utensils, ShoppingCart } from "lucide-react";
+import { MapPin, Utensils, ShoppingCart, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/features/auth";
 import { useCart } from "@/features/cart";
+import { useUserRoles } from "@/features/auth/hooks/useUserRoles";
 import NavItem from "./NavItem";
 import NavButton from "./NavButton";
 import HamburgerButton from "./HamburgerButton";
@@ -35,6 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const { isAuthenticated } = useAuth();
   const { itemCount } = useCart();
+  const { isAdmin } = useUserRoles();
 
   const handleAuthNavigation = () => {
     if (isAuthenticated) {
@@ -81,6 +83,13 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
                     badge={item.path === "/shopping" ? itemCount : undefined}
                   />
                 ))}
+                {isAuthenticated && isAdmin() && (
+                  <NavItem
+                    name="Admin"
+                    path="/admin"
+                    icon={Shield}
+                  />
+                )}
                 <NavButton
                   isAuthenticated={isAuthenticated}
                   onClick={handleAuthNavigation}
