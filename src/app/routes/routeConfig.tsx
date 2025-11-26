@@ -1,5 +1,5 @@
 import { ReactNode, Suspense, lazy } from 'react';
-import { Flame, Map, Home, UserRound } from 'lucide-react';
+import { Flame, Map, Home, UserRound, Shield } from 'lucide-react';
 import { 
   LazyMapPage, 
   LazyNutritionPage, 
@@ -16,6 +16,7 @@ import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { AppRoute } from './types';
 
 const LazyUnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
+const LazyAdminDashboardPage = lazy(() => import('@/pages/AdminDashboardPage'));
 
 // Wrapper component for lazy routes with suspense
 const LazyWrapper = ({ children }: { children: ReactNode }) => (
@@ -106,6 +107,20 @@ export const routes: AppRoute[] = [
     navLabel: 'Profile',
     icon: <UserRound className="w-4 h-4" />,
     showInNav: true,
+  },
+  {
+    path: '/admin',
+    element: (
+      <ProtectedRoute requireAuth={true} requiredRole="admin">
+        <LazyWrapper>
+          <LazyAdminDashboardPage />
+        </LazyWrapper>
+      </ProtectedRoute>
+    ),
+    title: 'Admin Dashboard',
+    navLabel: 'Admin',
+    icon: <Shield className="w-4 h-4" />,
+    showInNav: false,
   },
   {
     path: '/unauthorized',
