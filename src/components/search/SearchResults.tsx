@@ -4,6 +4,7 @@ import { Ingredient } from '@/models/NutritionalInfo';
 import { Apple, Beef, Milk, Utensils, ShoppingCart, Search, Leaf, MapPin, CalendarDays } from 'lucide-react';
 import { accessibility } from '@/services/accessibility/AccessibilityService';
 import { ComponentErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
+import { useSeasonalIngredients, isIngredientInSeason } from '@/hooks/useSeasonalIngredients';
 
 interface SearchResultsProps {
   results: Ingredient[];
@@ -36,6 +37,8 @@ const getCategoryIcon = (category?: string) => {
 };
 
 const SearchResults: React.FC<SearchResultsProps> = React.memo(({ results, onSelectIngredient }) => {
+  const { data: seasonalIngredients } = useSeasonalIngredients();
+
   // Announce results to screen readers
   React.useEffect(() => {
     if (results.length > 0) {
@@ -89,9 +92,9 @@ const SearchResults: React.FC<SearchResultsProps> = React.memo(({ results, onSel
                   <MapPin className="w-2.5 h-2.5" /> Local
                 </span>
               )}
-              {ingredient.isSeasonal && (
+              {(ingredient.isSeasonal || isIngredientInSeason(ingredient.name, seasonalIngredients)) && (
                 <span className="flex items-center gap-0.5 text-[10px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded-full">
-                  <CalendarDays className="w-2.5 h-2.5" /> Seasonal
+                  <CalendarDays className="w-2.5 h-2.5" /> In Season
                 </span>
               )}
               {ingredient.nutritionPer100g.calories && (
