@@ -1,0 +1,37 @@
+{
+  "title": "Shopping Cart",
+  "empty": "Your cart is empty",
+  "addItems": "Add items to get started",
+  "itemCount": "{{count}} item",
+  "itemCount_other": "{{count}} items",
+  "subtotal": "Subtotal",
+  "tax": "Tax",
+  "tip": "Tip",
+  "total": "Total",
+  "checkout": "Checkout",
+  "continueShopping": "Continue Shopping",
+  "removeItem": "Remove Item",
+  "updateQuantity": "Update Quantity",
+  "quantity": "Quantity",
+  "price": "Price",
+  "conflict": {
+    "title": "Cart Conflict Detected",
+    "message": "Items from {{restaurantName}} are already in your cart. You can only order from one location at a time.",
+    "keepCurrent": "Keep Current Cart",
+    "startNew": "Start New Cart",
+    "cancel": "Cancel"
+  },
+  "tipSuggestions": {
+    "title": "Add a tip",
+    "custom": "Custom",
+    "noTip": "No tip"
+  },
+  "payment": {
+    "title": "Payment",
+    "method": "Payment Method",
+    "card": "Credit/Debit Card",
+    "cash": "Cash",
+    "applePay": "Apple Pay",
+    "googlePay": "Google Pay"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "map": "Mapa",
+    "shopping": "Compras",
+    "nutrition": "Nutrición",
+    "profile": "Perfil"
+  },
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clearAll": "Limpiar Todo",
+    "apply": "Aplicar",
+    "viewDetails": "Ver Detalles",
+    "getDirections": "Obtener Direcciones",
+    "addToCart": "Agregar al Carrito",
+    "viewCart": "Ver Carrito",
+    "checkout": "Pagar"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Por favor, inténtelo de nuevo.",
+    "network": "Error de red. Por favor, verifique su conexión.",
+    "notFound": "No se encontró el recurso solicitado.",
+    "unauthorized": "No está autorizado para realizar esta acción.",
+    "validation": "Por favor, verifique su entrada e inténtelo de nuevo.",
+    "locationPermission": "Permiso de ubicación denegado. Por favor, habilite los servicios de ubicación."
+  },
+  "loading": {
+    "default": "Cargando...",
+    "places": "Cargando lugares...",
+    "ingredients": "Cargando ingredientes...",
+    "cart": "Cargando carrito..."
+  },
+  "empty": {
+    "noResults": "No se encontraron resultados",
+    "tryDifferent": "Intente una búsqueda diferente",
+    "noFavorites": "Aún no hay favoritos",
+    "noHistory": "Sin historial de búsqueda"
+  },
+  "common": {
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK",
+    "open": "Abierto",
+    "closed": "Cerrado",
+    "openNow": "Abierto Ahora",
+    "rating": "Calificación",
+    "reviews": "Reseñas",
+    "distance": "Distancia",
+    "phone": "Teléfono",
+    "website": "Sitio Web",
+    "address": "Dirección",
+    "hours": "Horario"
+  }
+}

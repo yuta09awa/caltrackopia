@@ -1,0 +1,51 @@
+{
+  "placeTypes": {
+    "restaurant": "Restaurant",
+    "grocery_store": "Grocery Store",
+    "supermarket": "Supermarket",
+    "convenience_store": "Convenience Store",
+    "farmers_market": "Farmers Market",
+    "bakery": "Bakery",
+    "cafe": "Café",
+    "bar": "Bar",
+    "food": "Food"
+  },
+  "filters": {
+    "categories": "Categories",
+    "cuisine": "Cuisine",
+    "priceRange": "Price Range",
+    "openNow": "Open Now",
+    "dietary": "Dietary",
+    "nutrition": "Nutrition Goals",
+    "ingredients": "Ingredients",
+    "cheap": "$",
+    "moderate": "$$",
+    "expensive": "$$$",
+    "luxury": "$$$$"
+  },
+  "search": {
+    "placeholder": "Search locations, ingredients...",
+    "recentSearches": "Recent Searches",
+    "popularSearches": "Popular Searches",
+    "clearHistory": "Clear History",
+    "noResults": "No locations found",
+    "tryAdjusting": "Try adjusting your filters or search area"
+  },
+  "details": {
+    "overview": "Overview",
+    "menu": "Menu",
+    "reviews": "Reviews",
+    "photos": "Photos",
+    "aboutThis": "About this place",
+    "nutritionInfo": "Nutrition Information",
+    "ingredients": "Ingredients",
+    "allergens": "Allergens"
+  },
+  "badges": {
+    "inSeason": "In Season",
+    "organic": "Organic",
+    "localSource": "Local",
+    "verified": "Verified",
+    "popular": "Popular"
+  }
+}

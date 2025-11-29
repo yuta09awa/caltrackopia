@@ -1,0 +1,60 @@
+{
+  "navigation": {
+    "home": "Home",
+    "map": "Map",
+    "shopping": "Shopping",
+    "nutrition": "Nutrition",
+    "profile": "Profile"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "clearAll": "Clear All",
+    "apply": "Apply",
+    "viewDetails": "View Details",
+    "getDirections": "Get Directions",
+    "addToCart": "Add to Cart",
+    "viewCart": "View Cart",
+    "checkout": "Checkout"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "notFound": "The requested resource was not found.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "validation": "Please check your input and try again.",
+    "locationPermission": "Location permission denied. Please enable location services."
+  },
+  "loading": {
+    "default": "Loading...",
+    "places": "Loading places...",
+    "ingredients": "Loading ingredients...",
+    "cart": "Loading cart..."
+  },
+  "empty": {
+    "noResults": "No results found",
+    "tryDifferent": "Try a different search",
+    "noFavorites": "No favorites yet",
+    "noHistory": "No search history"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "open": "Open",
+    "closed": "Closed",
+    "openNow": "Open Now",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "distance": "Distance",
+    "phone": "Phone",
+    "website": "Website",
+    "address": "Address",
+    "hours": "Hours"
+  }
+}

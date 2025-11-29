@@ -57,6 +57,10 @@ export function createMockStore(initialState?: Partial<AppStore>) {
     userPreferences: {
       theme: 'light',
       language: 'en',
+      locale: 'en',
+      currency: 'USD',
+      measurementUnit: 'metric',
+      region: null,
       notifications: true,
       location: {
         latitude: null,
