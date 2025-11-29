@@ -42,6 +42,8 @@ export { useHybridLocation } from './useHybridLocation';
 // Ingredient & Nutrition Hooks
 export { useIngredientSearch } from './useIngredientSearch';
 export { useEnhancedIngredientSearch } from './useEnhancedIngredientSearch';
+export { useSeasonalIngredients, isIngredientInSeason } from './useSeasonalIngredients';
+export { useRotatingPlaceholder } from './useRotatingPlaceholder';
 
 // Caching Hooks
 export { useEnhancedCaching } from './useEnhancedCaching';

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useIngredientSearch } from '@/features/ingredients/hooks/useIngredientApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useRotatingPlaceholder } from '@/hooks/useRotatingPlaceholder';
 import { Ingredient } from '@/models/NutritionalInfo';
 import SearchDropdown from './SearchDropdown';
 import { security } from '@/services/security/SecurityService';
@@ -27,6 +28,7 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const { placeholder, pause, resume } = useRotatingPlaceholder();
   
   // Debounce search term for API calls (300ms delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -66,8 +68,9 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
       onSearchReset();
       setSearchTerm('');
     }
+    pause(); // Pause placeholder rotation
     setIsOpen(true);
-  }, [displayValue, onSearchReset]);
+  }, [displayValue, onSearchReset, pause]);
 
   const handleClearSearch = useCallback(() => {
     if (onSearchReset) {
@@ -75,7 +78,15 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
     }
     setSearchTerm('');
     setIsOpen(false);
-  }, [onSearchReset]);
+    resume(); // Resume placeholder rotation
+  }, [onSearchReset, resume]);
+
+  const handleBlur = useCallback(() => {
+    // Resume rotation when input loses focus if empty
+    if (searchTerm.length === 0) {
+      resume();
+    }
+  }, [searchTerm, resume]);
 
   const handleSelectIngredient = useCallback((ingredient: Ingredient) => {
     // Add to search history
@@ -136,15 +147,16 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search ingredients, restaurants, dishes..."
+          placeholder={placeholder}
           className={cn(
-            "w-full pl-9",
+            "w-full pl-9 transition-opacity duration-300",
             displayValue ? "pr-10" : "pr-4",
             compact ? "h-9 text-sm" : "h-10"
           )}
           value={searchTerm}
           onChange={handleSearch}
           onFocus={handleFocus}
+          onBlur={handleBlur}
         />
         
         {/* Clear button when there's a displayed value */}
