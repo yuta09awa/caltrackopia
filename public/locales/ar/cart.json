@@ -1,0 +1,37 @@
+{
+  "title": "عربة التسوق",
+  "empty": "عربة التسوق فارغة",
+  "addItems": "أضف عناصر للبدء",
+  "itemCount": "{{count}} عنصر",
+  "itemCount_other": "{{count}} عناصر",
+  "subtotal": "المجموع الفرعي",
+  "tax": "الضريبة",
+  "tip": "الإكرامية",
+  "total": "المجموع",
+  "checkout": "الدفع",
+  "continueShopping": "متابعة التسوق",
+  "removeItem": "إزالة العنصر",
+  "updateQuantity": "تحديث الكمية",
+  "quantity": "الكمية",
+  "price": "السعر",
+  "conflict": {
+    "title": "تم اكتشاف تعارض في السلة",
+    "message": "العناصر من {{restaurantName}} موجودة بالفعل في سلتك. يمكنك الطلب من مكان واحد فقط في كل مرة.",
+    "keepCurrent": "الاحتفاظ بالسلة الحالية",
+    "startNew": "بدء سلة جديدة",
+    "cancel": "إلغاء"
+  },
+  "tipSuggestions": {
+    "title": "إضافة إكرامية",
+    "custom": "مخصص",
+    "noTip": "بدون إكرامية"
+  },
+  "payment": {
+    "title": "الدفع",
+    "method": "طريقة الدفع",
+    "card": "بطاقة ائتمان/خصم",
+    "cash": "نقدًا",
+    "applePay": "Apple Pay",
+    "googlePay": "Google Pay"
+  }
+}

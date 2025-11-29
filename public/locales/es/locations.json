@@ -1,0 +1,51 @@
+{
+  "placeTypes": {
+    "restaurant": "Restaurante",
+    "grocery_store": "Tienda de Comestibles",
+    "supermarket": "Supermercado",
+    "convenience_store": "Tienda de Conveniencia",
+    "farmers_market": "Mercado de Agricultores",
+    "bakery": "Panadería",
+    "cafe": "Cafetería",
+    "bar": "Bar",
+    "food": "Comida"
+  },
+  "filters": {
+    "categories": "Categorías",
+    "cuisine": "Cocina",
+    "priceRange": "Rango de Precio",
+    "openNow": "Abierto Ahora",
+    "dietary": "Dietético",
+    "nutrition": "Objetivos Nutricionales",
+    "ingredients": "Ingredientes",
+    "cheap": "$",
+    "moderate": "$$",
+    "expensive": "$$$",
+    "luxury": "$$$$"
+  },
+  "search": {
+    "placeholder": "Buscar lugares, ingredientes...",
+    "recentSearches": "Búsquedas Recientes",
+    "popularSearches": "Búsquedas Populares",
+    "clearHistory": "Limpiar Historial",
+    "noResults": "No se encontraron lugares",
+    "tryAdjusting": "Intente ajustar sus filtros o área de búsqueda"
+  },
+  "details": {
+    "overview": "Resumen",
+    "menu": "Menú",
+    "reviews": "Reseñas",
+    "photos": "Fotos",
+    "aboutThis": "Acerca de este lugar",
+    "nutritionInfo": "Información Nutricional",
+    "ingredients": "Ingredientes",
+    "allergens": "Alérgenos"
+  },
+  "badges": {
+    "inSeason": "En Temporada",
+    "organic": "Orgánico",
+    "localSource": "Local",
+    "verified": "Verificado",
+    "popular": "Popular"
+  }
+}

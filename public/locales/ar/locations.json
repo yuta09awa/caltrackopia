@@ -1,0 +1,51 @@
+{
+  "placeTypes": {
+    "restaurant": "مطعم",
+    "grocery_store": "متجر بقالة",
+    "supermarket": "سوبر ماركت",
+    "convenience_store": "متجر صغير",
+    "farmers_market": "سوق المزارعين",
+    "bakery": "مخبز",
+    "cafe": "مقهى",
+    "bar": "بار",
+    "food": "طعام"
+  },
+  "filters": {
+    "categories": "الفئات",
+    "cuisine": "المطبخ",
+    "priceRange": "نطاق السعر",
+    "openNow": "مفتوح الآن",
+    "dietary": "غذائي",
+    "nutrition": "أهداف التغذية",
+    "ingredients": "المكونات",
+    "cheap": "$",
+    "moderate": "$$",
+    "expensive": "$$$",
+    "luxury": "$$$$"
+  },
+  "search": {
+    "placeholder": "البحث عن الأماكن والمكونات...",
+    "recentSearches": "عمليات البحث الأخيرة",
+    "popularSearches": "عمليات البحث الشائعة",
+    "clearHistory": "مسح السجل",
+    "noResults": "لم يتم العثور على أماكن",
+    "tryAdjusting": "حاول تعديل المرشحات أو منطقة البحث"
+  },
+  "details": {
+    "overview": "نظرة عامة",
+    "menu": "القائمة",
+    "reviews": "المراجعات",
+    "photos": "الصور",
+    "aboutThis": "حول هذا المكان",
+    "nutritionInfo": "معلومات التغذية",
+    "ingredients": "المكونات",
+    "allergens": "المواد المسببة للحساسية"
+  },
+  "badges": {
+    "inSeason": "في الموسم",
+    "organic": "عضوي",
+    "localSource": "محلي",
+    "verified": "موثق",
+    "popular": "شائع"
+  }
+}

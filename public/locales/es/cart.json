@@ -1,0 +1,37 @@
+{
+  "title": "Carrito de Compras",
+  "empty": "Su carrito está vacío",
+  "addItems": "Agregue artículos para comenzar",
+  "itemCount": "{{count}} artículo",
+  "itemCount_other": "{{count}} artículos",
+  "subtotal": "Subtotal",
+  "tax": "Impuesto",
+  "tip": "Propina",
+  "total": "Total",
+  "checkout": "Pagar",
+  "continueShopping": "Continuar Comprando",
+  "removeItem": "Eliminar Artículo",
+  "updateQuantity": "Actualizar Cantidad",
+  "quantity": "Cantidad",
+  "price": "Precio",
+  "conflict": {
+    "title": "Conflicto de Carrito Detectado",
+    "message": "Los artículos de {{restaurantName}} ya están en su carrito. Solo puede ordenar de un lugar a la vez.",
+    "keepCurrent": "Mantener Carrito Actual",
+    "startNew": "Iniciar Nuevo Carrito",
+    "cancel": "Cancelar"
+  },
+  "tipSuggestions": {
+    "title": "Agregar una propina",
+    "custom": "Personalizado",
+    "noTip": "Sin propina"
+  },
+  "payment": {
+    "title": "Pago",
+    "method": "Método de Pago",
+    "card": "Tarjeta de Crédito/Débito",
+    "cash": "Efectivo",
+    "applePay": "Apple Pay",
+    "googlePay": "Google Pay"
+  }
+}

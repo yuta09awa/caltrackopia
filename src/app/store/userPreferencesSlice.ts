@@ -3,6 +3,10 @@ import { StateCreator } from 'zustand';
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   language: string;
+  locale: string;
+  currency: string;
+  measurementUnit: 'metric' | 'imperial';
+  region: string | null;
   notifications: boolean;
   location: {
     latitude: number | null;
@@ -19,6 +23,10 @@ export interface UserPreferencesSlice {
 const initialPreferences: UserPreferences = {
   theme: 'light',
   language: 'en',
+  locale: 'en',
+  currency: 'USD',
+  measurementUnit: 'metric',
+  region: null,
   notifications: true,
   location: {
     latitude: null,
@@ -55,6 +63,10 @@ export const createUserPreferencesSlice: StateCreator<
 export const selectUserPreferences = (state: UserPreferencesSlice) => state.userPreferences;
 export const selectTheme = (state: UserPreferencesSlice) => state.userPreferences.theme;
 export const selectLanguage = (state: UserPreferencesSlice) => state.userPreferences.language;
+export const selectLocale = (state: UserPreferencesSlice) => state.userPreferences.locale;
+export const selectCurrency = (state: UserPreferencesSlice) => state.userPreferences.currency;
+export const selectMeasurementUnit = (state: UserPreferencesSlice) => state.userPreferences.measurementUnit;
+export const selectRegion = (state: UserPreferencesSlice) => state.userPreferences.region;
 export const selectNotifications = (state: UserPreferencesSlice) => state.userPreferences.notifications;
 export const selectUserLocation = (state: UserPreferencesSlice) => state.userPreferences.location;
 export const selectHasUserLocation = (state: UserPreferencesSlice) => 
