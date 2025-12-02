@@ -6,6 +6,10 @@
  * L2 (IndexedDB): 24h TTL, persistent, browser storage
  * L3 (Supabase): Database-level caching with freshness tracking
  * 
+ * NOW LOCALE-AWARE: Keys are automatically prefixed with the current 
+ * language (e.g., 'en:places:all:100'). Use `ignoreLocale: true` option 
+ * for locale-agnostic data like user settings.
+ * 
  * @example
  * ```typescript
  * const data = await cacheService.get('places', 'search:pizza', async () => {
@@ -16,6 +20,7 @@
 
 import { indexedDBService, type StoreName } from '../storage/IndexedDBService';
 import { mapCacheService } from '../storage/MapCacheService';
+import i18n from '@/i18n/config';
 
 interface CacheEntry<T> {
   data: T;
@@ -28,6 +33,7 @@ interface CacheOptions {
   skipMemory?: boolean;
   skipIndexedDB?: boolean;
   skipSupabase?: boolean;
+  ignoreLocale?: boolean;
 }
 
 interface CacheMetrics {
@@ -77,10 +83,10 @@ export class UnifiedCacheService {
       ttl = this.DEFAULT_MEMORY_TTL,
       skipMemory = false,
       skipIndexedDB = false,
-      skipSupabase = false
     } = options;
 
-    const cacheKey = `${storeName}:${key}`;
+    const scopedKey = this.getScopedKey(key, options);
+    const cacheKey = `${storeName}:${scopedKey}`;
 
     // L1: Check memory cache
     if (!skipMemory) {
@@ -97,7 +103,7 @@ export class UnifiedCacheService {
     // L2: Check IndexedDB
     if (!skipIndexedDB) {
       try {
-        const indexedDBData = await this.getFromIndexedDB<T>(storeName as StoreName, key);
+        const indexedDBData = await this.getFromIndexedDB<T>(storeName as StoreName, scopedKey);
         if (indexedDBData !== null) {
           this.metrics.l2Hits++;
           // Promote to L1
@@ -122,7 +128,7 @@ export class UnifiedCacheService {
         this.setInMemory(cacheKey, data, ttl);
       }
       if (!skipIndexedDB) {
-        await this.setInIndexedDB(storeName as StoreName, key, data, this.DEFAULT_INDEXEDDB_TTL);
+        await this.setInIndexedDB(storeName as StoreName, scopedKey, data, this.DEFAULT_INDEXEDDB_TTL);
       }
       this.metrics.l3Hits++;
     } else {
@@ -148,14 +154,15 @@ export class UnifiedCacheService {
       skipIndexedDB = false
     } = options;
 
-    const cacheKey = `${storeName}:${key}`;
+    const scopedKey = this.getScopedKey(key, options);
+    const cacheKey = `${storeName}:${scopedKey}`;
 
     if (!skipMemory) {
       this.setInMemory(cacheKey, data, ttl);
     }
 
     if (!skipIndexedDB) {
-      await this.setInIndexedDB(storeName as StoreName, key, data, this.DEFAULT_INDEXEDDB_TTL);
+      await this.setInIndexedDB(storeName as StoreName, scopedKey, data, this.DEFAULT_INDEXEDDB_TTL);
     }
 
     console.log(`[Cache] SET: ${cacheKey}`);
@@ -166,16 +173,18 @@ export class UnifiedCacheService {
    */
   async invalidate(
     storeName: StoreName | 'places' | 'searches' | 'ingredients',
-    key: string
+    key: string,
+    options: CacheOptions = {}
   ): Promise<void> {
-    const cacheKey = `${storeName}:${key}`;
+    const scopedKey = this.getScopedKey(key, options);
+    const cacheKey = `${storeName}:${scopedKey}`;
     
     // Remove from memory
     this.memoryCache.delete(cacheKey);
     
     // Remove from IndexedDB
     try {
-      await indexedDBService.delete(storeName as StoreName, key);
+      await indexedDBService.delete(storeName as StoreName, scopedKey);
     } catch (error) {
       console.warn('[Cache] Error invalidating IndexedDB:', error);
     }
@@ -185,6 +194,7 @@ export class UnifiedCacheService {
 
   /**
    * Clear all caches for a store
+   * Note: This clears ALL locales for the store
    */
   async clearStore(storeName: StoreName | 'places' | 'searches' | 'ingredients'): Promise<void> {
     // Clear memory cache for this store
@@ -250,6 +260,17 @@ export class UnifiedCacheService {
   }
 
   // ============= PRIVATE METHODS =============
+
+  /**
+   * Generates a cache key prefixed with the current locale
+   */
+  private getScopedKey(key: string, options: CacheOptions): string {
+    if (options.ignoreLocale) {
+      return key;
+    }
+    const locale = i18n.language || 'en';
+    return `${locale}:${key}`;
+  }
 
   private getFromMemory<T>(key: string): T | null {
     const entry = this.memoryCache.get(key);
