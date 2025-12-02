@@ -3,6 +3,8 @@ import { DatabaseService, type EnhancedPlace, type Ingredient, type MenuItem, ty
 import { MockDataService } from '../mockDataService';
 import { DatabaseError } from '../errors/DatabaseError';
 import { unifiedCacheService } from '../cache/UnifiedCacheService';
+import { locationAdapter } from './adapters/locationAdapter';
+import { Location } from '@/models/Location';
 
 /**
  * Unified Data Access Layer
@@ -161,6 +163,90 @@ export class DataAccessLayer extends ServiceBase {
       }
       return this.dbService.getCachedPlacesByIds(ids);
     }, 'Getting cached places by IDs');
+  }
+
+  // ============= LOCATION DOMAIN OPERATIONS (Frontend Optimized) =============
+
+  /**
+   * Get all locations for the Browse View.
+   * Uses 3-tier caching: Memory (L1) -> IndexedDB (L2) -> Supabase (L3)
+   * Returns strict frontend Location types.
+   */
+  async getAllLocations(limit: number = 100): Promise<Location[]> {
+    return this.executeWithStateManagement(async () => {
+      const fetchFromSource = async () => {
+        // Mock Data Fallback - NO ADAPTER NEEDED
+        if (this.useMockData) {
+          console.log('[DAL] Using mock data for getAllLocations');
+          const { mockLocations } = await import('@/features/locations/data/mockLocations');
+          return mockLocations.slice(0, limit);
+        }
+
+        // DB Fetch
+        const places = await this.dbService.searchPlaces('', limit);
+        
+        // Adapter Conversion
+        return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+      };
+
+      // 3-Tier Cache Retrieval
+      return unifiedCacheService.get(
+        'places',
+        `locations_all:${limit}`,
+        fetchFromSource,
+        { ttl: 30 * 60 * 1000 } // 30 min L1 TTL
+      );
+    }, 'Getting all locations');
+  }
+
+  /**
+   * Search locations via the unified pipeline.
+   * Returns strict frontend Location types.
+   */
+  async searchFrontendLocations(query: string, limit: number = 50): Promise<Location[]> {
+    return this.executeWithStateManagement(async () => {
+      const fetchFromSource = async () => {
+        if (this.useMockData) {
+          const { mockLocations } = await import('@/features/locations/data/mockLocations');
+          const lowerQuery = query.toLowerCase();
+          return mockLocations
+            .filter(l => l.name.toLowerCase().includes(lowerQuery) || l.address.toLowerCase().includes(lowerQuery))
+            .slice(0, limit);
+        }
+        
+        const places = await this.dbService.searchPlaces(query, limit);
+        return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+      };
+
+      return unifiedCacheService.get(
+        'searches',
+        `locations:${query}:${limit}`,
+        fetchFromSource,
+        { ttl: 5 * 60 * 1000 } // 5 min cache for searches
+      );
+    }, 'Searching frontend locations');
+  }
+
+  /**
+   * Get locations by frontend type (Restaurant/Grocery).
+   */
+  async getLocationsByFrontendType(type: 'restaurant' | 'grocery', limit: number = 50): Promise<Location[]> {
+    return this.executeWithStateManagement(async () => {
+      const fetchFromSource = async () => {
+        // Fetch slightly more to ensure we have enough after filtering
+        const allPlaces = await this.getAllLocations(limit * 3);
+        return allPlaces
+          .filter(p => p.type.toLowerCase() === type.toLowerCase())
+          .slice(0, limit);
+      };
+
+      return unifiedCacheService.get(
+        'places',
+        `locations_type:${type}:${limit}`,
+        fetchFromSource,
+        { ttl: 15 * 60 * 1000 }
+      );
+    }, `Getting locations by type: ${type}`);
   }
 
   // ============= INGREDIENT OPERATIONS =============

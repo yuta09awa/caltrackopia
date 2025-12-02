@@ -44,6 +44,14 @@ export interface SearchResponse {
   query: SearchParams;
 }
 
+/**
+ * @deprecated Direct Edge API access is discouraged for feature code.
+ * Use DataAccessLayer which provides:
+ * - 3-tier caching (Memory → IndexedDB → Supabase)
+ * - Automatic mock fallback
+ * - Standardized error handling
+ * - Type-safe Location returns
+ */
 export class EdgeAPIClient {
   private edgeURL = import.meta.env.PROD 
     ? 'https://nutrimap-api.your-username.workers.dev' // TODO: Replace with your Worker URL
