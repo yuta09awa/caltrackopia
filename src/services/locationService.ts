@@ -5,6 +5,15 @@ import { EnhancedPlace } from './databaseService';
 import { enhancedCachingService } from './enhancedCachingService';
 import { mapCacheService } from './storage/MapCacheService';
 
+/**
+ * @deprecated Use DataAccessLayer instead.
+ * 
+ * Migration Guide:
+ * - locationService.getLocations() → dataAccess.getAllLocations()
+ * - locationService.searchLocations() → dataAccess.searchFrontendLocations()
+ * 
+ * See: docs/migrations/service-layer-migration.md
+ */
 class LocationService {
   private readonly MEMORY_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
   private readonly INDEXEDDB_TTL = 24 * 60 * 60 * 1000; // 24 hours

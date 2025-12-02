@@ -1,8 +1,8 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useMapFilters } from '@/features/map';
-import { EdgeAPIClient } from '@/lib/edge-api-client';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { dataAccess } from '@/services';
 import { 
   filterLocationsByType, 
   filterLocationsByOpenStatus, 
@@ -28,64 +28,23 @@ export function useLocations(options?: { disabled?: boolean }) {
   const [isOpenNow, setIsOpenNow] = useState(false);
   const { mapFilters } = useMapFilters();
 
-  // Fetch all locations from the edge API
+  // Unified Fetch Effect
   useEffect(() => {
     const fetchLocations = async () => {
       setLoading(true);
       setError(null);
+      
       try {
-        const edgeClient = new EdgeAPIClient();
-        console.log('Fetching locations from edge API...');
+        console.log('Fetching locations via DataAccessLayer...');
         
-        const result = await edgeClient.searchRestaurants({
-          limit: 1000
-        });
+        // Single call handles L1/L2/L3 caching, adapters, and mock fallbacks
+        const data = await dataAccess.getAllLocations(1000);
         
-        console.log('Fetched locations:', result.results.length, 'items from edge');
-        
-        if (result.results.length === 0) {
-          console.log('No locations found from edge, falling back to mock data');
-          const { mockLocations } = await import('../data/mockLocations');
-          setAllLocations(mockLocations);
-        } else {
-          // Map edge API results to Location type
-          const mappedLocations: Location[] = result.results.map(place => ({
-            id: place.id,
-            place_id: place.place_id,
-            name: place.name,
-            type: place.primary_type === 'restaurant' ? 'Restaurant' : 'Grocery',
-            latitude: place.latitude,
-            longitude: place.longitude,
-            address: place.formatted_address || '',
-            rating: place.rating || 0,
-            priceLevel: place.price_level || 2,
-            price: ['$', '$$', '$$$', '$$$$'][place.price_level || 1] as "$" | "$$" | "$$$" | "$$$$",
-            isOpen: place.is_open_now || false,
-            openNow: place.is_open_now || false,
-            cuisine: place.cuisine_types?.[0] || 'Various',
-            hours: place.opening_hours as any,
-            phone: place.phone_number,
-            website: place.website,
-            distance: place.distance_meters ? `${(place.distance_meters / 1000).toFixed(1)} km` : '0 km',
-            dietaryOptions: [],
-            images: place.photo_references || [],
-            coordinates: { lat: place.latitude, lng: place.longitude }
-          }));
-          setAllLocations(mappedLocations);
-        }
+        console.log(`Fetched ${data.length} locations`);
+        setAllLocations(data);
       } catch (err) {
-        console.error('Error fetching locations from edge API:', err);
+        console.error('Error in useLocations:', err);
         setError('Failed to load locations');
-        // Fallback to mock data if edge fetch fails
-        try {
-          const { mockLocations } = await import('../data/mockLocations');
-          console.log('Falling back to mock locations due to error');
-          setAllLocations(mockLocations);
-          setError(null);
-        } catch (mockErr) {
-          console.error('Error loading mock locations:', mockErr);
-          setAllLocations([]);
-        }
       } finally {
         setLoading(false);
       }

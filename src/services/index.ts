@@ -17,10 +17,11 @@ export type {
 // Unified Service Management
 export { UnifiedServiceManager, serviceManager } from './core/UnifiedServiceManager';
 
-// ============= NEW UNIFIED SERVICES (Recommended) =============
+// === NEW UNIFIED SERVICES (Recommended) ===
 
 // Data Access Layer - Single source for all data operations
 export { DataAccessLayer, dataAccess } from './data/DataAccessLayer';
+export { locationAdapter } from './data/adapters/locationAdapter';
 
 // Location Service - Single source for location operations
 export { LocationService, location } from './location/LocationService';
