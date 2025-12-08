@@ -1,4 +1,3 @@
-
 project_id = "aulfiflberencgsdvyay"
 
 [api]
@@ -35,4 +34,7 @@ enabled = true
 port = 54325
 
 [functions.places-cache-manager]
+verify_jwt = false
+
+[functions.analyze-food]
 verify_jwt = false
