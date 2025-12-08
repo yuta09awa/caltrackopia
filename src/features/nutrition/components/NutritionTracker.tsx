@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
-import { Plus, Search, ListFilter, Utensils, Apple, ArrowRight } from "lucide-react";
+import { Plus, Search, ListFilter, Utensils, Apple, ArrowRight, Camera } from "lucide-react";
+import SnapToTrack from "./SnapToTrack";
 
 // Mock nutrition data
 const mockNutritionData = [
@@ -172,6 +172,9 @@ const NutritionTracker = () => {
               <Utensils className="h-4 w-4 text-primary" />
               <span>Add a recipe</span>
             </button>
+          </div>
+          <div className="mt-4">
+            <SnapToTrack onAddToLog={(result) => console.log('Added to log:', result)} />
           </div>
           <div className="mt-6">
             <button className="w-full py-2 bg-primary text-white rounded-md font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
