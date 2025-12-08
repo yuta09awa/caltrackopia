@@ -248,6 +248,38 @@ export type Database = {
         }
         Relationships: []
       }
+      correction_votes: {
+        Row: {
+          correction_id: string
+          created_at: string
+          id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          correction_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          correction_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "correction_votes_correction_id_fkey"
+            columns: ["correction_id"]
+            isOneToOne: false
+            referencedRelation: "nutrition_corrections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dietary_restriction_types: {
         Row: {
           created_at: string
@@ -405,6 +437,172 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      menu_items: {
+        Row: {
+          allergens: string[] | null
+          calories: number | null
+          carbohydrates: number | null
+          category: string | null
+          cholesterol: number | null
+          confidence_score: number | null
+          created_at: string
+          data_source: string | null
+          description: string | null
+          dietary_tags: string[] | null
+          fat: number | null
+          fiber: number | null
+          id: string
+          image_url: string | null
+          ingredients: Json | null
+          is_available: boolean | null
+          last_ai_analysis_at: string | null
+          minerals: Json | null
+          name: string
+          price: number | null
+          protein: number | null
+          restaurant_id: string | null
+          sodium: number | null
+          sugar: number | null
+          updated_at: string
+          usda_match_ids: string[] | null
+          verified_at: string | null
+          verified_by: string | null
+          vitamins: Json | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          calories?: number | null
+          carbohydrates?: number | null
+          category?: string | null
+          cholesterol?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          data_source?: string | null
+          description?: string | null
+          dietary_tags?: string[] | null
+          fat?: number | null
+          fiber?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: Json | null
+          is_available?: boolean | null
+          last_ai_analysis_at?: string | null
+          minerals?: Json | null
+          name: string
+          price?: number | null
+          protein?: number | null
+          restaurant_id?: string | null
+          sodium?: number | null
+          sugar?: number | null
+          updated_at?: string
+          usda_match_ids?: string[] | null
+          verified_at?: string | null
+          verified_by?: string | null
+          vitamins?: Json | null
+        }
+        Update: {
+          allergens?: string[] | null
+          calories?: number | null
+          carbohydrates?: number | null
+          category?: string | null
+          cholesterol?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          data_source?: string | null
+          description?: string | null
+          dietary_tags?: string[] | null
+          fat?: number | null
+          fiber?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: Json | null
+          is_available?: boolean | null
+          last_ai_analysis_at?: string | null
+          minerals?: Json | null
+          name?: string
+          price?: number | null
+          protein?: number | null
+          restaurant_id?: string | null
+          sodium?: number | null
+          sugar?: number | null
+          updated_at?: string
+          usda_match_ids?: string[] | null
+          verified_at?: string | null
+          verified_by?: string | null
+          vitamins?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nutrition_corrections: {
+        Row: {
+          applied_at: string | null
+          corrected_value: Json
+          created_at: string
+          downvotes: number | null
+          evidence_url: string | null
+          field_name: string
+          id: string
+          menu_item_id: string
+          original_value: Json | null
+          reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submitted_by: string
+          upvotes: number | null
+        }
+        Insert: {
+          applied_at?: string | null
+          corrected_value: Json
+          created_at?: string
+          downvotes?: number | null
+          evidence_url?: string | null
+          field_name: string
+          id?: string
+          menu_item_id: string
+          original_value?: Json | null
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_by: string
+          upvotes?: number | null
+        }
+        Update: {
+          applied_at?: string | null
+          corrected_value?: Json
+          created_at?: string
+          downvotes?: number | null
+          evidence_url?: string | null
+          field_name?: string
+          id?: string
+          menu_item_id?: string
+          original_value?: Json | null
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_by?: string
+          upvotes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_corrections_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       nutrition_goal_types: {
         Row: {
