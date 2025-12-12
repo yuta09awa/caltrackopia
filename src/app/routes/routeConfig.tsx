@@ -9,6 +9,7 @@ import {
   LazyProfilePage,
   LazyNotFound,
   LazyHomePage,
+  LazyRestaurantDashboard,
   RouteLoadingFallback 
 } from '@/shared/routing/LazyRoutes';
 import ShoppingPage from '@/pages/ShoppingPage';
@@ -106,6 +107,17 @@ export const routes: AppRoute[] = [
     navLabel: 'Profile',
     icon: <UserRound className="w-4 h-4" />,
     showInNav: true,
+  },
+  {
+    path: '/restaurant-dashboard',
+    element: (
+      <ProtectedRoute requireAuth={true} requiredRole="restaurant_owner">
+        <LazyWrapper>
+          <LazyRestaurantDashboard />
+        </LazyWrapper>
+      </ProtectedRoute>
+    ),
+    title: 'Restaurant Dashboard',
   },
   {
     path: '/unauthorized',
