@@ -1,5 +1,4 @@
 import { ReactNode, Suspense, lazy } from 'react';
-import { Navigate } from 'react-router-dom';
 import { Flame, Map, Home, UserRound } from 'lucide-react';
 import { 
   LazyMapPage, 
@@ -12,7 +11,7 @@ import {
   LazyHomePage,
   LazyRestaurantDashboard,
   RouteLoadingFallback 
-} from '@/components/routing/LazyRoutes';
+} from '@/shared/routing/LazyRoutes';
 import ShoppingPage from '@/pages/ShoppingPage';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { AppRoute } from './types';
@@ -119,11 +118,6 @@ export const routes: AppRoute[] = [
       </ProtectedRoute>
     ),
     title: 'Restaurant Dashboard',
-  },
-  {
-    path: '/dashboard',
-    element: <Navigate to="/restaurant-dashboard" replace />,
-    title: 'Dashboard Redirect',
   },
   {
     path: '/unauthorized',
