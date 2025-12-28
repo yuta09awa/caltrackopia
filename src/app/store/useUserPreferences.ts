@@ -86,9 +86,10 @@ export function useUserPreferences() {
 }
 
 /**
- * Selector hook for just theme
+ * Selector hook for just theme preference from store
+ * Note: For theme context, use useTheme from @/providers/ThemeProvider instead
  */
-export function useTheme() {
+export function useThemePreference() {
   return useAppStore((state) => state.userPreferences.theme);
 }
 
