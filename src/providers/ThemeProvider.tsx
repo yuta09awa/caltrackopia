@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import { useUserPreferences } from '@/app/store/useUserPreferences';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -9,21 +8,27 @@ type ThemeProviderProps = {
   storageKey?: string;
 };
 
-const ThemeProviderContext = createContext<{
+type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-}>({
+};
+
+const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
-});
+};
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
+  storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const { theme: currentTheme, setTheme: setThemePreference } = useUserPreferences();
-  const theme = currentTheme || defaultTheme;
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -41,13 +46,12 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const setTheme = (newTheme: Theme) => {
-    setThemePreference(newTheme);
-  };
-
   const value = {
     theme,
-    setTheme,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+    },
   };
 
   return (
