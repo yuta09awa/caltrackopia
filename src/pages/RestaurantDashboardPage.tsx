@@ -12,16 +12,18 @@ import { useAuth } from '@/features/auth/store/useAuth';
 import { AuthService } from '@/features/auth/services/authService';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import {
-  useRestaurantData,
-  useRestaurantMenu,
-  DashboardOverview,
-  MenuItemsList,
-  MenuItemEditor,
-} from '@/features/restaurant-dashboard';
-import type { MenuItem, MenuItemFormData } from '@/features/restaurant-dashboard';
 
-// Placeholder components for Phase 3
+// Placeholder components for Phase 2
+const DashboardOverview = () => (
+  <div className="p-6 border rounded-lg bg-muted/10">
+    <p className="text-muted-foreground">Overview Content (Coming Soon)</p>
+  </div>
+);
+const MenuItemsList = () => (
+  <div className="p-6 border rounded-lg bg-muted/10">
+    <p className="text-muted-foreground">Menu Items Content (Coming Soon)</p>
+  </div>
+);
 const MenuUpload = () => (
   <div className="p-6 border rounded-lg bg-muted/10">
     <p className="text-muted-foreground">Menu Upload Content (Coming Soon)</p>
@@ -37,21 +39,6 @@ export default function RestaurantDashboardPage() {
   const { setUser, setIsAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-
-  const { restaurant, isLoading: restaurantLoading } = useRestaurantData();
-  const { 
-    menuItems, 
-    stats, 
-    isLoading: menuLoading,
-    createMenuItem,
-    updateMenuItem,
-    deleteMenuItem,
-    toggleAvailability,
-    isCreating,
-    isUpdating,
-  } = useRestaurantMenu(restaurant?.id);
 
   const handleSignOut = async () => {
     try {
@@ -63,30 +50,6 @@ export default function RestaurantDashboardPage() {
     } catch (error) {
       console.error('Sign out error:', error);
       toast.error('Failed to sign out');
-    }
-  };
-
-  const handleAddItem = () => {
-    setEditingItem(null);
-    setEditorOpen(true);
-  };
-
-  const handleEditItem = (item: MenuItem) => {
-    setEditingItem(item);
-    setEditorOpen(true);
-  };
-
-  const handleDeleteItem = async (id: string) => {
-    if (confirm('Are you sure you want to delete this item?')) {
-      await deleteMenuItem(id);
-    }
-  };
-
-  const handleSaveItem = async (data: MenuItemFormData) => {
-    if (editingItem) {
-      await updateMenuItem(editingItem.id, data);
-    } else {
-      await createMenuItem(data);
     }
   };
 
@@ -104,7 +67,7 @@ export default function RestaurantDashboardPage() {
         <div className="p-6 border-b">
           <h1 className="text-xl font-bold text-primary">Restaurant Portal</h1>
           <p className="text-xs text-muted-foreground mt-1 truncate">
-            {restaurant?.business_name || 'Manage your business'}
+            {user?.restaurant?.businessName || 'Manage your business'}
           </p>
         </div>
         
@@ -143,24 +106,12 @@ export default function RestaurantDashboardPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsContent value="overview" className="space-y-4 mt-0">
               <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
-              <DashboardOverview
-                stats={stats}
-                isLoading={restaurantLoading || menuLoading}
-                onAddItem={handleAddItem}
-                onUploadMenu={() => setActiveTab('upload')}
-              />
+              <DashboardOverview />
             </TabsContent>
             
             <TabsContent value="menu" className="space-y-4 mt-0">
               <h2 className="text-3xl font-bold tracking-tight">Menu Management</h2>
-              <MenuItemsList
-                menuItems={menuItems}
-                isLoading={restaurantLoading || menuLoading}
-                onEdit={handleEditItem}
-                onDelete={handleDeleteItem}
-                onToggleAvailability={toggleAvailability}
-                onAddNew={handleAddItem}
-              />
+              <MenuItemsList />
             </TabsContent>
             
             <TabsContent value="upload" className="space-y-4 mt-0">
@@ -175,15 +126,6 @@ export default function RestaurantDashboardPage() {
           </Tabs>
         </div>
       </main>
-
-      {/* Menu Item Editor Dialog */}
-      <MenuItemEditor
-        open={editorOpen}
-        onOpenChange={setEditorOpen}
-        item={editingItem}
-        onSave={handleSaveItem}
-        isSaving={isCreating || isUpdating}
-      />
     </div>
   );
 }

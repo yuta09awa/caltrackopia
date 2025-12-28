@@ -1,3 +1,4 @@
+
 import { lazy } from 'react';
 
 // Lazy load all route components for code splitting
@@ -10,7 +11,6 @@ export const LazyAuthPage = lazy(() => import('@/pages/AuthPage'));
 export const LazyProfilePage = lazy(() => import('@/pages/ProfilePage'));
 export const LazyNotFound = lazy(() => import('@/pages/NotFound'));
 export const LazyHomePage = lazy(() => import('@/pages/Index'));
-export const LazyRestaurantDashboard = lazy(() => import('@/pages/RestaurantDashboardPage'));
 
 // Loading fallback component
 export const RouteLoadingFallback = () => (

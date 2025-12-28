@@ -45,4 +45,4 @@ export { default as LocationSpoofPanel } from './development/LocationSpoofPanel'
 
 // Routing Components
 export * from './routing/LazyComponents';
-export * from '@/shared/routing/LazyRoutes';
+export * from './routing/LazyRoutes';
