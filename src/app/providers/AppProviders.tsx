@@ -1,7 +1,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from './ThemeProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { GlobalErrorBoundary } from '@/features/errors/components/GlobalErrorBoundary';
 import AuthInitializer from '@/features/auth/components/AuthInitializer';
