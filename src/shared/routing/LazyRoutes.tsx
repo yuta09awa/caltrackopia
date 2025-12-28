@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 
-// Lazy load all route components for code splitting
+// Lazy load route components for code splitting
 export const LazyMapPage = lazy(() => import('@/pages/MapPage'));
 export const LazyNutritionPage = lazy(() => import('@/pages/NutritionPage'));
 export const LazyShoppingPage = lazy(() => import('@/pages/ShoppingPage'));
