@@ -21,11 +21,9 @@ export interface AnalysisResult {
     portion_grams: number;
     confidence: number;
     usda_id?: string;
-    matched_from_db?: boolean;
   }>;
   confidence_score: number;
   data_source: 'ai_vision' | 'usda' | 'hybrid';
-  db_matches?: number;
   error?: string;
 }
 
