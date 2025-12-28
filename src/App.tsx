@@ -3,6 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n/config';
 import { AppProviders } from './app/providers/AppProviders';
 import AppRoutes from './app/routes/AppRoutes';
+import { Toaster } from './components/ui/toaster';
 import './App.css';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
     <I18nextProvider i18n={i18n}>
       <AppProviders>
         <AppRoutes />
+        <Toaster />
       </AppProviders>
     </I18nextProvider>
   );
