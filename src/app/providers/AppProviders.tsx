@@ -39,8 +39,8 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
               <OfflineInitializer />
               {children}
               <OfflineIndicator />
+              <Toaster position="top-center" />
             </AuthInitializer>
-            <Toaster position="top-center" />
           </ThemeProvider>
         </BrowserRouter>
       </QueryClientProvider>
