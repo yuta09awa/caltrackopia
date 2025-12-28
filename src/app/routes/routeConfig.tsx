@@ -12,7 +12,7 @@ import {
   LazyHomePage,
   LazyRestaurantDashboard,
   RouteLoadingFallback 
-} from '@/shared/routing/LazyRoutes';
+} from '@/components/routing/LazyRoutes';
 import ShoppingPage from '@/pages/ShoppingPage';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { AppRoute } from './types';
