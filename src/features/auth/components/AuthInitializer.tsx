@@ -1,33 +1,47 @@
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/features/auth';
-import { authApi } from '@/features/auth/api/authApi';
 
 interface AuthInitializerProps {
   children: React.ReactNode;
 }
 
+/**
+ * AuthInitializer handles authentication state management
+ * It defers Zustand store access until after the first render to avoid
+ * React initialization timing issues with useSyncExternalStore
+ */
 const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
-  const { setUser, setAuthLoading, setAuthError } = useAuth();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
+    // Defer store access to after first render
+    setIsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    // Dynamically import to avoid early initialization
+    const initAuth = async () => {
+      const { useAppStore } = await import('@/app/store');
+      const store = useAppStore.getState();
+      const { setUser, setAuthLoading, setAuthError } = store;
+
       try {
         setAuthLoading(true);
         setAuthError(null);
-        
-        const session = await authApi.getSession();
+
+        const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
           setUser(null);
+          setAuthLoading(false);
           return;
         }
 
-        // Get current user with profile data already transformed
-        const currentUser = await authApi.getCurrentUser();
+        // Get current user with profile data
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
         if (currentUser) {
-          // Transform to app user format (this will be handled by authApi in future)
           const { AuthService } = await import('@/features/auth/services/authService');
           const profileData = await AuthService.fetchUserProfile(currentUser.id);
           const user = await AuthService.transformSupabaseUserToUser(currentUser, profileData);
@@ -44,27 +58,29 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
       }
     };
 
-    checkSession();
+    initAuth();
 
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event);
-        
+
         try {
+          const { useAppStore } = await import('@/app/store');
+          const store = useAppStore.getState();
+
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             if (session?.user) {
               const { AuthService } = await import('@/features/auth/services/authService');
               const profileData = await AuthService.fetchUserProfile(session.user.id);
               const user = await AuthService.transformSupabaseUserToUser(session.user, profileData);
-              setUser(user);
+              store.setUser(user);
             }
           } else if (event === 'SIGNED_OUT') {
-            setUser(null);
+            store.setUser(null);
           }
         } catch (err: any) {
           console.error('Auth state change error:', err);
-          setAuthError(err.message);
         }
       }
     );
@@ -72,7 +88,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [setUser, setAuthLoading, setAuthError]);
+  }, [isReady]);
 
   return <>{children}</>;
 };

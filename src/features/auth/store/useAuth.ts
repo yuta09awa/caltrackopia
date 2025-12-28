@@ -1,11 +1,18 @@
 import { useAppStore } from '@/app/store';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 /**
  * Feature-specific hook for auth state
  * Provides memoized selectors and encapsulates auth logic
  */
 export function useAuth() {
+  // Add a mounted check to ensure we only access the store after hydration
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const store = useAppStore();
 
   // Memoized selectors for better performance
