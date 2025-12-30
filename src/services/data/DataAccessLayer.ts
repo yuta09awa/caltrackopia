@@ -183,10 +183,19 @@ export class DataAccessLayer extends ServiceBase {
         }
 
         // DB Fetch
+        console.log('[DAL] Fetching locations from database...');
         const places = await this.dbService.searchPlaces('', limit);
         
-        // Adapter Conversion
-        return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+        // If database has data, use it
+        if (places && places.length > 0) {
+          console.log(`[DAL] Found ${places.length} places in database`);
+          return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+        }
+        
+        // Fall back to mock data when DB is empty
+        console.log('[DAL] Database empty, falling back to mock data');
+        const { mockLocations } = await import('@/features/locations/data/mockLocations');
+        return mockLocations.slice(0, limit);
       };
 
       // 3-Tier Cache Retrieval
@@ -214,8 +223,22 @@ export class DataAccessLayer extends ServiceBase {
             .slice(0, limit);
         }
         
+        console.log(`[DAL] Searching locations for query: "${query}"`);
         const places = await this.dbService.searchPlaces(query, limit);
-        return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+        
+        // If database has results, use them
+        if (places && places.length > 0) {
+          console.log(`[DAL] Found ${places.length} search results in database`);
+          return places.map(p => locationAdapter.toLocationFromEnhancedPlace(p));
+        }
+        
+        // Fall back to mock data search when DB is empty
+        console.log('[DAL] No database results, falling back to mock data search');
+        const { mockLocations } = await import('@/features/locations/data/mockLocations');
+        const lowerQuery = query.toLowerCase();
+        return mockLocations
+          .filter(l => l.name.toLowerCase().includes(lowerQuery) || l.address.toLowerCase().includes(lowerQuery))
+          .slice(0, limit);
       };
 
       return unifiedCacheService.get(
