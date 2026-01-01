@@ -10,8 +10,14 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   optimizeDeps: {
-    // Include i18n packages and their CJS dependencies for proper transformation
     include: [
+      // React core - ensure single bundled version
+      'react',
+      'react-dom',
+      'react-router',
+      'react-router-dom',
+      '@tanstack/react-query',
+      // i18n packages and their CJS dependencies
       'i18next',
       'react-i18next',
       'i18next-browser-languagedetector',
@@ -20,6 +26,7 @@ export default defineConfig(({ mode }) => ({
       'void-elements'
     ],
     exclude: ['zustand'],
+    force: true,
   },
   resolve: {
     // Ensure single instance of React and React Router to fix useContext errors
