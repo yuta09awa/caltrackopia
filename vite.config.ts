@@ -10,8 +10,16 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   optimizeDeps: {
-    // Exclude i18n to prevent optimization issues
-    exclude: ['zustand', 'react-i18next', 'i18next'],
+    // Include i18n packages and their CJS dependencies for proper transformation
+    include: [
+      'i18next',
+      'react-i18next',
+      'i18next-browser-languagedetector',
+      'i18next-http-backend',
+      'html-parse-stringify',
+      'void-elements'
+    ],
+    exclude: ['zustand'],
   },
   resolve: {
     // Ensure single instance of React to fix useMemo/context errors
