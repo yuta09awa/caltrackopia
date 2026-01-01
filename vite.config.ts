@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => ({
     exclude: ['zustand'],
   },
   resolve: {
-    // Ensure single instance of React to fix useMemo/context errors
-    dedupe: ['react', 'react-dom'],
+    // Ensure single instance of React and React Router to fix useContext errors
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
