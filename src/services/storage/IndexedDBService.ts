@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'caltrackopia_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented to 2 to trigger upgrade
 
 export interface StoredItem<T = any> {
   id: string;
@@ -13,7 +13,18 @@ export interface StoredItem<T = any> {
   expiresAt?: number;
 }
 
-export type StoreName = 'cart' | 'searches' | 'favorites' | 'preferences' | 'offline_queue' | 'sync_metadata' | 'map_locations' | 'map_searches';
+// Added 'places' and 'ingredients' to the allowed store names
+export type StoreName = 
+  | 'cart' 
+  | 'searches' 
+  | 'favorites' 
+  | 'preferences' 
+  | 'offline_queue' 
+  | 'sync_metadata' 
+  | 'map_locations' 
+  | 'map_searches'
+  | 'places'
+  | 'ingredients';
 
 class IndexedDBService {
   private db: IDBDatabase | null = null;
@@ -35,8 +46,12 @@ class IndexedDBService {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
-        // Create object stores
-        const stores: StoreName[] = ['cart', 'searches', 'favorites', 'preferences', 'offline_queue', 'sync_metadata', 'map_locations', 'map_searches'];
+        // Create object stores - includes 'places' and 'ingredients'
+        const stores: StoreName[] = [
+          'cart', 'searches', 'favorites', 'preferences', 
+          'offline_queue', 'sync_metadata', 'map_locations', 
+          'map_searches', 'places', 'ingredients'
+        ];
         
         stores.forEach(storeName => {
           if (!db.objectStoreNames.contains(storeName)) {
@@ -91,7 +106,7 @@ class IndexedDBService {
 
         // Check expiration
         if (item.expiresAt && Date.now() > item.expiresAt) {
-          this.delete(storeName, id);
+          this.delete(storeName, id).catch(console.error);
           resolve(null);
           return;
         }
