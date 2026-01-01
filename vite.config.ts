@@ -11,12 +11,6 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
-      // React core - ensure single bundled version
-      'react',
-      'react-dom',
-      'react-router',
-      'react-router-dom',
-      '@tanstack/react-query',
       // i18n packages and their CJS dependencies
       'i18next',
       'react-i18next',
@@ -26,18 +20,20 @@ export default defineConfig(({ mode }) => ({
       'void-elements'
     ],
     exclude: ['zustand'],
-    force: true,
   },
   resolve: {
-    // Ensure single instance of React and React Router to fix useContext errors
     dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Force all React imports to use the same instance from node_modules
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+      'react-router': path.resolve(__dirname, 'node_modules/react-router'),
     },
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === 'development' && componentTagger(),
   ].filter(Boolean),
 }));
