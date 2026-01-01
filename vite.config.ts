@@ -10,16 +10,19 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   optimizeDeps: {
-    exclude: ['zustand'],
+    // Exclude i18n to prevent optimization issues
+    exclude: ['zustand', 'react-i18next', 'i18next'],
+  },
+  resolve: {
+    // Ensure single instance of React to fix useMemo/context errors
+    dedupe: ['react', 'react-dom'],
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   plugins: [
     react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
 }));

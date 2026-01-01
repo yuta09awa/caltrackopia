@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { MarkerData } from '../types';
 import { usePlaceSearch } from './usePlaceSearch';
@@ -14,7 +13,7 @@ export const usePlacesApi = () => {
     resultCount
   } = usePlaceSearch();
 
-  const { getPlaceDetails } = usePlacesApiService();
+  const { getPlaceDetails, waitForPlacesApi, getProvider } = usePlacesApiService();
 
   const searchNearbyPlaces = useCallback(async (
     map: google.maps.Map,
@@ -25,12 +24,21 @@ export const usePlacesApi = () => {
   }, [searchNearbyPlacesCore]);
 
   return {
+    // Core search functions
     searchPlacesByText,
     searchNearbyPlaces,
     searchPlacesWithIngredients,
+    
+    // Place details
     getPlaceDetails,
+    
+    // State
     loading,
     error,
-    resultCount
+    resultCount,
+    
+    // Provider access (for advanced use)
+    waitForPlacesApi,
+    getProvider
   };
 };

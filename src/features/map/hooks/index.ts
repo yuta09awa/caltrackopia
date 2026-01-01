@@ -4,24 +4,24 @@
 export { useConsolidatedMap } from './useConsolidatedMap';
 export type { ConsolidatedMapHook, ConsolidatedMapOptions } from './useConsolidatedMap';
 
-// CORE MAP BUILDING BLOCKS - For advanced usage or custom implementations
+// CORE MAP BUILDING BLOCKS
 export { useMapCore } from './useMapCore';
 export { useUserLocation } from './useUserLocation';
 export { usePlacesApi } from './usePlacesApi';
 export { useToastManager } from './useToastManager';
 
-// SPECIALIZED HOOKS - For specific functionality
+// SPECIALIZED HOOKS
 export { useApiKeyState } from './useApiKeyState';
 export { useCacheMetrics } from './useCacheMetrics';
 export { useEdgeFunctionApi } from './useEdgeFunctionApi';
 
-// FILTER HOOKS - For filtering and search
+// FILTER HOOKS
 export { useDietaryRestrictions } from './filters/useDietaryRestrictions';
 export { useIngredientSources } from './filters/useIngredientSources';
 export { useNutritionGoals } from './filters/useNutritionGoals';
+export { usePlaceFilters } from './usePlaceFilters';
 
 // === INTERNAL HOOKS - Not recommended for direct use ===
-// These are used internally by consolidated hooks
 export { useMapState } from './useMapState';
 export { useMapSearch } from './useMapSearch';
 export { useMapUI } from './useMapUI';
@@ -29,24 +29,15 @@ export { useMapMarkers } from './useMapMarkers';
 export { useMapOptions } from './useMapOptions';
 export { useInfoCardState } from './useInfoCardState';
 export { useSearchState } from './useSearchState';
-
-// Places API utilities (internal)
 export { usePlacesApiService } from './usePlacesApiService';
+export { useIngredientSearch } from './useIngredientSearch';
 
-// Search implementation hooks
+// === DEPRECATED - Use usePlacesApi instead ===
 export { usePlaceSearch } from './usePlaceSearch';
 export { useTextSearch } from './useTextSearch';
 export { useNearbySearch } from './useNearbySearch';
-export { useIngredientSearch } from './useIngredientSearch';
 
-// === LEGACY HOOKS - Deprecated, will be removed in future versions ===
-// Use useConsolidatedMap instead for new code
-
-// Still in use by UnifiedMapView - will be migrated
+// === LEGACY - Will be removed ===
 export { useMapRendering } from './useMapRendering';
-
-// Still in use by SimpleMapView - will be migrated
 export { useSimpleMapState } from './useSimpleMapState';
-
-// Kept for backward compatibility - consider migrating to useConsolidatedMap
 export { useLocationSelection } from './useLocationSelection';
