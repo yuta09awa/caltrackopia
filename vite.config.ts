@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => ({
       'void-elements'
     ],
     exclude: ['zustand'],
+    force: true, // Force cache rebuild to apply new aliases
   },
   resolve: {
     dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
