@@ -11,22 +11,21 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
-      // i18n packages and their CJS dependencies
+      // i18n packages (non-React dependencies only)
       'i18next',
-      'react-i18next',
       'i18next-browser-languagedetector',
       'i18next-http-backend',
       'html-parse-stringify',
       'void-elements'
     ],
-    exclude: ['zustand'],
-    force: true, // Force cache rebuild to apply new aliases
+    // Exclude packages that need to share React instance
+    exclude: ['zustand', 'react-i18next'],
   },
   resolve: {
-    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom', 'react-i18next'],
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Force all React imports to use the same instance from node_modules
+      // Force all React imports to use the same instance
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
       'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
