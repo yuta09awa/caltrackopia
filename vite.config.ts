@@ -18,11 +18,25 @@ export default defineConfig(({ mode }) => ({
       'html-parse-stringify',
       'void-elements'
     ],
-    // Exclude packages that need to share React instance
-    exclude: ['zustand', 'react-i18next'],
+    // Exclude ALL packages that use React hooks to prevent duplicate React instances
+    exclude: [
+      'zustand',
+      'react-i18next',
+      'react-router-dom',
+      'react-router',
+      '@tanstack/react-query'
+    ],
+    force: true, // Force cache rebuild - remove after fix is confirmed
   },
   resolve: {
-    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom', 'react-i18next'],
+    dedupe: [
+      'react',
+      'react-dom',
+      'react-router',
+      'react-router-dom',
+      'react-i18next',
+      '@tanstack/react-query'
+    ],
     alias: {
       "@": path.resolve(__dirname, "./src"),
       // Force all React imports to use the same instance
