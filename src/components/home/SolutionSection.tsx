@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle, Leaf, ShieldCheck, Store, Tractor, Users } from "lucide-react";
+import { ArrowRight, CheckCircle, Leaf, ShieldCheck, Store, Sprout, Users } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -9,10 +9,10 @@ const SolutionSection = () => {
       title: "For Consumers",
       color: "from-blue-500 to-blue-600",
       features: [
-        "See which farm supplied the eggs in your omelet",
+        "Know what's local, what's seasonal, what aligns with your values",
         "Access allergen protocols with cross-contamination risk levels",
-        "Track nutrition with verified data provenance (USDA, AI Vision, Restaurant Verified)",
-        "Make informed decisions based on real supply chain data",
+        "Track nutrition with verified data you can trust",
+        "Make choices based on information, not guesswork",
       ],
     },
     {
@@ -20,21 +20,21 @@ const SolutionSection = () => {
       title: "For Restaurants",
       color: "from-green-500 to-green-600",
       features: [
-        "Showcase supply chain transparency to attract health-conscious diners",
-        "Gain competitive advantage through verified farm partnerships",
+        "Showcase local partnerships to attract health-conscious diners",
+        "Stand out with visible sourcing and regional ingredients",
         "Reduce liability with documented allergen protocols",
-        "Turn sourcing into marketing with visible farm relationships",
+        "Turn quality sourcing into a marketing advantage",
       ],
     },
     {
-      icon: Tractor,
-      title: "For Farms & Suppliers",
+      icon: Sprout,
+      title: "For Local Producers",
       color: "from-amber-500 to-amber-600",
       features: [
-        "Gain consumer visibility through restaurant profiles",
-        "Access market intelligence on certification demand",
-        "Build direct relationships with local restaurants",
-        "Premium positioning for sustainable practices",
+        "Connect directly to your community through restaurant partners",
+        "Get recognized for the quality you've always delivered",
+        "Build relationships with local restaurants who value your work",
+        "Let diners discover the story behind their food",
       ],
     },
   ];
@@ -55,10 +55,10 @@ const SolutionSection = () => {
             The Solution
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            A Three-Sided Marketplace
+            Transparency That Connects
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            NutriMap creates value at every node of the food chain—building network effects that compound with scale.
+            We're building the infrastructure for food trust—connecting the people who grow, prepare, and eat food in ways that benefit everyone.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ const SolutionSection = () => {
             </text>
             <circle cx="50" cy="250" r="30" className="fill-amber-500/20 stroke-amber-500" strokeWidth="2" />
             <text x="50" y="255" textAnchor="middle" className="fill-amber-600 text-xs font-medium">
-              Farms
+              Producers
             </text>
             {/* Flow arrows */}
             <path d="M180 70 L160 120" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground" markerEnd="url(#arrowhead)" />
@@ -147,9 +147,9 @@ const SolutionSection = () => {
           <div className="inline-flex flex-col md:flex-row items-center gap-4 md:gap-8 px-8 py-6 rounded-2xl bg-gradient-to-r from-primary/10 via-background to-accent/10 border border-border/50">
             <ShieldCheck className="w-10 h-10 text-primary" />
             <div className="text-left">
-              <div className="font-bold text-lg">Compounding Network Effects</div>
+              <div className="font-bold text-lg">Everyone Benefits When Food Gets Transparent</div>
               <div className="text-muted-foreground text-sm">
-                Each new restaurant adds visibility for farms. Each new farm strengthens restaurant sourcing. Each consumer drives demand.
+                Each new restaurant brings visibility to local producers. Each producer strengthens restaurant sourcing. Each diner drives the demand for honesty.
               </div>
             </div>
             <ArrowRight className="w-6 h-6 text-primary hidden md:block" />

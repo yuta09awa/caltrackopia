@@ -1,4 +1,4 @@
-import { TrendingUp, Target, Globe, Sprout } from "lucide-react";
+import { TrendingUp, Target, Globe, Shield } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -36,21 +36,21 @@ const MarketOpportunity = () => {
     },
     {
       icon: Target,
-      title: "Allergen Regulations",
+      title: "Global Allergen Regulations",
       stat: "40+",
       description: "countries with mandatory allergen disclosure laws",
     },
     {
       icon: Globe,
-      title: "Farm-to-Table Growth",
-      stat: "12%",
-      description: "annual growth in farm-to-table dining market",
+      title: "Universal Common Ground",
+      stat: "8B",
+      description: "people on Earth who eat—our total addressable humanity",
     },
     {
-      icon: Sprout,
-      title: "Sustainability Focus",
+      icon: Shield,
+      title: "Local Food Movement",
       stat: "65%",
-      description: "of Gen Z chooses restaurants based on sustainability",
+      description: "of consumers prefer restaurants using local ingredients",
     },
   ];
 
@@ -68,10 +68,10 @@ const MarketOpportunity = () => {
             Market Opportunity
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Massive Addressable Market
+            The Largest Unaddressed Market
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Capturing value in a multi-trillion dollar market with no dominant transparency platform.
+            Trillions in food transactions, zero transparency infrastructure. Until now.
           </p>
         </div>
 
@@ -134,8 +134,8 @@ const MarketOpportunity = () => {
         {/* Growth Drivers */}
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <h3 className="text-2xl font-bold mb-2">Market Tailwinds</h3>
-            <p className="text-muted-foreground">Secular trends driving platform adoption</p>
+            <h3 className="text-2xl font-bold mb-2">Why Now?</h3>
+            <p className="text-muted-foreground">The world is ready for food transparency—and the infrastructure finally exists to deliver it</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
