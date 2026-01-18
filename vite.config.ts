@@ -39,11 +39,9 @@ export default defineConfig(({ mode }) => ({
     ],
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Force all React imports to use the same instance
+      // Only alias React core - NOT router packages
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
-      'react-router': path.resolve(__dirname, 'node_modules/react-router'),
     },
   },
   plugins: [
