@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, BarChart3, Store, Tractor, Users, Utensils } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BarChart3, MapPin, Store, Sprout, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
@@ -9,38 +9,22 @@ const TractionMetrics = () => {
       icon: Store,
       value: "10,000+",
       label: "Restaurants Onboarded",
-      growth: "+340%",
-      growthLabel: "YoY",
     },
     {
-      icon: Tractor,
+      icon: Sprout,
       value: "500+",
-      label: "Farms in Network",
-      growth: "+180%",
-      growthLabel: "YoY",
+      label: "Local Producers",
     },
     {
       icon: Utensils,
       value: "2.5M+",
       label: "Menu Items Tracked",
-      growth: "+420%",
-      growthLabel: "YoY",
     },
     {
-      icon: Users,
-      value: "850K+",
-      label: "Monthly Active Users",
-      growth: "+290%",
-      growthLabel: "YoY",
+      icon: MapPin,
+      value: "30+",
+      label: "Cities & Growing",
     },
-  ];
-
-  const milestones = [
-    { quarter: "Q1 2024", event: "Platform Launch", highlight: true },
-    { quarter: "Q2 2024", event: "1K Restaurants" },
-    { quarter: "Q3 2024", event: "Farm Network Expansion" },
-    { quarter: "Q4 2024", event: "10K Restaurants Milestone", highlight: true },
-    { quarter: "Q1 2025", event: "International Expansion", upcoming: true },
   ];
 
   return (
@@ -59,10 +43,10 @@ const TractionMetrics = () => {
             Traction
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Accelerating Growth
+            Growing Every Day
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Strong product-market fit with exponential growth across all key metrics.
+            Real restaurants. Real producers. Real people who want to know what they're eating.
           </p>
         </div>
 
@@ -80,10 +64,6 @@ const TractionMetrics = () => {
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
-                    <ArrowUpRight className="w-3 h-3" />
-                    {metric.growth} {metric.growthLabel}
-                  </div>
                 </div>
                 <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
                   {metric.value}
@@ -92,50 +72,6 @@ const TractionMetrics = () => {
               </div>
             );
           })}
-        </div>
-
-        {/* Growth Timeline */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-2">Key Milestones</h3>
-            <p className="text-muted-foreground">Building momentum quarter over quarter</p>
-          </div>
-
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute top-6 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-border to-transparent" />
-
-            <div className="flex justify-between relative">
-              {milestones.map((milestone, index) => (
-                <div
-                  key={milestone.quarter}
-                  className={`flex flex-col items-center text-center animate-fade-in ${
-                    milestone.upcoming ? "opacity-60" : ""
-                  }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  {/* Dot */}
-                  <div className={`w-4 h-4 rounded-full mb-4 ${
-                    milestone.highlight
-                      ? "bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30"
-                      : milestone.upcoming
-                      ? "bg-border border-2 border-dashed border-muted-foreground"
-                      : "bg-primary/30"
-                  }`} />
-                  
-                  {/* Content */}
-                  <div className="text-xs font-medium text-muted-foreground mb-1">
-                    {milestone.quarter}
-                  </div>
-                  <div className={`text-xs md:text-sm font-medium max-w-[80px] md:max-w-[100px] ${
-                    milestone.highlight ? "text-primary" : milestone.upcoming ? "text-muted-foreground" : ""
-                  }`}>
-                    {milestone.event}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* CTA Section */}
@@ -150,7 +86,7 @@ const TractionMetrics = () => {
                 Ready to Learn More?
               </h3>
               <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-                Join the food transparency revolution. Whether you're an investor, restaurant, or farm—we'd love to connect.
+                Whether you're an investor, a restaurant looking to stand out, or a producer ready to be discovered—let's talk.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -172,7 +108,7 @@ const TractionMetrics = () => {
 
               <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
                 <span>🏢 For Restaurants</span>
-                <span>🌾 For Farms</span>
+                <span>🌱 For Local Producers</span>
                 <span>💼 For Investors</span>
               </div>
             </div>

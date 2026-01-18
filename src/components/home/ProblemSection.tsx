@@ -1,4 +1,4 @@
-import { AlertTriangle, Store, Tractor, Users } from "lucide-react";
+import { AlertTriangle, Store, Sprout, Users } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -8,8 +8,8 @@ const ProblemSection = () => {
       icon: Users,
       audience: "For Consumers",
       stat: "87%",
-      statLabel: "of diners want food source transparency",
-      problem: "Zero platforms deliver comprehensive farm-to-fork visibility with allergen protocols and verified nutrition data.",
+      statLabel: "want to know what's in their food",
+      problem: "What's actually in my food? Where did it come from? Simple questions—almost impossible to answer.",
       color: "text-blue-600",
       bgColor: "bg-blue-500/10",
     },
@@ -23,11 +23,11 @@ const ProblemSection = () => {
       bgColor: "bg-green-500/10",
     },
     {
-      icon: Tractor,
-      audience: "For Farms",
-      stat: "0%",
-      statLabel: "visibility to end consumers",
-      problem: "Local producers remain invisible to the diners who value their products. No direct-to-consumer visibility exists.",
+      icon: Sprout,
+      audience: "For Local Producers",
+      stat: "Invisible",
+      statLabel: "to the people who value them most",
+      problem: "The farmers and producers behind your food remain unseen. The people who'd pay a premium to support local can't find them.",
       color: "text-amber-600",
       bgColor: "bg-amber-500/10",
     },
@@ -46,10 +46,10 @@ const ProblemSection = () => {
             The Problem
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            The Broken Food Trust Chain
+            A Question Everyone Asks
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            A fragmented ecosystem where transparency should exist but doesn't—leaving billions in value untapped.
+            Ever wonder what's actually in your food? You're not alone—and right now, there's no good way to find out.
           </p>
         </div>
 
@@ -100,7 +100,7 @@ const ProblemSection = () => {
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary border border-border/50">
             <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
             <span className="text-sm font-medium text-muted-foreground">
-              <span className="text-foreground font-semibold">$2.4 trillion</span> global food service market with zero transparency infrastructure
+              <span className="text-foreground font-semibold">$2.4 trillion</span> in food choices made every year—how many are truly informed?
             </span>
           </div>
         </div>
