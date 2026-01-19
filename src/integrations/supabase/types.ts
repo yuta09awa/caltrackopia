@@ -390,6 +390,81 @@ export type Database = {
           },
         ]
       }
+      ingredients: {
+        Row: {
+          allergens: string[] | null
+          calories_per_100g: number | null
+          carbs_per_100g: number | null
+          category: string
+          common_names: string[] | null
+          created_at: string | null
+          dietary_restrictions: string[] | null
+          fat_per_100g: number | null
+          fiber_per_100g: number | null
+          id: string
+          is_local: boolean | null
+          is_organic: boolean | null
+          is_seasonal: boolean | null
+          minerals: Json | null
+          name: string
+          peak_season_end: number | null
+          peak_season_start: number | null
+          protein_per_100g: number | null
+          sodium_per_100g: number | null
+          sugar_per_100g: number | null
+          updated_at: string | null
+          vitamins: Json | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          calories_per_100g?: number | null
+          carbs_per_100g?: number | null
+          category: string
+          common_names?: string[] | null
+          created_at?: string | null
+          dietary_restrictions?: string[] | null
+          fat_per_100g?: number | null
+          fiber_per_100g?: number | null
+          id?: string
+          is_local?: boolean | null
+          is_organic?: boolean | null
+          is_seasonal?: boolean | null
+          minerals?: Json | null
+          name: string
+          peak_season_end?: number | null
+          peak_season_start?: number | null
+          protein_per_100g?: number | null
+          sodium_per_100g?: number | null
+          sugar_per_100g?: number | null
+          updated_at?: string | null
+          vitamins?: Json | null
+        }
+        Update: {
+          allergens?: string[] | null
+          calories_per_100g?: number | null
+          carbs_per_100g?: number | null
+          category?: string
+          common_names?: string[] | null
+          created_at?: string | null
+          dietary_restrictions?: string[] | null
+          fat_per_100g?: number | null
+          fiber_per_100g?: number | null
+          id?: string
+          is_local?: boolean | null
+          is_organic?: boolean | null
+          is_seasonal?: boolean | null
+          minerals?: Json | null
+          name?: string
+          peak_season_end?: number | null
+          peak_season_start?: number | null
+          protein_per_100g?: number | null
+          sodium_per_100g?: number | null
+          sugar_per_100g?: number | null
+          updated_at?: string | null
+          vitamins?: Json | null
+        }
+        Relationships: []
+      }
       master_ingredients: {
         Row: {
           allergen_ids: string[] | null
