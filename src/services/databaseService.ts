@@ -209,33 +209,88 @@ export class DatabaseService {
     }
   }
 
-  // Ingredient queries - these tables don't exist yet, so throw appropriate errors
-  async getAllIngredients(): Promise<Ingredient[]> {
-    throw new DatabaseError(
-      'Ingredients table is not available yet. Please use the mock data service.',
-      'TABLE_NOT_AVAILABLE'
-    );
+  // Ingredient queries - query the ingredients table
+  async getAllIngredients(limit: number = 50): Promise<Ingredient[]> {
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .limit(limit);
+
+      if (error) {
+        console.error('Error fetching all ingredients:', error);
+        throw new DatabaseError(`Failed to fetch ingredients: ${error.message}`, 'INGREDIENT_FETCH_ERROR', error);
+      }
+
+      return (data || []) as Ingredient[];
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching ingredients:', error);
+      throw new NetworkError('Network error while fetching ingredients');
+    }
   }
 
   async searchIngredients(query: string, limit: number = 20): Promise<Ingredient[]> {
-    throw new DatabaseError(
-      'Ingredients table is not available yet. Please use the mock data service.',
-      'TABLE_NOT_AVAILABLE'
-    );
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .or(`name.ilike.%${query}%,category.ilike.%${query}%`)
+        .limit(limit);
+
+      if (error) {
+        console.error('Error searching ingredients:', error);
+        throw new DatabaseError(`Failed to search ingredients: ${error.message}`, 'INGREDIENT_SEARCH_ERROR', error);
+      }
+
+      return (data || []) as Ingredient[];
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error searching ingredients:', error);
+      throw new NetworkError('Network error while searching ingredients');
+    }
   }
 
   async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    throw new DatabaseError(
-      'Ingredients table is not available yet. Please use the mock data service.',
-      'TABLE_NOT_AVAILABLE'
-    );
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .eq('category', category);
+
+      if (error) {
+        console.error('Error fetching ingredients by category:', error);
+        throw new DatabaseError(`Failed to fetch ingredients by category: ${error.message}`, 'INGREDIENT_CATEGORY_ERROR', error);
+      }
+
+      return (data || []) as Ingredient[];
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching ingredients by category:', error);
+      throw new NetworkError('Network error while fetching ingredients by category');
+    }
   }
 
   async getIngredientById(ingredientId: string): Promise<Ingredient | null> {
-    throw new DatabaseError(
-      'Ingredients table is not available yet. Please use the mock data service.',
-      'TABLE_NOT_AVAILABLE'
-    );
+    try {
+      const { data, error } = await supabase
+        .from('ingredients')
+        .select('*')
+        .eq('id', ingredientId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null; // Not found
+        console.error('Error fetching ingredient by ID:', error);
+        throw new DatabaseError(`Failed to fetch ingredient: ${error.message}`, 'INGREDIENT_FETCH_ERROR', error);
+      }
+
+      return data as Ingredient;
+    } catch (error) {
+      if (error instanceof DatabaseError) throw error;
+      console.error('Unexpected error fetching ingredient by ID:', error);
+      throw new NetworkError('Network error while fetching ingredient');
+    }
   }
 
   // Menu items queries

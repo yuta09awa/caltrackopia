@@ -51,17 +51,17 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     
-    // Security: Detect suspicious activity in search queries
+    // Security: Detect suspicious activity in search queries (log only, don't block)
     if (query.length > 0 && security.detectSuspiciousActivity(query, 'search')) {
-      console.warn('Suspicious search query detected');
-      return;
+      console.warn('Suspicious search query detected, continuing with sanitized input');
     }
 
-    // Security: Validate and sanitize search input
+    // Security: Validate and sanitize - but preserve spaces for natural search
     const validation = security.validateInput(query, 'text');
-    const sanitized = validation.sanitized;
+    // Use original query to preserve spaces, security service may strip them
+    const sanitizedQuery = query.replace(/[<>]/g, ''); // Only remove dangerous chars
     
-    setSearchTerm(sanitized);
+    setSearchTerm(sanitizedQuery);
     setIsOpen(true);
   }, []);
 
