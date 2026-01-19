@@ -14,53 +14,6 @@ serve(async (req) => {
   }
 
   try {
-    // Authentication check - require valid auth token
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Missing or invalid authorization header');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }), 
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Verify the JWT token using Supabase Auth
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('Missing Supabase configuration');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }), 
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !data.user) {
-      console.error('Authentication failed:', authError?.message || 'No user found');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }), 
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // User is authenticated, return the API key
     const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
     
     if (!apiKey) {
@@ -74,7 +27,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Successfully retrieved Google Maps API key for user:', data.user.id);
+    console.log('Successfully retrieved Google Maps API key');
     
     return new Response(
       JSON.stringify({ apiKey }), 
