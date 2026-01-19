@@ -10,12 +10,16 @@ import TractionMetrics from "@/components/home/TractionMetrics";
 import GlobalSearch from "@/components/search/GlobalSearch";
 
 const Index = () => {
+  const handleNavigateToMap = () => {
+    window.location.href = '/map';
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar>
         <div className="flex-1 max-w-2xl mx-4">
           <GlobalSearch 
-            navigateTo="/map"
+            onNavigate={handleNavigateToMap}
             className="w-full"
             compact={true}
           />

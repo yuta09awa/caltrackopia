@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,7 +13,7 @@ import { security } from '@/services/security/SecurityService';
 interface GlobalSearchProps {
   className?: string;
   onSelectIngredient?: (ingredient: Ingredient) => void;
-  navigateTo?: string;
+  onNavigate?: () => void;
   onSearchReset?: () => void;
   displayValue?: string;
   compact?: boolean;
@@ -23,12 +22,11 @@ interface GlobalSearchProps {
 const GlobalSearch = React.memo<GlobalSearchProps>(({ 
   className, 
   onSelectIngredient,
-  navigateTo,
+  onNavigate,
   onSearchReset,
   displayValue = "",
   compact = false 
 }) => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { placeholder, pause, resume } = useRotatingPlaceholder();
@@ -102,16 +100,16 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
     // Close dropdown
     setIsOpen(false);
     
-    // Handle navigation
-    if (navigateTo) {
-      navigate(navigateTo);
+    // Handle navigation via callback (avoids useNavigate hook issues in lazy-loaded pages)
+    if (onNavigate) {
+      onNavigate();
     }
     
     // Notify parent callback
     if (onSelectIngredient) {
       onSelectIngredient(ingredient);
     }
-  }, [addToHistory, onSelectIngredient, navigateTo, navigate]);
+  }, [addToHistory, onSelectIngredient, onNavigate]);
 
   const handleSelectHistoryItem = useCallback((historyItem: any) => {
     setIsOpen(false);
