@@ -11,22 +11,20 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
-      // i18n packages (non-React dependencies only)
+      // Core i18n packages
       'i18next',
       'i18next-browser-languagedetector',
       'i18next-http-backend',
       'html-parse-stringify',
-      'void-elements'
-    ],
-    // Exclude ALL packages that use React hooks to prevent duplicate React instances
-    exclude: [
-      'zustand',
+      'void-elements',
+      // Include React-dependent packages to ensure single instance
       'react-i18next',
       'react-router-dom',
       'react-router',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      'zustand'
     ],
-    force: true, // Force cache rebuild - remove after fix is confirmed
+    force: true,
   },
   resolve: {
     dedupe: [
@@ -35,14 +33,14 @@ export default defineConfig(({ mode }) => ({
       'react-router',
       'react-router-dom',
       'react-i18next',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      'zustand'
     ],
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Alias React packages to ensure single instance
+      // Force single React instance for all packages
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react-i18next': path.resolve(__dirname, 'node_modules/react-i18next'),
     },
   },
   plugins: [
