@@ -39,9 +39,10 @@ export default defineConfig(({ mode }) => ({
     ],
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Only alias React core - NOT router packages
+      // Alias React packages to ensure single instance
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-i18next': path.resolve(__dirname, 'node_modules/react-i18next'),
     },
   },
   plugins: [
