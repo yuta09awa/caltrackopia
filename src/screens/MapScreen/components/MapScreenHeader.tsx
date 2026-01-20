@@ -9,12 +9,14 @@ interface MapScreenHeaderProps {
   displayedSearchQuery: string;
   onSelectIngredient: (ingredient: Ingredient) => void;
   onSearchReset: () => void;
+  onSearchOnMap?: (query: string) => void;
 }
 
 const MapScreenHeader: React.FC<MapScreenHeaderProps> = React.memo(({
   displayedSearchQuery,
   onSelectIngredient,
-  onSearchReset
+  onSearchReset,
+  onSearchOnMap
 }) => {
   return (
     <Navbar>
@@ -22,6 +24,7 @@ const MapScreenHeader: React.FC<MapScreenHeaderProps> = React.memo(({
         <GlobalSearch 
           onSelectIngredient={onSelectIngredient}
           onSearchReset={onSearchReset}
+          onSearchOnMap={onSearchOnMap}
           displayValue={displayedSearchQuery}
           className="w-full"
           compact={true}

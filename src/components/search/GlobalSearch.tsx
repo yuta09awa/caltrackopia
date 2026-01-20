@@ -15,6 +15,7 @@ interface GlobalSearchProps {
   onSelectIngredient?: (ingredient: Ingredient) => void;
   onNavigate?: () => void;
   onSearchReset?: () => void;
+  onSearchOnMap?: (query: string) => void;
   displayValue?: string;
   compact?: boolean;
 }
@@ -24,6 +25,7 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
   onSelectIngredient,
   onNavigate,
   onSearchReset,
+  onSearchOnMap,
   displayValue = "",
   compact = false 
 }) => {
@@ -190,6 +192,7 @@ const GlobalSearch = React.memo<GlobalSearchProps>(({
         debouncedSearchTerm={debouncedSearchTerm}
         onSelectIngredient={handleSelectIngredient}
         onSelectHistoryItem={handleSelectHistoryItem}
+        onSearchOnMap={onSearchOnMap}
       />
     </div>
   );

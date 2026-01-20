@@ -101,6 +101,11 @@ export const useMapScreen = () => {
     performSearch(query);
   }, [performSearch]);
 
+  const handleSearchOnMap = useCallback((query: string) => {
+    setDisplayedSearchQuery(query);
+    performSearch(query);
+  }, [performSearch]);
+
   const handleSearchReset = useCallback(() => {
     setDisplayedSearchQuery('');
     clearAll();
@@ -139,6 +144,7 @@ export const useMapScreen = () => {
     
     // Handlers
     handleSelectIngredient,
+    handleSearchOnMap,
     handleSearchReset,
     handleLocationSelect,
     handleViewDetails,
