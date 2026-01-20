@@ -72,6 +72,7 @@ export interface MapScreenLayoutProps {
   displayLocations: Location[];
   listRef: React.RefObject<HTMLDivElement>;
   onSelectIngredient: (ingredient: Ingredient) => void;
+  onSearchOnMap: (query: string) => void;
   onSearchReset: () => void;
   onLocationSelect: (locationId: string | null) => void;
   onMarkerClick: (locationId: string, position: { x: number; y: number }) => void;

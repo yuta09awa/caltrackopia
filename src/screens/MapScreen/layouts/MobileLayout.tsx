@@ -13,6 +13,7 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
   displayLocations,
   listRef,
   onSelectIngredient,
+  onSearchOnMap,
   onSearchReset,
   onLocationSelect,
   onMarkerClick,
@@ -27,6 +28,7 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
       <MapScreenHeader
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={onSelectIngredient}
+        onSearchOnMap={onSearchOnMap}
         onSearchReset={onSearchReset}
       />
 
