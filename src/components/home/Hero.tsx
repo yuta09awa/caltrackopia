@@ -5,9 +5,9 @@ import { SPACING } from "@/constants/spacing";
 
 const Hero = () => {
   const trustBadges = [
-    { value: "10K+", label: "Restaurants" },
-    { value: "500+", label: "Local Producers" },
-    { value: "30+", label: "Cities" },
+    { value: "10K+", label: "Food Sources" },
+    { value: "500+", label: "Direct Brands" },
+    { value: "30+", label: "Markets" },
   ];
 
   return (
@@ -30,15 +30,15 @@ const Hero = () => {
           
           {/* Main Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-balance leading-tight">
-            Know What's On Your Plate.
+            Your Food. Your Information.
             <span className="block bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
-              Own What You Eat.
+              Your Choice.
             </span>
           </h1>
           
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Food is personal—it's memory, culture, health. We believe you deserve to <span className="text-foreground font-medium">really know</span> what you're eating. And the people who grow and prepare it deserve to be <span className="text-foreground font-medium">seen</span>.
+            We're building the infrastructure that connects people with food sources—from restaurants to farms to brands. Allergens, sourcing, nutrition. The information is there. <span className="text-foreground font-medium">The choice is yours.</span>
           </p>
           
           {/* CTAs */}
@@ -47,7 +47,7 @@ const Hero = () => {
               to="/map"
               className="px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
-              Request Early Access
+              Find Your Food
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
@@ -83,11 +83,12 @@ const Hero = () => {
             <div className="aspect-[16/9] bg-gradient-to-br from-secondary via-background to-secondary rounded-2xl overflow-hidden">
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center space-y-4">
-                  <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                    <Utensils className="w-10 h-10 text-primary" />
+                  <div className="text-4xl">🌍 🔗 🥗</div>
+                  <div className="text-xl font-semibold text-foreground">
+                    The Connected Food Graph
                   </div>
-                  <div className="text-muted-foreground font-medium">
-                    Live Platform Demo
+                  <div className="text-muted-foreground font-medium max-w-md">
+                    Mapping relationships between ingredients, allergens, and locations.
                   </div>
                 </div>
               </div>

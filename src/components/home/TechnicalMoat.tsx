@@ -48,7 +48,7 @@ const TechnicalMoat = () => {
             Everybody Eats
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            One Platform. Every City. Any Cuisine.
+            One Platform. Every Source. Any Need.
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             Ingredient safety and food transparency aren't local issues—they're universal. We built infrastructure that starts in one neighborhood and scales to every corner of the world.
@@ -87,10 +87,10 @@ const TechnicalMoat = () => {
 
             <div className="text-center relative z-10">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Allergies Don't Care About Borders
+                Infrastructure, Not Just an App
               </h3>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-                Food safety is a universal language. Whether you're in Tokyo or Toronto, São Paulo or Stockholm—the need to know what's in your food doesn't change. We're building for everyone, everywhere.
+                We're building the transparency layer for all food commerce. APIs for restaurants. Widgets for brands. Integrations for platforms. The information layer that makes informed choice possible everywhere.
               </p>
               
               <div className="flex flex-wrap justify-center gap-4 text-sm">

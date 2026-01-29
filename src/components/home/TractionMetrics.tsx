@@ -1,30 +1,14 @@
-import { ArrowRight, ArrowUpRight, BarChart3, MapPin, Store, Sprout, Utensils } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BarChart3, MapPin, Store, Sprout, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
 const TractionMetrics = () => {
   const metrics = [
-    {
-      icon: Store,
-      value: "10,000+",
-      label: "Restaurants Onboarded",
-    },
-    {
-      icon: Sprout,
-      value: "500+",
-      label: "Local Producers",
-    },
-    {
-      icon: Utensils,
-      value: "2.5M+",
-      label: "Menu Items Tracked",
-    },
-    {
-      icon: MapPin,
-      value: "30+",
-      label: "Cities & Growing",
-    },
+    { icon: Store, value: "10,000+", label: "Food Sources" },
+    { icon: Sprout, value: "500+", label: "Local Producers" },
+    { icon: ShoppingBag, value: "250+", label: "Direct Brands" },
+    { icon: MapPin, value: "30+", label: "Active Markets" },
   ];
 
   return (
@@ -46,7 +30,7 @@ const TractionMetrics = () => {
             Growing Every Day
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Real restaurants. Real producers. Real people who want to know what they're eating.
+            Real restaurants. Real producers. Real brands. All connecting to diners who care.
           </p>
         </div>
 
@@ -83,10 +67,10 @@ const TractionMetrics = () => {
 
             <div className="text-center relative z-10">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Ready to Learn More?
+                Ready to Connect?
               </h3>
               <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-                Whether you're an investor, a restaurant looking to stand out, or a producer ready to be discovered—let's talk.
+                Whether you're an eater, a restaurant, a producer, or an investor—we're building this for you.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -107,8 +91,9 @@ const TractionMetrics = () => {
               </div>
 
               <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-                <span>🏢 For Restaurants</span>
-                <span>🌱 For Local Producers</span>
+                <span>🍽️ For Eaters</span>
+                <span>🏪 For Food Sources</span>
+                <span>📦 For D2C Brands</span>
                 <span>💼 For Investors</span>
               </div>
             </div>
