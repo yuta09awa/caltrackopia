@@ -1,39 +1,23 @@
 import { useState } from "react";
-import { AlertCircle, CheckCircle, Leaf, MapPin, Search, Shield, Utensils } from "lucide-react";
+import { AlertCircle, CheckCircle, Leaf, MapPin, Search, Shield, Utensils, ShoppingBag } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
 const PlatformDemo = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(3);
 
   const tabs = [
-    {
-      id: "supply-chain",
-      label: "Supply Chain",
-      icon: Leaf,
-    },
-    {
-      id: "allergens",
-      label: "Allergen Protocols",
-      icon: Shield,
-    },
-    {
-      id: "nutrition",
-      label: "Nutrition Data",
-      icon: Utensils,
-    },
-    {
-      id: "search",
-      label: "Global Search",
-      icon: Search,
-    },
+    { id: "supply-chain", label: "Source Transparency", icon: Leaf },
+    { id: "allergens", label: "Allergen Safety", icon: Shield },
+    { id: "nutrition", label: "Full Ingredients", icon: Utensils },
+    { id: "search", label: "Find Your Food", icon: Search },
   ];
 
   const demoContent = [
-    // Supply Chain
+    // Source Transparency
     {
-      title: "Farm-to-Fork Visibility",
-      description: "Every ingredient traced back to its source",
+      title: "Traceability for Everyone",
+      description: "Know exactly where ingredients come from",
       content: (
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary/50 border border-border/50">
@@ -44,26 +28,18 @@ const PlatformDemo = () => {
               <div className="font-semibold">Sunrise Valley Farm</div>
               <div className="text-sm text-muted-foreground">Organic • 12 miles away • Since 2019</div>
               <div className="flex items-center gap-2 mt-2">
-                <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">Verified Partner</span>
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 text-xs font-medium">USDA Organic</span>
+                <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">Verified Source</span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 text-xs font-medium">Supplying 12 local restaurants</span>
               </div>
             </div>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {["Eggs", "Vegetables", "Herbs"].map((item) => (
-              <div key={item} className="p-3 rounded-lg bg-background border border-border/50 text-center">
-                <div className="text-sm font-medium">{item}</div>
-                <div className="text-xs text-muted-foreground">Fresh today</div>
-              </div>
-            ))}
           </div>
         </div>
       ),
     },
-    // Allergen Protocols
+    // Allergen Safety
     {
-      title: "Cross-Contamination Risk Assessment",
-      description: "Restaurant-verified allergen protocols with risk levels",
+      title: "Safety Standardized",
+      description: "Protocols displayed clearly for any venue",
       content: (
         <div className="space-y-4">
           {[
@@ -93,10 +69,10 @@ const PlatformDemo = () => {
         </div>
       ),
     },
-    // Nutrition Data
+    // Full Ingredients
     {
-      title: "Verified Nutrition Provenance",
-      description: "Know where nutrition data comes from",
+      title: "Beyond Calorie Counting",
+      description: "Full ingredient lists and micronutrients",
       content: (
         <div className="space-y-4">
           <div className="p-4 rounded-xl bg-secondary/50 border border-border/50">
@@ -137,30 +113,34 @@ const PlatformDemo = () => {
         </div>
       ),
     },
-    // Global Search
+    // Find Your Food
     {
-      title: "Find Healthy Food Anywhere",
-      description: "Sub-50ms search across 10K+ locations worldwide",
+      title: "One Search. Every Option.",
+      description: "Restaurants, groceries, and D2C products in one view.",
       content: (
         <div className="space-y-4">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50">
             <Search className="w-5 h-5 text-muted-foreground" />
-            <span className="text-muted-foreground">Organic restaurants near me...</span>
+            <span className="text-muted-foreground">"Organic gluten-free snacks"</span>
           </div>
           {[
-            { name: "Green Kitchen", type: "Restaurant", distance: "0.3 mi", rating: 4.8 },
-            { name: "Farm Fresh Market", type: "Grocery", distance: "0.7 mi", rating: 4.6 },
-            { name: "Harvest Bistro", type: "Restaurant", distance: "1.2 mi", rating: 4.9 },
+            { name: "Green Kitchen", type: "Restaurant", distance: "0.3 mi", icon: MapPin, color: "text-primary" },
+            { name: "Valley Hive Honey", type: "Direct Brand", distance: "Ships Nationwide", icon: ShoppingBag, color: "text-orange-500" },
+            { name: "Whole Foods Market", type: "Grocery", distance: "0.7 mi", icon: MapPin, color: "text-green-600" },
           ].map((result, i) => (
-            <div key={result.name} className="flex items-center gap-4 p-4 rounded-xl bg-background border border-border/50 hover:border-primary/30 transition-colors cursor-pointer animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+            <div 
+              key={result.name} 
+              className="flex items-center gap-4 p-4 rounded-xl bg-background border border-border/50 hover:border-primary/30 transition-colors cursor-pointer animate-fade-in" 
+              style={{ animationDelay: `${i * 100}ms` }}
+            >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-primary" />
+                <result.icon className={`w-6 h-6 ${result.color}`} />
               </div>
               <div className="flex-1">
                 <div className="font-medium">{result.name}</div>
                 <div className="text-sm text-muted-foreground">{result.type} • {result.distance}</div>
               </div>
-              <div className="text-sm font-medium text-primary">★ {result.rating}</div>
+              <div className="text-sm font-medium text-primary">View</div>
             </div>
           ))}
         </div>
@@ -181,10 +161,10 @@ const PlatformDemo = () => {
             Platform Features
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            See It In Action
+            See How It Works
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            A unified platform for food transparency, allergen safety, and nutrition tracking.
+            One platform for restaurants, products, and producers. Same transparency standard everywhere.
           </p>
         </div>
 

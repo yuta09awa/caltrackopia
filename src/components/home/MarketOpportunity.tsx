@@ -1,4 +1,4 @@
-import { TrendingUp, Target, Globe, Shield } from "lucide-react";
+import { TrendingUp, Target, Globe, Shield, Package } from "lucide-react";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -6,22 +6,22 @@ const MarketOpportunity = () => {
   const marketSizing = [
     {
       label: "TAM",
-      value: "$2.4T",
-      description: "Global Food Service Market",
+      value: "$2.6T",
+      description: "Global Food Service + D2C",
       percentage: 100,
       color: "from-primary/20 to-primary/30",
     },
     {
       label: "SAM",
-      value: "$890B",
-      description: "Health-Conscious Dining Segment",
+      value: "$1.1T",
+      description: "Informed Dining & Specialty Foods",
       percentage: 70,
       color: "from-primary/40 to-primary/50",
     },
     {
       label: "SOM",
-      value: "$12B",
-      description: "Initial Target: Major Metro Areas",
+      value: "$25B",
+      description: "Initial Key Markets",
       percentage: 40,
       color: "from-primary to-accent",
     },
@@ -32,25 +32,25 @@ const MarketOpportunity = () => {
       icon: TrendingUp,
       title: "Rising Transparency Demand",
       stat: "73%",
-      description: "of consumers willing to pay more for food transparency",
+      description: "consumers willing to pay more for transparency",
+    },
+    {
+      icon: Package,
+      title: "D2C Food Boom",
+      stat: "$195B",
+      description: "Direct-to-consumer market growing 15% annually",
     },
     {
       icon: Target,
-      title: "Global Allergen Regulations",
+      title: "Global Regulation",
       stat: "40+",
-      description: "countries with mandatory allergen disclosure laws",
-    },
-    {
-      icon: Globe,
-      title: "Universal Common Ground",
-      stat: "8B",
-      description: "people on Earth who eat—our total addressable humanity",
+      description: "countries with mandatory allergen laws",
     },
     {
       icon: Shield,
-      title: "Local Food Movement",
-      stat: "65%",
-      description: "of consumers prefer restaurants using local ingredients",
+      title: "Universal Need",
+      stat: "100%",
+      description: "of people eat—our total addressable humanity",
     },
   ];
 
@@ -71,7 +71,7 @@ const MarketOpportunity = () => {
             The Largest Unaddressed Market
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Trillions in food transactions, zero transparency infrastructure. Until now.
+            Trillions in food transactions. Billions in D2C growth. Zero unified infrastructure. Until now.
           </p>
         </div>
 
@@ -111,19 +111,19 @@ const MarketOpportunity = () => {
               {/* TAM Circle */}
               <div className="absolute inset-0 rounded-full border-2 border-dashed border-primary/20 flex items-center justify-center">
                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">
-                  TAM: $2.4T
+                  TAM: $2.6T
                 </span>
               </div>
               {/* SAM Circle */}
               <div className="absolute inset-8 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center">
                 <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">
-                  SAM: $890B
+                  SAM: $1.1T
                 </span>
               </div>
               {/* SOM Circle */}
               <div className="absolute inset-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">
                 <div className="text-center text-primary-foreground">
-                  <div className="text-2xl font-bold">$12B</div>
+                  <div className="text-2xl font-bold">$25B</div>
                   <div className="text-xs opacity-80">SOM</div>
                 </div>
               </div>

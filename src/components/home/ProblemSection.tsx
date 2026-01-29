@@ -6,28 +6,28 @@ const ProblemSection = () => {
   const painPoints = [
     {
       icon: Users,
-      audience: "For Consumers",
+      audience: "For Eaters",
       stat: "87%",
-      statLabel: "want to know what's in their food",
-      problem: "What's actually in my food? Where did it come from? Simple questions—almost impossible to answer.",
+      statLabel: "want transparent ingredient info",
+      problem: "Allergens, sourcing, nutrition—basic information that should be accessible everywhere. Instead, every restaurant and product has different standards.",
       color: "text-blue-600",
       bgColor: "bg-blue-500/10",
     },
     {
       icon: Store,
-      audience: "For Restaurants",
+      audience: "For Food Sources",
       stat: "$890B",
-      statLabel: "health-conscious dining market",
-      problem: "No tools exist to showcase supply chain as a competitive marketing advantage for attracting health-focused diners.",
+      statLabel: "informed dining market",
+      problem: "Restaurants, farms, and brands that do things right have no standard way to prove it. The information exists—it's just invisible to the people who'd value it.",
       color: "text-green-600",
       bgColor: "bg-green-500/10",
     },
     {
       icon: Sprout,
-      audience: "For Local Producers",
-      stat: "Invisible",
-      statLabel: "to the people who value them most",
-      problem: "The farmers and producers behind your food remain unseen. The people who'd pay a premium to support local can't find them.",
+      audience: "The Connection Gap",
+      stat: "Disconnected",
+      statLabel: "despite aligned interests",
+      problem: "Eaters want information. Sources have it. The connection is broken. We are simply building the infrastructure to fix it.",
       color: "text-amber-600",
       bgColor: "bg-amber-500/10",
     },
@@ -43,13 +43,13 @@ const ProblemSection = () => {
         <div className="text-center mb-16 animate-fade-in">
           <div className="inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-1.5 text-sm font-medium text-destructive mb-6">
             <AlertTriangle className="w-4 h-4" />
-            The Problem
+            The Data Gap
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            A Question Everyone Asks
+            Information Shouldn't Be Hard to Find
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ever wonder what's actually in your food? You're not alone—and right now, there's no good way to find out.
+            Whether you need allergen info for safety, want to support local, or just care about nutrition—the data exists. It's just scattered.
           </p>
         </div>
 
@@ -100,7 +100,7 @@ const ProblemSection = () => {
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-secondary border border-border/50">
             <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
             <span className="text-sm font-medium text-muted-foreground">
-              <span className="text-foreground font-semibold">$2.4 trillion</span> in food choices made every year—how many are truly informed?
+              <span className="text-foreground font-semibold">$2.4 trillion</span> in food choices made every year—most with incomplete information.
             </span>
           </div>
         </div>

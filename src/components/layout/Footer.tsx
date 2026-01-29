@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import Container from "../ui/Container";
 import { Github, Twitter, Instagram } from "lucide-react";
@@ -8,15 +7,14 @@ const Footer = () => {
     <footer className="mt-auto py-12 bg-secondary/30">
       <Container className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4 text-center">
+          <div className="space-y-4 text-center md:text-left">
             <h3 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-              Nutrackr
+              NutriMap
             </h3>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-              The ultimate nutrition tracking app with location-based services
-              to help you maintain a healthy lifestyle.
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto md:mx-0">
+              Connecting every eater with every food source. Your food choices, powered by information.
             </p>
-            <div className="flex space-x-4 justify-center">
+            <div className="flex space-x-4 justify-center md:justify-start">
               <a
                 href="#"
                 className="text-foreground/70 hover:text-primary transition-colors"
@@ -39,7 +37,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-medium mb-4">Features</h4>
+            <h4 className="font-medium mb-4">Platform</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -62,7 +60,7 @@ const Footer = () => {
                   href="#"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Local Menus
+                  Restaurants
                 </a>
               </li>
               <li>
@@ -70,7 +68,7 @@ const Footer = () => {
                   href="#"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Health Analytics
+                  Brands
                 </a>
               </li>
             </ul>
@@ -80,19 +78,19 @@ const Footer = () => {
             <h4 className="font-medium mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/contact"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#market-opportunity"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Help Center
+                  Investors
                 </a>
               </li>
               <li>
@@ -135,7 +133,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-muted/20 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Nutrackr. All rights reserved.
+            © {new Date().getFullYear()} NutriMap. All rights reserved.
           </p>
           <div className="flex space-x-6 text-xs text-muted-foreground">
             <a href="#" className="hover:text-primary transition-colors">

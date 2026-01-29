@@ -8,6 +8,7 @@ import TechnicalMoat from "@/components/home/TechnicalMoat";
 import MarketOpportunity from "@/components/home/MarketOpportunity";
 import TractionMetrics from "@/components/home/TractionMetrics";
 import GlobalSearch from "@/components/search/GlobalSearch";
+import D2CSection from "@/components/home/D2CSection";
 
 const Index = () => {
   const handleNavigateToMap = () => {
@@ -30,10 +31,10 @@ const Index = () => {
         {/* Hero - Vision Statement */}
         <Hero />
         
-        {/* Problem - Market Pain Points */}
+        {/* Problem - The Data Gap */}
         <ProblemSection />
         
-        {/* Solution - Three-Sided Marketplace */}
+        {/* Solution - Connection Through Information */}
         <SolutionSection />
         
         {/* Platform Demo - Interactive Features */}
@@ -44,6 +45,9 @@ const Index = () => {
         
         {/* Market Opportunity - TAM/SAM/SOM */}
         <MarketOpportunity />
+        
+        {/* D2C Section - Beyond Restaurants */}
+        <D2CSection />
         
         {/* Traction - Metrics & CTA */}
         <TractionMetrics />
