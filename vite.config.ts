@@ -11,6 +11,11 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
+      // Force single React instance
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime',
       // Core i18n packages
       'i18next',
       'i18next-browser-languagedetector',
