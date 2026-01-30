@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { MapPin, Utensils, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Container from "../ui/Container";
@@ -31,16 +30,15 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isAuthenticated } = useAuth();
   const { itemCount } = useCart();
 
   const handleAuthNavigation = () => {
     if (isAuthenticated) {
-      navigate("/profile");
+      window.location.href = "/profile";
     } else {
-      navigate("/auth");
+      window.location.href = "/auth";
     }
   };
 
@@ -52,8 +50,8 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
       >
         <Container size="full" className="px-4">
           <nav className="flex items-center justify-between gap-4" role="navigation" aria-label="Main navigation">
-            <Link
-              to="/"
+            <a
+              href="/"
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
               aria-label="Home"
             >
@@ -65,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
                   isMobile ? "h-8 max-w-[100px]" : "h-10 max-w-[120px]"
                 )}
               />
-            </Link>
+            </a>
 
             {children}
 

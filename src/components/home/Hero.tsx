@@ -1,5 +1,4 @@
 import { ArrowRight, Utensils } from "lucide-react";
-import { Link } from "react-router-dom";
 import Container from "../ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -43,13 +42,13 @@ const Hero = () => {
           
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Link
-              to="/map"
+            <a
+              href="/map"
               className="px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
               Find Your Food
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
             <a
               href="#market-opportunity"
               className="px-8 py-4 bg-background text-foreground rounded-xl font-semibold hover:bg-secondary transition-all border-2 border-border hover:border-primary/50"

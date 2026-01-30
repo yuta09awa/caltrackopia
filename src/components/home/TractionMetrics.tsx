@@ -1,5 +1,4 @@
 import { ArrowRight, ArrowUpRight, BarChart3, MapPin, Store, Sprout, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
 import Container from "@/components/ui/Container";
 import { SPACING } from "@/constants/spacing";
 
@@ -74,13 +73,13 @@ const TractionMetrics = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/contact"
+                <a
+                  href="/contact"
                   className="px-8 py-4 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5"
                 >
                   Request Demo
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </a>
                 <a
                   href="#"
                   className="px-8 py-4 bg-background text-foreground rounded-xl font-semibold hover:bg-secondary transition-all border-2 border-border hover:border-primary/50 flex items-center justify-center gap-2"
