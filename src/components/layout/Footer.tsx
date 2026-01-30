@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Container from "../ui/Container";
 import { Github, Twitter, Instagram } from "lucide-react";
 
@@ -40,20 +39,20 @@ const Footer = () => {
             <h4 className="font-medium mb-4">Platform</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/map"
+                <a
+                  href="/map"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Map
-                </Link>
+                </a>
               </li>
               <li>
-                <Link
-                  to="/nutrition"
+                <a
+                  href="/nutrition"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Nutrition
-                </Link>
+                </a>
               </li>
               <li>
                 <a
@@ -78,12 +77,12 @@ const Footer = () => {
             <h4 className="font-medium mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/contact"
+                <a
+                  href="/contact"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Contact Us
-                </Link>
+                </a>
               </li>
               <li>
                 <a
