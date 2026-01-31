@@ -1,61 +1,57 @@
 
-# Fix Plan: Multiple React Instances Context Error
+# Fix Plan: Complete Native Navigation Migration for Navbar Sub-components
 
-## Problem Analysis
+## Problem Summary
 
-The error `Cannot read properties of null (reading 'useContext')` occurs when calling `useNavigate` in the Navbar component. This is a well-known "multiple React instances" issue in Vite's sandbox environment.
+The error `Cannot read properties of null (reading 'useContext')` persists because the Navbar component renders two sub-components that still use React Router:
 
-**Root Cause**: The lazy-loaded Index page imports Navbar, which uses `useNavigate()` hook. Due to Vite's module bundling, these components may receive different React instances, causing React Router's context to be null.
+1. **`NavItem.tsx`** - Uses `useLocation()` hook (line 15) and `<Link>` component (line 19)
+2. **`MobileMenu.tsx`** - Uses `<Link>` component (lines 2, 52)
 
-**Affected Components**:
-1. `src/components/layout/Navbar.tsx` - Uses `useNavigate()` directly (line 34)
-2. `src/components/home/Hero.tsx` - Uses `<Link>` component
-3. `src/components/home/TractionMetrics.tsx` - Uses `<Link>` component
-4. `src/components/layout/Footer.tsx` - Uses `<Link>` component
+These React Router dependencies conflict with Vite's module bundling in the sandbox environment, causing the router context to be unavailable.
 
 ## Solution
 
-Replace React Router hooks and components with native navigation in Index page components:
+Convert both components to use native HTML navigation elements, following the pattern already established in the Navbar, Hero, Footer, and TractionMetrics components.
 
-### 1. Update `src/components/layout/Navbar.tsx`
+---
 
-Replace `useNavigate()` with a callback prop pattern or `window.location.href`:
+## Changes Required
 
-**Changes:**
-- Remove `useNavigate` import
-- Convert `navigate()` calls to `window.location.href` assignments
-- Keep `Link` for logo (it's acceptable or also convert)
+### 1. Update `src/components/layout/NavItem.tsx`
 
-### 2. Update `src/components/home/Hero.tsx`
-
-**Changes:**
-- Replace `Link` component with `<a>` tags using `href` for internal navigation
-- Change `/map` Link to anchor tag with `window.location.href` via onClick
-
-### 3. Update `src/components/home/TractionMetrics.tsx`
+**Current issues:**
+- Uses `useLocation()` to determine active state
+- Uses `<Link>` for navigation
 
 **Changes:**
-- Replace `Link` component with `<a>` tags
-- Use `onClick` handlers with `window.location.href` for internal routes
+- Remove React Router imports (`Link`, `useLocation`)
+- Replace `<Link>` with `<a>` tag using `href`
+- Determine active state using `window.location.pathname` instead of `useLocation()`
 
-### 4. Update `src/components/layout/Footer.tsx`
+### 2. Update `src/components/layout/MobileMenu.tsx`
+
+**Current issues:**
+- Uses `<Link>` component for menu item navigation
 
 **Changes:**
-- Replace `Link` components with `<a>` tags using `href`
+- Remove `Link` import from `react-router-dom`
+- Replace all `<Link>` components with `<a>` tags using `href`
+
+---
 
 ## Technical Details
 
-The workaround using `window.location.href` instead of React Router's hooks bypasses the context issue entirely. This causes a full page reload but is acceptable for:
-- Landing page navigation (users typically navigate to other pages anyway)
+Using native `<a>` tags with `href` attributes causes full page reloads, which is acceptable for:
+- Landing page navigation (users navigate away from the page anyway)
+- Mobile menu navigation (menu closes, page changes)
 - Maintaining stability in the Vite sandbox environment
+
+The active state detection will use `window.location.pathname` at render time, which works correctly for initial page loads.
+
+---
 
 ## Implementation Order
 
-1. Navbar.tsx (most critical - uses `useNavigate` directly)
-2. Hero.tsx
-3. TractionMetrics.tsx
-4. Footer.tsx
-
-## Alternative Considered
-
-Adding more packages to `vite.config.ts` `optimizeDeps.include` has already been attempted and the error persists. The native navigation workaround is the proven solution per the project's architecture memory notes.
+1. `NavItem.tsx` - Most critical (uses `useLocation` hook directly)
+2. `MobileMenu.tsx` - Uses `<Link>` components
