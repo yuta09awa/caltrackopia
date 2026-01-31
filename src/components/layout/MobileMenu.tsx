@@ -1,13 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { MapPin, Utensils, ShoppingCart, User, X } from 'lucide-react';
+import { MapPin, User } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
-  SheetClose,
 } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
@@ -49,9 +46,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         
         <div className="flex flex-col space-y-4 mt-6">
           {menuItems.map((item) => (
-            <Link
+            <a
               key={item.name}
-              to={item.path}
+              href={item.path}
               onClick={handleItemClick}
               className={cn(
                 "flex items-center space-x-3 p-3 rounded-lg transition-colors",
@@ -69,7 +66,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
-            </Link>
+            </a>
           ))}
           
           <div className="border-t border-border pt-4">
