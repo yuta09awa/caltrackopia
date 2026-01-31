@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,12 +11,11 @@ interface NavItemProps {
 }
 
 const NavItem: React.FC<NavItemProps> = ({ name, path, icon: Icon, badge }) => {
-  const location = useLocation();
-  const isActive = location.pathname === path;
+  const isActive = window.location.pathname === path;
 
   return (
-    <Link
-      to={path}
+    <a
+      href={path}
       className={cn(
         "flex items-center justify-center w-8 h-8 rounded-full relative transition-colors",
         isActive
@@ -36,7 +34,7 @@ const NavItem: React.FC<NavItemProps> = ({ name, path, icon: Icon, badge }) => {
           {badge > 9 ? '9+' : badge}
         </span>
       )}
-    </Link>
+    </a>
   );
 };
 
