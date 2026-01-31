@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
+import PhilosophySection from "@/components/home/PhilosophySection";
 import ProblemSection from "@/components/home/ProblemSection";
 import SolutionSection from "@/components/home/SolutionSection";
 import PlatformDemo from "@/components/home/PlatformDemo";
@@ -30,6 +31,9 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero - Vision Statement */}
         <Hero />
+        
+        {/* Philosophy - Empowerment Messaging */}
+        <PhilosophySection />
         
         {/* Problem - The Data Gap */}
         <ProblemSection />
