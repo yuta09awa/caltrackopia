@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => ({
       'html-parse-stringify',
       'void-elements',
     ],
-    force: true,
+    force: true, // bust stale cache
     esbuildOptions: {
       // Force consistent JSX handling
       jsx: 'automatic',
