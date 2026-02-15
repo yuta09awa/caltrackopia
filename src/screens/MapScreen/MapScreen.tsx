@@ -8,7 +8,6 @@ const MapScreen: React.FC = () => {
     isMobile,
     listRef,
     displayedSearchQuery,
-    navHeight,
     mapState,
     infoCardVisible,
     infoCardPosition,
@@ -29,7 +28,6 @@ const MapScreen: React.FC = () => {
 
   const layoutProps = {
     displayedSearchQuery,
-    navHeight,
     mapState,
     infoCardVisible,
     infoCardPosition,

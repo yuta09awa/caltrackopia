@@ -4,7 +4,7 @@ import { MapScreenLayoutProps } from '../types';
 
 const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
   displayedSearchQuery,
-  navHeight,
+  
   mapState,
   infoCardVisible,
   infoCardPosition,
@@ -32,16 +32,7 @@ const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
         onSearchReset={onSearchReset}
       />
 
-      <main 
-        className="flex overflow-hidden"
-        style={{ 
-          position: 'fixed',
-          top: `${navHeight}px`,
-          left: 0,
-          right: 0,
-          bottom: 0
-        }}
-      >
+      <main className="flex flex-1 overflow-hidden">
         <div className="flex-1 relative h-full">
           <MapScreenContent
             mapHeight="100%"

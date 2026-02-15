@@ -4,7 +4,7 @@ import { MapScreenLayoutProps } from '../types';
 
 const MobileLayout: React.FC<MapScreenLayoutProps> = ({
   displayedSearchQuery,
-  navHeight,
+  
   mapState,
   infoCardVisible,
   infoCardPosition,
@@ -32,16 +32,7 @@ const MobileLayout: React.FC<MapScreenLayoutProps> = ({
         onSearchReset={onSearchReset}
       />
 
-      <main 
-        className="flex flex-col overflow-hidden"
-        style={{ 
-          position: 'fixed',
-          top: `${navHeight}px`,
-          left: 0,
-          right: 0,
-          bottom: 0
-        }}
-      >
+      <main className="flex flex-col flex-1 overflow-hidden">
         <MapScreenContent
           mapHeight="60%"
           selectedIngredient={null}
