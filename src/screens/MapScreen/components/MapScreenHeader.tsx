@@ -19,7 +19,7 @@ const MapScreenHeader: React.FC<MapScreenHeaderProps> = React.memo(({
   onSearchOnMap
 }) => {
   return (
-    <Navbar>
+    <Navbar flat>
       <div className="flex-1 max-w-2xl mx-4">
         <GlobalSearch 
           onSelectIngredient={onSelectIngredient}

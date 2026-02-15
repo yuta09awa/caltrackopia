@@ -26,9 +26,10 @@ const menuItems: MenuItem[] = [
 
 interface NavbarProps {
   children?: React.ReactNode;
+  flat?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ children }) => {
+const Navbar: React.FC<NavbarProps> = ({ children, flat = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const { isAuthenticated } = useAuth();
@@ -45,7 +46,12 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
   return (
     <>
       <header 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border"
+        className={cn(
+          "top-0 left-0 right-0 z-50 border-b border-border",
+          flat
+            ? "relative bg-background"
+            : "fixed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        )}
         style={{ paddingTop: SPACING.navbar.py, paddingBottom: SPACING.navbar.py }}
       >
         <Container size="full" className="px-4">

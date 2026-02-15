@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useLayoutEffect, useEffect } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConsolidatedMap } from '@/features/map/hooks/useConsolidatedMap';
 import { useLocations } from '@/features/locations/hooks/useLocations';
@@ -12,30 +12,6 @@ export const useMapScreen = () => {
   const isMobile = useIsMobile();
   const listRef = useRef<HTMLDivElement>(null);
   const [displayedSearchQuery, setDisplayedSearchQuery] = useState('');
-  const [navHeight, setNavHeight] = useState(0);
-
-  // Dynamic navbar height measurement with ResizeObserver
-  useLayoutEffect(() => {
-    const navElement = document.querySelector('nav') || document.querySelector('header');
-    if (!navElement) return;
-
-    const updateNavHeight = () => {
-      const height = Math.ceil(navElement.getBoundingClientRect().height);
-      setNavHeight(height);
-    };
-
-    updateNavHeight();
-
-    const resizeObserver = new ResizeObserver(updateNavHeight);
-    resizeObserver.observe(navElement);
-
-    window.addEventListener('resize', updateNavHeight);
-    
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateNavHeight);
-    };
-  }, []);
 
   // Lock body scroll on this route
   useEffect(() => {
@@ -130,7 +106,6 @@ export const useMapScreen = () => {
     isMobile,
     listRef,
     displayedSearchQuery,
-    navHeight,
     
     // Map state
     mapState,

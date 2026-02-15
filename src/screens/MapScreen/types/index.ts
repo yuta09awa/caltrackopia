@@ -63,7 +63,7 @@ export interface MapScreenProps {
 
 export interface MapScreenLayoutProps {
   displayedSearchQuery: string;
-  navHeight: number;
+  
   mapState: MapState;
   infoCardVisible: boolean;
   infoCardPosition: { x: number; y: number } | null;
