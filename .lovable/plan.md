@@ -1,57 +1,55 @@
 
-# Fix Plan: Complete Native Navigation Migration for Navbar Sub-components
 
-## Problem Summary
+# Flatten Map Page Layout with Conditional Navbar Positioning
 
-The error `Cannot read properties of null (reading 'useContext')` persists because the Navbar component renders two sub-components that still use React Router:
+## Overview
 
-1. **`NavItem.tsx`** - Uses `useLocation()` hook (line 15) and `<Link>` component (line 19)
-2. **`MobileMenu.tsx`** - Uses `<Link>` component (lines 2, 52)
+Add a `flat` prop to the Navbar so the map page renders it in normal document flow (no overlap), while all other pages keep the current fixed/floating behavior.
 
-These React Router dependencies conflict with Vite's module bundling in the sandbox environment, causing the router context to be unavailable.
+## Changes
 
-## Solution
+### 1. `src/components/layout/Navbar.tsx`
+- Add optional `flat?: boolean` prop
+- When `flat` is true: use `relative` position, solid `bg-background`, no `backdrop-blur`
+- When `flat` is false (default): keep current `fixed` + translucent styling (unchanged behavior for landing page, etc.)
 
-Convert both components to use native HTML navigation elements, following the pattern already established in the Navbar, Hero, Footer, and TractionMetrics components.
+### 2. `src/screens/MapScreen/components/MapScreenHeader.tsx`
+- Pass `flat` prop to `<Navbar flat>`
 
----
+### 3. `src/screens/MapScreen/layouts/MobileLayout.tsx`
+- Remove the `style={{ position: 'fixed', top: navHeight... }}` from `<main>`
+- Use `flex-1 overflow-hidden` so content fills remaining space naturally
+- Remove `navHeight` from props usage
 
-## Changes Required
+### 4. `src/screens/MapScreen/layouts/DesktopLayout.tsx`
+- Same as MobileLayout: remove fixed positioning from `<main>`, use `flex-1`
 
-### 1. Update `src/components/layout/NavItem.tsx`
+### 5. `src/screens/MapScreen/hooks/useMapScreen.ts`
+- Remove the `navHeight` state and the entire `ResizeObserver` / `useLayoutEffect` block
+- Remove `navHeight` from the return object
 
-**Current issues:**
-- Uses `useLocation()` to determine active state
-- Uses `<Link>` for navigation
+### 6. `src/screens/MapScreen/types/index.ts`
+- Remove `navHeight` from `MapScreenLayoutProps`
 
-**Changes:**
-- Remove React Router imports (`Link`, `useLocation`)
-- Replace `<Link>` with `<a>` tag using `href`
-- Determine active state using `window.location.pathname` instead of `useLocation()`
+### 7. `src/screens/MapScreen/MapScreen.tsx`
+- Remove `navHeight` from `layoutProps`
 
-### 2. Update `src/components/layout/MobileMenu.tsx`
+## Resulting Layout
 
-**Current issues:**
-- Uses `<Link>` component for menu item navigation
+```text
+Landing page (unchanged):          Map page (flat):
++---------------------------+      +---------------------------+
+| Navbar (fixed, floating)  |      | Navbar (in normal flow)   |
++--  overlaps content  -----+      +---------------------------+
+|                           |      | Map + List (flex-1)       |
+| Hero scrolls under navbar |      | No overlap, no JS sizing  |
+|                           |      |                           |
++---------------------------+      +---------------------------+
+```
 
-**Changes:**
-- Remove `Link` import from `react-router-dom`
-- Replace all `<Link>` components with `<a>` tags using `href`
+## What This Achieves
+- Zero overlap on the map page -- navbar and map content stack naturally
+- Removes the ResizeObserver and navHeight state entirely from the map screen
+- No changes to landing page or other pages -- they keep the fixed floating navbar
+- Map list view and map panning/scrolling work as before within their flex container
 
----
-
-## Technical Details
-
-Using native `<a>` tags with `href` attributes causes full page reloads, which is acceptable for:
-- Landing page navigation (users navigate away from the page anyway)
-- Mobile menu navigation (menu closes, page changes)
-- Maintaining stability in the Vite sandbox environment
-
-The active state detection will use `window.location.pathname` at render time, which works correctly for initial page loads.
-
----
-
-## Implementation Order
-
-1. `NavItem.tsx` - Most critical (uses `useLocation` hook directly)
-2. `MobileMenu.tsx` - Uses `<Link>` components
