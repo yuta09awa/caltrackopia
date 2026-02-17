@@ -24,7 +24,7 @@ const DesktopLayout: React.FC<MapScreenLayoutProps> = ({
   onScroll,
 }) => {
   return (
-    <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
+    <div className="flex flex-col h-dvh w-full bg-background overflow-hidden">
       <MapScreenHeader
         displayedSearchQuery={displayedSearchQuery}
         onSelectIngredient={onSelectIngredient}
