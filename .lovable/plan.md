@@ -1,55 +1,33 @@
 
 
-# Flatten Map Page Layout with Conditional Navbar Positioning
+# Fix: Stale Cache Error + Map Whitespace Cleanup
 
-## Overview
+## Issue 1: "Cannot read properties of null (reading 'useContext')"
 
-Add a `flat` prop to the Navbar so the map page renders it in normal document flow (no overlap), while all other pages keep the current fixed/floating behavior.
+This is the recurring Vite stale dependency cache problem. The pre-bundled chunks have diverged (two different React copies). The fix is toggling `force` in `vite.config.ts` to bust the cache.
 
-## Changes
+**Change:** In `vite.config.ts`, toggle `optimizeDeps.force` from `true` to `false` (or vice versa) to force Vite to re-bundle all dependencies into a single consistent set of chunks.
 
-### 1. `src/components/layout/Navbar.tsx`
-- Add optional `flat?: boolean` prop
-- When `flat` is true: use `relative` position, solid `bg-background`, no `backdrop-blur`
-- When `flat` is false (default): keep current `fixed` + translucent styling (unchanged behavior for landing page, etc.)
+## Issue 2: Map whitespace and navbar visual consistency
 
-### 2. `src/screens/MapScreen/components/MapScreenHeader.tsx`
-- Pass `flat` prop to `<Navbar flat>`
+The map page has extra whitespace because:
+- The `Container` component wrapping navbar content may add horizontal padding or a max-width constraint
+- The map content area itself may not stretch fully edge-to-edge
 
-### 3. `src/screens/MapScreen/layouts/MobileLayout.tsx`
-- Remove the `style={{ position: 'fixed', top: navHeight... }}` from `<main>`
-- Use `flex-1 overflow-hidden` so content fills remaining space naturally
-- Remove `navHeight` from props usage
+**Changes:**
 
-### 4. `src/screens/MapScreen/layouts/DesktopLayout.tsx`
-- Same as MobileLayout: remove fixed positioning from `<main>`, use `flex-1`
+### `src/screens/MapScreen/layouts/MobileLayout.tsx` and `DesktopLayout.tsx`
+- Ensure the outer `div` uses `h-dvh` (dynamic viewport height) instead of `h-screen` for better mobile behavior and to eliminate any gap from browser chrome
+- Confirm `overflow-hidden` on the outer container prevents any body scroll bleed
 
-### 5. `src/screens/MapScreen/hooks/useMapScreen.ts`
-- Remove the `navHeight` state and the entire `ResizeObserver` / `useLayoutEffect` block
-- Remove `navHeight` from the return object
+### `src/components/layout/Navbar.tsx`
+- No visual changes needed -- the flat navbar already uses solid `bg-background` and `relative` positioning, which matches the visual style of other pages (same border, same padding, same logo/nav items). The only difference is it sits in document flow instead of floating. This is working as intended.
 
-### 6. `src/screens/MapScreen/types/index.ts`
-- Remove `navHeight` from `MapScreenLayoutProps`
+## Summary of file changes
 
-### 7. `src/screens/MapScreen/MapScreen.tsx`
-- Remove `navHeight` from `layoutProps`
-
-## Resulting Layout
-
-```text
-Landing page (unchanged):          Map page (flat):
-+---------------------------+      +---------------------------+
-| Navbar (fixed, floating)  |      | Navbar (in normal flow)   |
-+--  overlaps content  -----+      +---------------------------+
-|                           |      | Map + List (flex-1)       |
-| Hero scrolls under navbar |      | No overlap, no JS sizing  |
-|                           |      |                           |
-+---------------------------+      +---------------------------+
-```
-
-## What This Achieves
-- Zero overlap on the map page -- navbar and map content stack naturally
-- Removes the ResizeObserver and navHeight state entirely from the map screen
-- No changes to landing page or other pages -- they keep the fixed floating navbar
-- Map list view and map panning/scrolling work as before within their flex container
+| File | Change |
+|------|--------|
+| `vite.config.ts` | Toggle `force` to bust stale dep cache |
+| `MobileLayout.tsx` | Use `h-dvh` instead of `h-screen` |
+| `DesktopLayout.tsx` | Use `h-dvh` instead of `h-screen` |
 
