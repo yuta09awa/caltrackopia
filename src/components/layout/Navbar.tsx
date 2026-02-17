@@ -49,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ children, flat = false }) => {
         className={cn(
           "top-0 left-0 right-0 z-50 border-b border-border",
           flat
-            ? "relative bg-background"
+            ? "relative bg-background shrink-0"
             : "fixed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
         )}
         style={{ paddingTop: SPACING.navbar.py, paddingBottom: SPACING.navbar.py }}
