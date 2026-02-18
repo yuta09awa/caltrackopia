@@ -9,6 +9,7 @@ import { useCartOperations, useCartAnalytics, useInternationalization } from "@/
 import { useMemo, useCallback, useEffect } from "react";
 import CartErrorBoundary from "@/features/cart/components/CartErrorBoundary";
 import EnhancedCartConflictDialog from "@/features/cart/components/EnhancedCartConflictDialog";
+import GlobalSearch from "@/components/search/GlobalSearch";
 
 const ShoppingPage = () => {
   const { 
@@ -65,7 +66,9 @@ const ShoppingPage = () => {
   if (itemCount === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+        <Navbar>
+          <GlobalSearch className="flex-1 max-w-md" compact />
+        </Navbar>
         
         <main className="flex-1 pt-24 pb-16">
           <Container>
@@ -88,7 +91,9 @@ const ShoppingPage = () => {
   return (
     <CartErrorBoundary>
       <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+        <Navbar>
+          <GlobalSearch className="flex-1 max-w-md" compact />
+        </Navbar>
         
         <main className="flex-1 pt-24 pb-16">
           <Container>
