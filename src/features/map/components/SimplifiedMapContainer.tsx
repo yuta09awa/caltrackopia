@@ -1,7 +1,7 @@
 
 import React from 'react';
 import MapRenderer from './core/MapRenderer';
-import { MapState, LatLng } from '@/features/map/hooks/useMapState';
+import { MapState, LatLng } from '@/features/map/types';
 import { UnifiedMapState } from '../types/unified';
 
 interface SimplifiedMapContainerProps {

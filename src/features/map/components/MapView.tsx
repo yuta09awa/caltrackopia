@@ -1,7 +1,7 @@
 
 import React from 'react';
 import UnifiedMapView from './core/UnifiedMapView';
-import { MapState, LatLng } from '@/features/map/hooks/useMapState';
+import { MapState, LatLng } from '@/features/map/types';
 import { UnifiedMapState } from '../types/unified';
 
 interface MapViewProps {

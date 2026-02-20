@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
@@ -11,8 +10,8 @@ interface NavButtonProps {
 }
 
 const NavButton: React.FC<NavButtonProps> = ({ isAuthenticated, onClick }) => {
-  const location = useLocation();
-  const isActive = isAuthenticated || location.pathname === '/auth' || location.pathname === '/profile';
+  const pathname = window.location.pathname;
+  const isActive = isAuthenticated || pathname === '/auth' || pathname === '/profile';
 
   return (
     <Button

@@ -4,7 +4,7 @@ import MapScreenMap from './MapScreenMap';
 import MapScreenInfoCard from './MapScreenInfoCard';
 import { Ingredient } from "@/models/NutritionalInfo";
 import { Location } from "@/features/locations/types";
-import { MapState, LatLng } from "@/features/map/hooks/useMapState";
+import { MapState, LatLng } from "@/features/map/types";
 
 interface MapScreenContentProps {
   mapHeight: string;
