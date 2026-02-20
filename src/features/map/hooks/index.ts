@@ -21,8 +21,8 @@ export { useIngredientSources } from './filters/useIngredientSources';
 export { useNutritionGoals } from './filters/useNutritionGoals';
 export { usePlaceFilters } from './usePlaceFilters';
 
-// === INTERNAL HOOKS - Not recommended for direct use ===
-export { useMapState } from './useMapState';
+// TYPE RE-EXPORTS (backward compat from useMapState)
+export type { MapState, LatLng, MarkerData } from './useMapState';
 export { useMapSearch } from './useMapSearch';
 export { useMapUI } from './useMapUI';
 export { useMapMarkers } from './useMapMarkers';
@@ -31,13 +31,3 @@ export { useInfoCardState } from './useInfoCardState';
 export { useSearchState } from './useSearchState';
 export { usePlacesApiService } from './usePlacesApiService';
 export { useIngredientSearch } from './useIngredientSearch';
-
-// === DEPRECATED - Use usePlacesApi instead ===
-export { usePlaceSearch } from './usePlaceSearch';
-export { useTextSearch } from './useTextSearch';
-export { useNearbySearch } from './useNearbySearch';
-
-// === LEGACY - Will be removed ===
-export { useMapRendering } from './useMapRendering';
-export { useSimpleMapState } from './useSimpleMapState';
-export { useLocationSelection } from './useLocationSelection';

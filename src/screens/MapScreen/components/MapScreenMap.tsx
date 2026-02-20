@@ -2,7 +2,7 @@
 import React from 'react';
 import MapContainer from "@/features/map/components/MapContainer";
 import { Ingredient } from "@/models/NutritionalInfo";
-import { MapState, LatLng } from "@/features/map/hooks/useMapState";
+import { MapState, LatLng } from "@/features/map/types";
 
 interface MapScreenMapProps {
   mapHeight: string;
