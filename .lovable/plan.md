@@ -1,85 +1,29 @@
 
 
-# Comprehensive Refactor: React Stability, Map Hooks, Navigation, and Types
+# Fix: Clear Stale Vite Cache Causing useNavigate Crash
 
-## 1. Fix Duplicate React Instance Errors (Root Cause)
+## Problem
 
-The `useContext`/`useEffect` null errors stem from `NavButton.tsx` importing `useLocation` from `react-router-dom`. This is the ONLY remaining component in the Navbar tree that uses a React Router hook -- all others (NavItem, MobileMenu, Navbar, Hero, Footer) already use `window.location`. When the Vite pre-bundler creates separate chunks, `NavButton` pulls in a second React instance through the router dependency.
+The error "Cannot read properties of null (reading 'useContext')" at `Index.tsx:23` references `useNavigate`, but the current source code for `Index.tsx` does NOT contain `useNavigate` -- it was already removed in the previous refactor. The browser is running a **stale cached build** from before the fix.
 
-**Fix:** Replace `useLocation()` in `NavButton.tsx` with `window.location.pathname`, matching the pattern already used everywhere else in the navbar tree.
+Evidence:
+- The chunk URLs in the error have old version hashes (`?v=890b0593`, `?v=f4672ef2`)
+- No component in the Index page tree (`Navbar`, `GlobalSearch`, `Hero`, `Footer`, etc.) imports `useNavigate`
+- The previous refactor already replaced all router hooks with `window.location` in the landing page tree
 
-| File | Change |
-|------|--------|
-| `src/components/layout/NavButton.tsx` | Replace `useLocation()` with `window.location.pathname` |
+## Fix
 
----
-
-## 2. Delete Legacy/Deprecated Map Hooks
-
-Three hooks are marked "LEGACY - Will be removed" and three more are "DEPRECATED". After checking usage:
-
-- `useSimpleMapState` -- no active consumers (migration completed per CHANGELOG)
-- `useLocationSelection` -- no active consumers
-- `useMapRendering` -- no active consumers
-- `useMapState` -- still imported by `MapContainer`, `SimplifiedMapContainer`, `MapView`, `MapScreenMap`, `MapScreenContent`, and `MapScreen/types`. Only used for the `MapState` and `LatLng` type re-exports, not the hook itself.
-
-**Plan:**
-
-| File | Action |
-|------|--------|
-| `src/features/map/hooks/useSimpleMapState.ts` | Delete |
-| `src/features/map/hooks/useLocationSelection.ts` | Delete |
-| `src/features/map/hooks/useMapRendering.ts` | Delete |
-| `src/features/map/hooks/useMapState.tsx` | Keep but strip to type-only re-exports (remove the hook function and test markers). Eventually consumers should import from `../types` directly. |
-| `src/features/map/hooks/index.ts` | Remove exports for deleted hooks. Remove "DEPRECATED" and "LEGACY" sections. |
-
----
-
-## 3. Consolidate Deprecated Search Hooks
-
-`usePlaceSearch`, `useTextSearch`, and `useNearbySearch` are marked deprecated but are still in the active call chain: `usePlacesApi` -> `usePlaceSearch` -> `useTextSearch` + `useNearbySearch`. They should be inlined into `usePlacesApi` to eliminate the indirection.
-
-| File | Action |
-|------|--------|
-| `src/features/map/hooks/usePlacesApi.ts` | Inline logic from `usePlaceSearch` (which just combines `useTextSearch` + `useNearbySearch` + `useIngredientSearch`) |
-| `src/features/map/hooks/usePlaceSearch.ts` | Delete after inlining |
-| `src/features/map/hooks/useTextSearch.ts` | Keep as internal utility (still has significant logic) but remove from public exports |
-| `src/features/map/hooks/useNearbySearch.ts` | Keep as internal utility but remove from public exports |
-| `src/features/map/hooks/index.ts` | Remove deprecated exports |
-
----
-
-## 4. Type System Cleanup
-
-`MapState` from `useMapState.tsx` duplicates `UnifiedMapState` from `types/unified.ts`. Multiple files import `MapState` and `LatLng` from the hook file instead of the types directory.
+Force a full Vite dependency cache bust by toggling the `optimizeDeps.force` flag in `vite.config.ts`:
 
 | File | Change |
 |------|--------|
-| `src/features/map/types/index.ts` | Ensure `MapState` is exported as an alias for backward compat |
-| `src/features/map/hooks/useMapState.tsx` | Reduce to type re-exports only (no hook, no test markers) |
-| `src/screens/MapScreen/types/index.ts` | Update import to `@/features/map/types` |
-| `src/features/map/components/MapContainer.tsx` | Update import to `@/features/map/types` |
-| `src/features/map/components/SimplifiedMapContainer.tsx` | Update import to `@/features/map/types` |
-| `src/features/map/components/MapView.tsx` | Update import to `@/features/map/types` |
-| `src/screens/MapScreen/components/MapScreenMap.tsx` | Update import to `@/features/map/types` |
-| `src/screens/MapScreen/components/MapScreenContent.tsx` | Update import to `@/features/map/types` |
+| `vite.config.ts` | Change a comment or whitespace in `optimizeDeps` to force Vite to re-prebundle all dependencies, clearing the stale chunk cache |
 
----
+This is a one-line change. After the rebuild, the Index page will load correctly since no router hooks exist in the landing page tree.
 
-## 5. Summary
+## Technical Details
 
-```text
-Files deleted:     3  (useSimpleMapState, useLocationSelection, useMapRendering)
-Files modified:   ~12  (NavButton, usePlacesApi, useMapState, hooks/index, 
-                        types/index, + 6 import updates)
-Files removed from
-  public exports:  5  (usePlaceSearch, useTextSearch, useNearbySearch, 
-                        useSimpleMapState, useLocationSelection)
-```
-
-**Priority order:**
-1. NavButton fix (immediately resolves the crash)
-2. Delete legacy hooks (dead code removal)
-3. Consolidate search hooks (reduce indirection)
-4. Type import cleanup (consistency)
+- Vite's pre-bundler caches dependency chunks with version hashes. When source files change but the dependency graph appears unchanged, Vite may serve stale chunks.
+- `optimizeDeps.force: true` is already set but may not have triggered a full rebuild after the last refactor.
+- The fix adds a cache-busting comment change to force Vite to regenerate all chunks with the updated source code.
 
